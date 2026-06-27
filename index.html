@@ -136,6 +136,11 @@ svg#canvas{width:100%;height:100%;display:block}
 .en{color:var(--text-3);font-size:13px;margin-top:4px}
 .sum{color:var(--text);font-size:14px;margin-top:14px;line-height:1.6}
 .sech{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--text-3);text-transform:uppercase;margin:20px 0 8px}
+.sech.ax{color:var(--accent)}
+.audit-item{font-size:13px;color:var(--text-2);line-height:1.62;padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+.audit-item::before{content:"›";position:absolute;left:3px;top:8px;color:var(--accent);font-weight:600}
+.audit-item.nc{color:#e7b09a}
+.audit-item.nc::before{content:"!";color:#dd8a64}
 .exp{color:var(--text-2);font-size:14.5px;line-height:1.78}
 .sc-item{padding:9px 0;border-top:1px solid var(--line)}
 .sc-l{color:var(--text);font-size:13px;font-weight:500}
@@ -177,6 +182,7 @@ svg#canvas{width:100%;height:100%;display:block}
       <input id="q" type="text" placeholder="搜尋條款 / 控制 / 編號…" autocomplete="off" />
       <div class="results" id="results"></div>
     </div>
+    <button class="toggle" id="mode-btn"><span class="dot"></span><span id="mode-label">學習者視角</span></button>
     <button class="toggle" id="overlay-btn"><span class="dot"></span>疊控制措施</button>
   </header>
   <div class="stage">
@@ -206,7 +212,7 @@ const SVGNS="http://www.w3.org/2000/svg";
 const scene=document.getElementById("scene"), svg=document.getElementById("canvas");
 const grid=document.getElementById("grid"), panel=document.getElementById("panel"), pbody=document.getElementById("pbody");
 const toastEl=document.getElementById("toast");
-let DATA=null, byId=new Map(), byRef=new Map(), adj=new Map(), curView="pdca", selected=null, overlay=false;
+let DATA=null, byId=new Map(), byRef=new Map(), adj=new Map(), curView="pdca", selected=null, overlay=false, mode="learn";
 
 const el=(t,a,k)=>{const n=document.createElementNS(SVGNS,t);for(const x in a)n.setAttribute(x,a[x]);if(k)for(const c of [].concat(k))if(c)n.append(c);return n;};
 const tx=(x,y,cls,s,ex)=>el("text",{x,y,class:cls,...(ex||{})},document.createTextNode(s));
@@ -380,6 +386,12 @@ function openPanel(n){
   if(n.title_en)h+=`<div class="en">${n.title_en}</div>`;
   if(n.summary)h+=`<div class="sum">${n.summary}</div>`;
   if(n.explanation)h+=`<div class="sech">白話說明 · Explanation</div><div class="exp">${n.explanation}</div>`;
+  if(mode==="audit"&&n.audit){
+    const L=(arr,cls)=>arr.map(x=>`<div class="audit-item${cls||""}">${x}</div>`).join("");
+    if(n.audit.questions?.length)h+=`<div class="sech ax">稽核問句 · Audit Questions</div>${L(n.audit.questions)}`;
+    if(n.audit.evidence?.length)h+=`<div class="sech ax">應備證據 · Evidence</div>${L(n.audit.evidence)}`;
+    if(n.audit.nonconformities?.length)h+=`<div class="sech ax">常見不符合 · Nonconformities</div>${L(n.audit.nonconformities," nc")}`;
+  }
   if(n.attributes){const a=n.attributes;
     if(a.cia?.length){h+=`<div class="sech">CIA</div><div class="attrs">`+["機密性","完整性","可用性"].map(c=>`<span class="led ${a.cia.includes(c)?"on":""}"><span class="d"></span>${c}</span>`).join("")+`</div>`;}
     const more=[["控制類型",a.controlType],["作業能力",a.operationalCapability],["安全領域",a.securityDomain]].filter(([_,v])=>v?.length);
@@ -405,6 +417,10 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closePanel();if(e.ke
 // overlay toggle
 document.getElementById("overlay-btn").addEventListener("click",function(){overlay=!overlay;this.classList.toggle("on",overlay);
   if(curView==="pdca"){scene.replaceChildren();renderPDCA();if(selected)highlight(selected);}updateHash();});
+// learner <-> auditor(LA) view mode
+const modeBtn=document.getElementById("mode-btn");
+function setMode(m){mode=m;modeBtn.classList.toggle("on",m==="audit");document.getElementById("mode-label").textContent=m==="audit"?"稽核者視角":"學習者視角";}
+modeBtn.addEventListener("click",()=>{setMode(mode==="learn"?"audit":"learn");if(selected)openPanel(byId.get(selected));updateHash();});
 
 // search
 const q=document.getElementById("q"),results=document.getElementById("results");
@@ -415,10 +431,11 @@ q.addEventListener("input",()=>{const s=q.value.trim().toLowerCase();if(!s){resu
 document.addEventListener("click",e=>{if(!e.target.closest(".search"))results.classList.remove("open");});
 
 // deep-link
-function updateHash(){const p=new URLSearchParams();p.set("view",curView);if(overlay)p.set("ov","1");if(selected)p.set("sel",selected);
+function updateHash(){const p=new URLSearchParams();p.set("view",curView);if(overlay)p.set("ov","1");if(mode==="audit")p.set("mode","audit");if(selected)p.set("sel",selected);
   history.replaceState(null,"","#"+p.toString());}
 function applyHash(){const p=new URLSearchParams(location.hash.replace(/^#/,""));const v=p.get("view");overlay=p.get("ov")==="1";
   document.getElementById("overlay-btn").classList.toggle("on",overlay);
+  setMode(p.get("mode")==="audit"?"audit":"learn");
   switchView(v&&VIEWS[v]?v:"pdca",true);const s=p.get("sel");if(s&&byId.has(s))select(s);}
 document.getElementById("copy").addEventListener("click",()=>{navigator.clipboard?.writeText(location.href);toast("已複製此視角連結");});
 

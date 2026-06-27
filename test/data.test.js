@@ -96,4 +96,12 @@ describe("內容對帳 (覆蓋率 — 隨內容補完逐步收緊)", () => {
     expect(t("risk-step")).toBeGreaterThanOrEqual(10);  // ISO 31000/27005 流程
     expect(t("lifecycle-stage") + t("cross-cutting-band")).toBeGreaterThanOrEqual(13); // AI 5338 階段 + 22989 橫向帶
   });
+
+  it("每個條款/控制都有稽核三件組 (LA 視角：問句/證據/不符合)", () => {
+    const auditable = data.nodes.filter((n) => n.type === "control" || n.type === "clause");
+    const bad = auditable
+      .filter((n) => !(n.audit?.questions?.length && n.audit?.evidence?.length && n.audit?.nonconformities?.length))
+      .map((n) => n.id);
+    expect(bad).toEqual([]);
+  });
 });
