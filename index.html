@@ -371,7 +371,7 @@ function select(id){
   const hv=homeView(id);if(hv!==curView)switchView(hv,true);
   highlight(id);openPanel(n);updateHash();
 }
-function typeName(t){return({clause:"CLAUSE 條款",control:"CONTROL 控制","risk-step":"RISK 風險流程","risk-technique":"TECHNIQUE 技術","lifecycle-stage":"LIFECYCLE 生命週期",bridge:"BRIDGE 橋樑"})[t]||"NODE";}
+function typeName(t){return({clause:"CLAUSE 條款",control:"CONTROL 控制","risk-step":"RISK 風險流程","risk-technique":"TECHNIQUE 技術","lifecycle-stage":"LIFECYCLE 生命週期","cross-cutting-band":"BAND 橫向關注帶",bridge:"BRIDGE 橋樑"})[t]||"NODE";}
 function openPanel(n){
   let h=`<div class="ovl">${typeName(n.type)}</div><span class="ref">${n.ref||n.id}</span><h2>${n.title||n.id}</h2>`;
   if(n.title_en)h+=`<div class="en">${n.title_en}</div>`;

@@ -45,7 +45,7 @@
           "id": { "type": "string", "pattern": "^[a-z0-9.\\-]+$" },
           "type": {
             "type": "string",
-            "enum": ["clause", "control", "risk-step", "risk-technique", "bridge", "architecture", "lifecycle-stage"]
+            "enum": ["clause", "control", "risk-step", "risk-technique", "bridge", "architecture", "lifecycle-stage", "cross-cutting-band"]
           },
           "ref": { "type": "string" },
           "title": { "type": "string", "minLength": 1 },

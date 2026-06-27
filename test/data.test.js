@@ -63,7 +63,7 @@ describe("參照完整性 (沒有斷掉的連結)", () => {
       referenced.add(e.from);
       referenced.add(e.to);
     }
-    const grouped = ["architecture", "control", "clause", "lifecycle-stage"];
+    const grouped = ["architecture", "control", "clause", "lifecycle-stage", "cross-cutting-band"];
     const orphans = data.nodes
       .filter((n) => !grouped.includes(n.type))
       .filter((n) => !referenced.has(n.id))
@@ -94,6 +94,6 @@ describe("內容對帳 (覆蓋率 — 隨內容補完逐步收緊)", () => {
     const t = (type) => data.nodes.filter((n) => n.type === type).length;
     expect(t("clause")).toBeGreaterThanOrEqual(25);     // 條款 4-10
     expect(t("risk-step")).toBeGreaterThanOrEqual(10);  // ISO 31000/27005 流程
-    expect(t("lifecycle-stage")).toBeGreaterThanOrEqual(10); // AI 5338/22989
+    expect(t("lifecycle-stage") + t("cross-cutting-band")).toBeGreaterThanOrEqual(13); // AI 5338 階段 + 22989 橫向帶
   });
 });
