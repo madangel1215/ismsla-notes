@@ -110,6 +110,7 @@ svg#canvas{width:100%;height:100%;display:block}
 .node .num{fill:var(--text-3);font-family:var(--mono);font-size:13px;text-anchor:middle;pointer-events:none}
 .node .lab{fill:var(--text);font-size:15px;font-weight:500;pointer-events:none}
 .node .sub{fill:var(--text-3);font-size:12.5px;pointer-events:none}
+.node .ai-sub{fill:var(--text-2);font-size:11px;pointer-events:none}
 .node:hover .disc,.node:hover .box,.node:hover .bar{stroke:var(--accent);filter:url(#glow)}
 .node.sel .disc,.node.sel .box,.node.sel .bar{stroke:var(--accent);stroke-width:1.8;filter:url(#glow)}
 .node.sel .nm,.node.sel .lab{fill:var(--text)}
@@ -405,23 +406,37 @@ function renderRisk(){
 }
 
 // ---------- VIEW: AI lifecycle (ISO 5338/22989) ----------
+function aiBox(id,x,y,w,h){const n=byId.get(id);if(!n)return;
+  const g=el("g",{class:"node","data-id":id,tabindex:"0",role:"button"});
+  g.append(el("rect",{class:"box",x,y,width:w,height:h,rx:10}));
+  g.append(tx(x+14,y+26,"lab",n.title));
+  if(n.title_en)g.append(tx(x+14,y+43,"sub",n.title_en));
+  let yy=y+66;
+  for(const s of (n.subconcepts||[])){const t=(s.label||"").split("（")[0].split("(")[0].trim();
+    g.append(tx(x+14,yy,"ai-sub",t));yy+=16;}
+  wire(g,id,{x:x+w/2,y:y+h/2,r:Math.max(w,h)/2});scene.append(g);}
 function renderAI(){
-  svg.setAttribute("viewBox","0 0 1340 720");
-  scene.append(tx(40,40,"grp-label","AI 系統生命週期 — ISO/IEC 5338 / 22989"));
-  const y=120,w=158,h=92,gap=20;const xs=[];let x=30;
-  const stages=[["ai-inception","起始","Inception"],["ai-design-dev","設計與開發","Design & Dev"],["ai-vnv","查證與確證","V&V"],["ai-deployment","部署","Deployment"],["ai-operation-monitoring","營運與監督","Operation"],["ai-reevaluation","重新評估","Re-evaluation"],["ai-retirement","汰除","Retirement"]];
-  for(const[id,t,en]of stages){scene.append(box(id,t,en,x,y,w,h,false));xs.push(x);x+=w+gap;}
-  for(let i=0;i<stages.length-1;i++)scene.append(arrow(`M${xs[i]+w},${y+h/2} L${xs[i+1]},${y+h/2}`,true));
-  // continuous validation above operation
-  const opx=xs[4];scene.append(box("ai-continuous-validation","持續確證","Continuous validation",opx,y-110,w,80,true));
-  scene.append(arrow(`M${opx+w/2},${y} L${opx+w/2},${y-30}`));
-  // reevaluation loop back to design-dev
-  const rex=xs[5]+w/2,ddx=xs[1]+w/2;scene.append(el("path",{class:"flow-line",d:`M${rex},${y+h} L${rex},${y+150} L${ddx},${y+150} L${ddx},${y+h}`,"marker-end":"url(#aha)"}));
-  scene.append(tx((rex+ddx)/2,y+165,"flow-label","重新評估 → 回開發"));
-  // 22989 bands
+  svg.setAttribute("viewBox","0 0 1420 868");
+  scene.append(tx(20,38,"grp-label","AI 系統生命週期技術流程 — ISO/IEC 5338"));
+  const W=205,H=190,Y=128,GAP=12.4,X0=18;
+  const main=["ai-inception","ai-design-dev","ai-vnv","ai-deployment","ai-operation-monitoring","ai-retirement"];
+  const xs=main.map((_,i)=>X0+i*(W+GAP));
+  main.forEach((id,i)=>aiBox(id,xs[i],Y,W,H));
+  for(let i=0;i<main.length-1;i++)scene.append(arrow(`M${xs[i]+W},${Y+H/2} L${xs[i+1]},${Y+H/2}`,true));
+  // 持續確證 在 營運與監督 正上方（雙向）
+  const ox=xs[4];aiBox("ai-continuous-validation",ox,18,W,86);
+  scene.append(el("line",{class:"flow-line",x1:ox+W/2,y1:104,x2:ox+W/2,y2:Y,"marker-start":"url(#ah)","marker-end":"url(#ah)"}));
+  // 重新評估 在下方（營運與汰除之間），並迴圈回設計與開發
+  const rx=ox+44,ry=Y+H+64;aiBox("ai-reevaluation",rx,ry,252,128);
+  scene.append(arrow(`M${ox+W/2},${Y+H} L${ox+W/2},${ry+18}`));
+  const ddx=xs[1]+W/2;
+  scene.append(el("path",{class:"flow-line",d:`M${rx+126},${ry+128} L${rx+126},${ry+168} L${ddx},${ry+168} L${ddx},${Y+H}`,"marker-end":"url(#ah)"}));
+  scene.append(tx((ddx+rx+126)/2,ry+184,"flow-label","重新評估 → 回設計與開發"));
+  // ISO/IEC 22989 橫向關注帶（A：放下方、標示）
+  scene.append(tx(20,ry+222,"grp-label","ISO/IEC 22989 — 橫向關注帶（貫穿全程）"));
   const bands=[["band-devops","開發與營運 Develop & Operations"],["band-transparency","透明性與可解釋性 Transparency"],["band-security-privacy","安全與隱私保護 Security & privacy"],["band-risk","風險管理 Risk management"],["band-governance","組織治理 Governance"]];
-  const by0=y+220,bh=44,bw=1280;
-  bands.forEach(([id,t],i)=>scene.append(bar(id,t,30,by0+i*(bh+10),bw,bh,false)));
+  const by0=ry+238,bh=40,bw=1384;
+  bands.forEach(([id,t],i)=>scene.append(bar(id,t,18,by0+i*(bh+8),bw,bh,false)));
 }
 
 // ---------- VIEW: controls grid ----------
