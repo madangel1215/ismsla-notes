@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#08080a" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="ISMS 主導稽核員 · 互動課程筆記" />
-<meta property="og:description" content="能學、能查、能拿去稽核的 ISMS LA 互動筆記：PDCA · 風險流程 · AI 生命週期 · 附錄A 控制 · ISO 27000 家族。" />
+<meta property="og:description" content="能學、能查、能拿去稽核的 ISMS LA 互動筆記：PDCA · 風險流程 · AI 生命週期 · 附錄 A 控制 · ISO 27000 家族。" />
 <meta property="og:url" content="https://madangel1215.github.io/ismsla-notes/" />
 <meta property="og:image" content="https://madangel1215.github.io/ismsla-notes/og-image.png" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -619,7 +619,7 @@ details.acc:not([open])>summary{margin-bottom:6px}
       <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="ob-title">
         <div class="ob-eyebrow">ISMS 主導稽核員 · 互動課程筆記</div>
         <h1 id="ob-title">30 秒上手</h1>
-        <p>左側九個視圖：<b>① PDCA ② 風險流程 ③ AI 生命週期 ④ AIMS(42001) ⑤ 稽核流程 ⑥ 附錄A 控制 ⑦ 文件·標準 ⑧ 關係總覽 ⑨ 考題練習</b>（☰ 可收合，⌘K 快速跳，數字鍵 1–9 直達）。點任一節點看白話說明；右上 <b>⚙</b> 可切「學習者 / 稽核者(LA)視角」、深淺色、疊控制；點節點會把<b>相關的跨圖高亮</b>、其餘變暗。</p>
+        <p>左側九個視圖：<b>① PDCA ② 風險流程 ③ AI 生命週期 ④ AIMS(42001) ⑤ 稽核流程 ⑥ 附錄 A 控制 ⑦ 文件·標準 ⑧ 關係總覽 ⑨ 考題練習</b>（☰ 可收合，⌘K 快速跳，數字鍵 1–9 直達）。點任一節點看白話說明；右上 <b>⚙</b> 可切「學習者 / 稽核者(LA)視角」、深淺色、疊控制；點節點會把<b>相關的跨圖高亮</b>、其餘變暗。</p>
         <div class="ob-q">稽核三問當主線：<b>這是什麼架構？ · 有什麼風險？ · 產品/服務週期是什麼？</b></div>
         <div class="ob-actions">
           <button class="ob-go" id="ob-tour">▶ 帶我走一遍（稽核三問）</button>
@@ -795,9 +795,9 @@ function renderPDCA(){
   if(overlay)drawOverlay(N,C);
 }
 function drawOverlay(N,C){
-  // 控制層外環：附錄A 4 主題置於 PDCA 四角(＝由管理系統治理、仍在範圍內的落地層)；點主題→附錄A 該主題
+  // 控制層外環：附錄 A 4 主題置於 PDCA 四角(＝由管理系統治理、仍在範圍內的落地層)；點主題→附錄 A 該主題
   const cnt=p=>DATA.nodes.filter(n=>n.type==="control"&&(n.ref||"").startsWith(p)).length;
-  scene.append(tx(560,100,"flow-label","附錄A 控制層（仍在 ISMS 範圍內）— 經 6.1.2 風險評鑑、6.1.3 選定並記入 SoA（含排除理由），於 8.1 落實運作（點主題看控制）"));
+  scene.append(tx(560,100,"flow-label","附錄 A 控制層（仍在 ISMS 範圍內）— 經 6.1.2 風險評鑑、6.1.3 選定並記入 SoA（含排除理由），於 8.1 落實運作（點主題看控制）"));
   // 連到 支援/運作[7·8]（控制真正落地處）
   scene.append(el("line",{class:"flow-line",x1:N.n78.x,y1:N.n78.y-N.n78.r,x2:N.n78.x,y2:118,"marker-end":"url(#ah)"}));
   const C4=[["A.5","組織控制",250,116],["A.8","技術控制",790,116],["A.6","人員控制",250,748],["A.7","實體控制",790,748]];
@@ -954,7 +954,7 @@ function renderAIMS(){
   sat("AI 風險評鑑","23894 → 規劃[6]",34,430,std("iso-23894"),N.n6,218,461);
   sat("AI 衝擊評鑑","42005 → 規劃[6]",34,600,std("iso-42005"),N.n6,218,631);
   sat("AI 系統生命週期","5338 → 支援/運作[7·8]",1022,236,()=>switchView("ai"),N.n78,1022,267);
-  sat("AI 控制 · 附錄A","42001 附錄A → 績效[9]",1022,436,std("iso-42001"),N.n9,1022,467);
+  sat("AI 控制 · 附錄 A","42001 附錄 A → 績效[9]",1022,436,std("iso-42001"),N.n9,1022,467);
 }
 
 // ---------- 稽核實務內容(d) + 面板 ----------
@@ -1091,7 +1091,7 @@ function updateCtlStats(){
   const stN=s=>ctrls.filter(c=>WS[c.id]&&WS[c.id].status===s).length;
   const marked=ctrls.filter(c=>WS[c.id]&&WS[c.id].status).length;
   const m=grid.querySelector("#ctl-marked");if(m)m.textContent=marked;
-  grid.querySelectorAll(".ctl-stat").forEach(b=>{const v=b.dataset.status,n=v==="unmarked"?93-marked:stN(v),bb=b.querySelector("b");if(bb)bb.textContent=n;});
+  grid.querySelectorAll(".ctl-stat").forEach(b=>{const v=b.dataset.status,n=v==="unmarked"?ctrls.length-marked:stN(v),bb=b.querySelector("b");if(bb)bb.textContent=n;});
 }
 function markCtl(id,status){
   const cur=WS[id]&&WS[id].status,ns=cur===status?undefined:status;
@@ -1124,15 +1124,15 @@ function renderControls(){
   heat+=`</div>`;
   tocSections=[{id:"sec-heat",label:"覆蓋熱圖"},...(filtering?[]:groups.map(g=>({id:g.id,label:g.label})))];
   let html=`<button class="toc-fab" title="頁內目錄" aria-label="開啟頁內目錄">${icon("menu",18)}</button>`;
-  html+=`<div class="ctl-toolbar"><div class="ctl-stats"><span class="ctl-hint">附錄A · 93 控制 · 已標記 <b style="color:var(--text)" id="ctl-marked">${marked}</b>/93</span>`+
-    [["conform","✓ 符合"],["observe","△ 觀察"],["nc","✗ 不符合"],["unmarked","○ 未標"]].map(([v,t])=>`<button class="ctl-stat ${v}${ctlFilter&&ctlFilter.status===v?" on":""}" data-status="${v}">${t} <b>${v==="unmarked"?93-marked:stN(v)}</b></button>`).join("")+
+  html+=`<div class="ctl-toolbar"><div class="ctl-stats"><span class="ctl-hint">附錄 A · ${ctrls.length} 控制 · 已標記 <b style="color:var(--text)" id="ctl-marked">${marked}</b>/${ctrls.length}</span>`+
+    [["conform","✓ 符合"],["observe","△ 觀察"],["nc","✗ 不符合"],["unmarked","○ 未標"]].map(([v,t])=>`<button class="ctl-stat ${v}${ctlFilter&&ctlFilter.status===v?" on":""}" data-status="${v}">${t} <b>${v==="unmarked"?ctrls.length-marked:stN(v)}</b></button>`).join("")+
     `</div><div class="ctl-tools"><input class="ctl-search" type="text" placeholder="搜尋控制…" value="${esc(ctlSearch)}" aria-label="搜尋控制"><button id="oscal-btn">⤓ OSCAL</button></div></div>`;
   html+=`<div class="layerbar" role="radiogroup" aria-label="分層看法"><span class="lb-label">分層看法：</span>`+LAYERS.map(([k,n])=>`<button class="lb-btn${!filtering&&ctlLayer===k?" on":""}" data-layer="${k}" role="radio" aria-checked="${!filtering&&ctlLayer===k}">${n}</button>`).join("")+`</div>`;
   const LNOTE={cia:"多數控制三性兼具（機密 87／完整 84／可用 84 條），CIA 維度<b>區別力低</b>——主要用於反查具特定性質的控制，而非把控制硬分到單一性質。",operationalCapability:"ISO 27002:2022 屬性共 5 種，本工具收錄 4 種；第 5 種『Cybersecurity concepts（識別／保護／偵測／回應／復原，對齊 NIST CSF）』暫略。"};
   if(!filtering&&LNOTE[ctlLayer])html+=`<div class="docs-intro" style="margin:-6px 0 14px"><span class="mic" style="margin-right:4px;color:var(--text-3)">${icon("info",12)}</span>${LNOTE[ctlLayer]}</div>`;
   html+=`<section class="dsec${docCollapsed.has("sec-heat")?" collapsed":""}" id="sec-heat"><div class="theme-h dsec-h" data-sec="sec-heat"><span class="th-ref">覆蓋</span><span class="th-t">覆蓋熱圖 · 主題 × 控制類型</span><span class="th-c">點格子篩選</span></div><div class="dsec-body">${heat}<div class="docs-intro" style="margin-top:8px">點<b>格子／列／欄</b>即可篩選下方控制。格子是<b>絕對數</b>（一控制可多型、列和 ≥ 小計）；主題大小不同，<b>淺色不代表缺失</b>——控制依風險評鑑選用。</div></div></section>`;
   if(filtering){const list=ctrls.filter(ctlMatch);
-    html+=`<div class="ctl-filterbar"><span>篩選中：<b>${ctlFilterLabel()}</b> · ${list.length} 條</span><button class="ctl-clearf">✕ 清除篩選</button></div>`;
+    html+=`<div class="ctl-filterbar"><span>篩選中：<b>${esc(ctlFilterLabel())}</b> · ${list.length} 條</span><button class="ctl-clearf">✕ 清除篩選</button></div>`;
     html+=list.length?`<div class="chips">${list.map(chip).join("")}</div>`:`<div class="ex-empty">沒有符合的控制。</div>`;
   }else{
     for(const g of groups)html+=`<section class="dsec${docCollapsed.has(g.id)?" collapsed":""}" id="${g.id}"><div class="theme-h dsec-h" data-sec="${g.id}"><span class="th-t">${g.label}</span><span class="th-c">${g.items.length} 控制</span></div><div class="dsec-body"><div class="chips">${g.items.map(chip).join("")}</div></div></section>`;
@@ -1225,7 +1225,7 @@ function buildCyStyle(){const g=getComputedStyle(document.documentElement),v=n=>
 function applyCyTheme(){if(cy)cy.style(buildCyStyle()).update();}
 function initCy(){
   const deg={};for(const e of DATA.edges){deg[e.from]=(deg[e.from]||0)+1;deg[e.to]=(deg[e.to]||0)+1;}
-  const conn=DATA.nodes.filter(n=>deg[n.id]);              // 只放有關係的節點（孤立控制不入圖，見附錄A）
+  const conn=DATA.nodes.filter(n=>deg[n.id]);              // 只放有關係的節點（孤立控制不入圖，見附錄 A）
   cyHidden=DATA.nodes.length-conn.length;
   const els=[
     ...conn.map(n=>({data:{id:n.id,label:n.ref||n.id,cat:CAT[n.type]||"ai",deg:deg[n.id]}})),
@@ -1251,7 +1251,7 @@ function legendEl(){const d=document.createElement("div");d.className="cy-legend
   const chip=(cls,cat,t)=>`<span class="lg ${cls}${catFilter[cat]?"":" off"}" data-cat="${cat}">${t}</span>`;
   d.innerHTML='<b>關係總覽</b> 點節點看它連到誰 · 滾輪縮放 · 點圖例篩選<br>'+
     chip("c","clause","▢ 條款")+chip("o","control","◯ 控制")+chip("r","risk","◇ 風險")+chip("a","ai","⬡ AI／橫向帶")+
-    `<div class="cy-note">只顯示有關係的 ${cy?cy.nodes().length:""} 節點；${cyHidden} 個無連線控制不入圖（見「附錄A」）。節點大小＝連線數。</div>`;
+    `<div class="cy-note">只顯示有關係的 ${cy?cy.nodes().length:""} 節點；${cyHidden} 個無連線控制不入圖（見「附錄 A」）。節點大小＝連線數。</div>`;
   d.querySelectorAll("[data-cat]").forEach(s=>s.addEventListener("click",()=>toggleCat(s.dataset.cat,s)));
   return d;}
 function renderExplorer(){
@@ -1266,7 +1266,7 @@ const examEl=document.getElementById("exam");
 let EXAM=[], EX={}, exMode="practice", exTopic=null, mockState=null, mockTimer=null;
 try{EX=JSON.parse(localStorage.getItem("ismsla_exam")||"{}");}catch(e){EX={};}
 function exSave(){try{localStorage.setItem("ismsla_exam",JSON.stringify(EX));}catch(e){}}
-function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 const EX_TYPE={single:"單選",multi:"複選",tf:"是非",order:"排序",match:"配對"};
 let ordDraft={};  // 排序題：作答中的暫存序列（依 qid）
 function arrEq(a,b){a=[...a].sort();b=[...b].sort();return a.length===b.length&&a.every((x,i)=>x===b[i]);}
@@ -1460,9 +1460,9 @@ const VIEWS={pdca:{n:"圖一",t:"PDCA 運轉",r:renderPDCA,cap:"圖一 · ISMS P
   ai:{n:"圖三",t:"AI 生命週期",r:renderAI,cap:"圖三 · AI 系統生命週期（ISO/IEC 5338 / 22989）"},
   aims:{n:"AIMS",t:"AI 管理系統",r:renderAIMS,cap:"ISO/IEC 42001 · AI 管理系統（與 27001 同 Annex SL；可與 27701 / 9001 / 14001 / 45001 整合稽核）"},
   audit:{n:"稽核",t:"稽核流程",r:renderAuditFlow,cap:"ISO 19011 · 管理系統稽核流程（如何稽核：啟動→文審→現場→報告→跟催）"},
-  controls:{n:"附錄A",t:"控制措施",r:renderControls,cap:"附錄 A · 93 控制措施（4 主題）"},
+  controls:{n:"附錄 A",t:"控制措施",r:renderControls,cap:"附錄 A · 93 控制措施（4 主題）"},
   docs:{n:"文件",t:"文件·標準",r:renderDocs,cap:"ISMS 文件化資訊清單（7.5）+ ISO 27000 標準家族"},
-  explorer:{n:"總覽",t:"關係總覽",r:renderExplorer,cap:"關係總覽 · 只顯示有關係的節點（節點大小＝連線數；孤立控制見附錄A）"},
+  explorer:{n:"總覽",t:"關係總覽",r:renderExplorer,cap:"關係總覽 · 只顯示有關係的節點（節點大小＝連線數；孤立控制見附錄 A）"},
   exam:{n:"測驗",t:"考題練習",r:renderExam,cap:"考題練習 · 純練習題（練習 / 模擬考 / 錯題本，作答存本機）"}};
 // ---------- 每視圖「怎麼看」引導提示條 ----------
 let hintDismissed=new Set();try{hintDismissed=new Set(JSON.parse(localStorage.getItem("iso_hints")||"[]"));}catch(e){}
@@ -1472,7 +1472,7 @@ const HINTS={
   ai:"圖三＝AI 生命週期(5338)：6 階段橫向流＋持續確證(上)＋重新評估(下，迴圈回開發)；底部 22989 橫向關注帶；頂部標明上游母框架 15288/12207。",
   aims:"AIMS＝42001 與 27001 同 PDCA 殼；環上點看共用條款，側欄是 AI 專屬(政策/風險/衝擊評鑑/生命週期/控制)，點看對應標準。",
   audit:"稽核流程＝ISO 19011『怎麼稽核』：啟動→文審(Stage 1)→現場(Stage 2)→報告→跟催；下方三方稽核＋『稽核實務深入』6 卡(七大原則§4／方案管理§5／NC分級＋改正vs矯正措施／Stage1·2／技巧／能力，點看細節)。",
-  controls:"附錄A＝93 控制(4 主題，標題可收合)。切『稽核者視角』每條看稽核三件組；面板可標稽核底稿狀態，這裡看進度。右側目錄可跳主題。",
+  controls:"附錄 A＝93 控制(4 主題，標題可收合)。切『稽核者視角』每條看稽核三件組；面板可標稽核底稿狀態，這裡看進度。右側目錄可跳主題。",
   docs:"文件·標準＝上方文件金字塔(點層篩選)＋下方標準家族(可收合，點卡看血緣)；右側目錄可跳段。",
   explorer:"關係總覽＝知識圖，只顯示有關係的節點(大小＝連線數)。點節點看它連到誰；點圖例可篩選類別。",
   exam:"考題練習＝三模式：『練習』作答即時對答＋解析；『模擬考』抽題計時、交卷出分＋逐題檢討；『錯題本』收答錯的題重練。每題解析下方『相關』可跳回對應條款。",
@@ -1678,7 +1678,7 @@ const GLOSSARY={
   "風險擁有者":"對某『風險』當責(accountable)、有權核准其處理並接受剩餘風險的人(ISO 31000)；＝風險當責者，職位需夠高、能調資源。",
   "風險當責者":"同『風險擁有者』——對風險當責、有權核准處理的人。",
   "資產擁有者":"對某『資產』日常管理與保護負責的人或單位(A.5.9)，常為較基層角色；與風險擁有者不同、常為不同人。",
-  "適用性聲明":"SoA：列出附錄A每條控制是否適用、理由與實施狀態，是風險決定與控制之間的橋樑(6.1.3 d)。",
+  "適用性聲明":"SoA：列出附錄 A每條控制是否適用、理由與實施狀態，是風險決定與控制之間的橋樑(6.1.3 d)。",
   "SoA":"適用性聲明 Statement of Applicability：列出每條控制適用與否、理由、實施狀態(6.1.3 d)。",
   "剩餘風險":"風險處理後仍殘留的風險，須由風險擁有者知情後正式接受並簽核(6.1.3 f)。",
   "風險評鑑":"識別→分析→評估三步合稱(27001 6.1.2)：判斷有哪些風險、多嚴重、優先序。",

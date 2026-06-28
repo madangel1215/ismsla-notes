@@ -11,7 +11,7 @@ const ZD = ROOT + "data/_zones";
 // ── meta + architectures（產物的固定外殼；非衍生自 zones，故在此維護）──
 const META = {
   standard: "CNS/ISO/IEC 27001:2023 (對應 ISO/IEC 27001:2022)",
-  version: "0.9.1",
+  version: "0.9.2",
   accent: "#3b82f6",
   note: "所有說明為自行撰寫之白話轉譯，未複製標準正文（版權）。條款編號與標題為事實引用。",
   linkTypes: ["feeds", "treats", "selects", "implements", "aligns", "contains"],
@@ -31,7 +31,7 @@ const ISO27001 = {
   "communication-consultation": "7.4", "monitoring-review": "9.1 / 9.3", "documented-information": "7.5",
   "technique-fmea": "6.1.2", "technique-bow-tie": "6.1.2", "technique-hazop": "6.1.2", "technique-brainstorming": "6.1.2", "technique-scenario-analysis": "6.1.2", "technique-checklists": "6.1.2",
   "ai-inception": "4.2 / 6.1", "ai-design-dev": "8.1", "ai-vnv": "8.1 / 9.1", "ai-deployment": "8.1", "ai-operation-monitoring": "8.1 / 9.1", "ai-continuous-validation": "9.1 / 10.1", "ai-reevaluation": "9.3 / 10", "ai-retirement": "8.1",
-  "band-devops": "8.1", "band-transparency": "7.4 / 7.5", "band-security-privacy": "8 / 附錄A", "band-risk": "6.1", "band-governance": "5",
+  "band-devops": "8.1", "band-transparency": "7.4 / 7.5", "band-security-privacy": "8 / 附錄 A", "band-risk": "6.1", "band-governance": "5",
 };
 
 // ── 風險相關章節的關鍵概念（資產/當責人/風險擁有者…），面板顯示「關鍵概念」──
@@ -55,7 +55,7 @@ const CONCEPTS = {
   ],
   "clause-6.1.3": [
     { label: "風險擁有者核准/接受", note: "風險處理計畫與剩餘風險，須經風險擁有者核准、知情後接受(6.1.3 f)。" },
-    { label: "適用性聲明 SoA", note: "列出附錄A每條控制是否適用、理由、是否實施——風險決定與控制之間的橋樑(6.1.3 d)。" },
+    { label: "適用性聲明 SoA", note: "列出附錄 A每條控制是否適用、理由、是否實施——風險決定與控制之間的橋樑(6.1.3 d)。" },
   ],
   "risk-identification": [
     { label: "資產 Asset", note: "要保護的標的：資訊、系統、人員、流程、服務。識別風險常從盤點資產開始(A.5.9 資產清冊)。" },
@@ -181,6 +181,8 @@ export function build() {
   const ids = new Set(nodes.map((n) => n.id));
   const broken = EDGES.filter((e) => !ids.has(e.from) || !ids.has(e.to));
   if (broken.length) throw new Error("BROKEN EDGES: " + broken.map((e) => `${e.from}->${e.to}`).join(", "));
+  const deadKeys = [...Object.keys(ISO27001), ...Object.keys(CONCEPTS)].filter((k) => !ids.has(k));
+  if (deadKeys.length) throw new Error("DEAD ISO27001/CONCEPTS keys (no such node): " + deadKeys.join(", "));
   return { meta: META, architectures: ARCHITECTURES, nodes, edges: EDGES };
 }
 
