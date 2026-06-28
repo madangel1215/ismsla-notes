@@ -1,5 +1,5 @@
 {
-  "_about": "ISO 27000 標準家族：圍繞 27001 的相關標準生態。role=該標準在做什麼，relation=與 27001 的關係，view=對應的圖(可點跳)。手維護＋schema 驗證，內容為原創白話。",
+  "_about": "ISO 27000 標準家族：圍繞 27001 的標準生態。parent=血緣上游，nodes=此標準是圖上哪些節點的量尺，certifiable=是否可驗證發證，view=對應的圖。手維護＋schema 驗證，內容原創白話。",
   "items": [
     {
       "id": "iso-27000",
@@ -9,7 +9,10 @@
       "family": "核心 ISMS",
       "role": "整個 27000 家族的字典與導覽圖，把「風險」「控制」「資產」等名詞定義一致化，讓所有標準講同一種語言；本身免費提供，是入門第一站。",
       "relation": "讀 27001 前的詞彙底座；27001 用到的專有名詞都回到這裡定義，避免各方各自解讀。",
-      "view": null
+      "view": null,
+      "parent": [],
+      "nodes": [],
+      "certifiable": false
     },
     {
       "id": "iso-27002",
@@ -19,7 +22,15 @@
       "family": "控制與實作",
       "role": "把 93 條控制措施一條條講清楚要怎麼做、為什麼做，等於附錄 A 的詳細說明書（屬指引型，非要求型）。",
       "relation": "27001 附錄 A 只列控制標題，27002 補上每條控制的實作細節與目的，是挑選與落地控制的主要參考。",
-      "view": "controls"
+      "view": "controls",
+      "parent": [
+        "iso-27001"
+      ],
+      "nodes": [
+        "soa",
+        "select-implement-controls"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-27003",
@@ -29,7 +40,14 @@
       "family": "核心 ISMS",
       "role": "逐條手把手教你把 27001 條款 4 到 10 真的建起來，提供導入專案的操作建議（指引型）。",
       "relation": "27001 說「要做什麼」，27003 補上「怎麼一步步做」，是建置 ISMS 的施工說明書。",
-      "view": "pdca"
+      "view": "pdca",
+      "parent": [
+        "iso-27001"
+      ],
+      "nodes": [
+        "clause-4.4"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-27004",
@@ -39,7 +57,14 @@
       "family": "核心 ISMS",
       "role": "教你怎麼設計指標與量測，判斷 ISMS 與控制到底有沒有效，把成效變成看得見的數字（指引型）。",
       "relation": "落地 27001 條款 9.1（績效監視與量測）的方法指引，提供指標設計與資料蒐集範例。",
-      "view": "pdca"
+      "view": "pdca",
+      "parent": [
+        "iso-27001"
+      ],
+      "nodes": [
+        "clause-9.1"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-27005",
@@ -49,7 +74,16 @@
       "family": "風險",
       "role": "專講資安風險怎麼識別、分析、評估與處理的完整方法，是風險作業的操作藍本（指引型）。",
       "relation": "把 27001 條款 6.1 的風險評估與處理要求，落地成可執行的資安風險流程；為 ISO 31000 在資安領域的專門化版本。",
-      "view": "risk"
+      "view": "risk",
+      "parent": [
+        "iso-31000"
+      ],
+      "nodes": [
+        "risk-assessment",
+        "risk-identification",
+        "risk-treatment-options"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-27006",
@@ -59,7 +93,10 @@
       "family": "稽核與驗證",
       "role": "規範「發證書的驗證機構」自己要符合哪些條件（要求型），補充 ISO/IEC 17021-1，確保各家頒發的 27001 證書具備一致公信力。",
       "relation": "27001 是被稽核的對象，27006-1 管的是稽核別人、發證的機構資格，撐起整個驗證制度的可信度；2024 版取代 27006:2015。",
-      "view": null
+      "view": null,
+      "parent": [],
+      "nodes": [],
+      "certifiable": false
     },
     {
       "id": "iso-27007",
@@ -69,7 +106,14 @@
       "family": "稽核與驗證",
       "role": "教稽核員怎麼規劃與執行一場 ISMS 稽核，從稽核方案、能力到現場技巧都給建議（指引型）。",
       "relation": "支援 27001 條款 9.2 內部稽核，也是第三方稽核員的作業參考，與 ISO 19011 通用稽核指引搭配使用。",
-      "view": "pdca"
+      "view": "pdca",
+      "parent": [
+        "iso-19011"
+      ],
+      "nodes": [
+        "clause-9.2"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-27017",
@@ -79,7 +123,14 @@
       "family": "雲端",
       "role": "在 27002 基礎上加上雲端特有的控制與實作建議（指引型），並釐清雲端供應商與客戶各自的責任分工。",
       "relation": "27002 的雲端加強版，為上雲的組織補上 27001 附錄 A 沒細談的雲端控制。",
-      "view": "controls"
+      "view": "controls",
+      "parent": [
+        "iso-27002"
+      ],
+      "nodes": [
+        "soa"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-27018",
@@ -89,7 +140,14 @@
       "family": "雲端",
       "role": "針對「在公有雲處理個資的雲端業者」給出保護個人資料的控制建議（指引型），例如不得拿客戶資料做行銷。",
       "relation": "把 27002／27017 的控制延伸到雲端個資情境，協助雲端處理者滿足 27001 中與個資相關的控制要求。",
-      "view": "controls"
+      "view": "controls",
+      "parent": [
+        "iso-27002"
+      ],
+      "nodes": [
+        "soa"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-27035",
@@ -99,7 +157,10 @@
       "family": "事故",
       "role": "建立一套從偵測、通報、應變到記取教訓的事故管理流程（指引型），讓組織遇到資安事件時能有序處理。",
       "relation": "把 27001 附錄 A 的事故管理控制（A.5.24–A.5.28）展開成完整流程，並回饋條款 10 的持續改善。",
-      "view": null
+      "view": null,
+      "parent": [],
+      "nodes": [],
+      "certifiable": false
     },
     {
       "id": "iso-27701",
@@ -109,7 +170,14 @@
       "family": "隱私",
       "role": "建立專屬的隱私資訊管理系統（PIMS），對個資控制者與處理者訂出要求與控制；2025 年第二版改為可獨立實施的標準，協助對應 GDPR 等隱私法規（含要求型條款）。",
       "relation": "與 27001／27002 緊密相連：2019 舊版原是兩者的延伸，2025 年第二版改為可獨立運作，但仍對齊 27001:2022／27002:2022 結構，可在既有 ISMS 上整合導入並一起驗證升級為 PIMS。",
-      "view": null
+      "view": null,
+      "parent": [
+        "iso-27001"
+      ],
+      "nodes": [
+        "clause-6.1.2"
+      ],
+      "certifiable": true
     },
     {
       "id": "iso-31000",
@@ -119,7 +187,13 @@
       "family": "風險",
       "role": "提供放諸各領域皆通用的風險管理原則、架構與流程（指引型，不可驗證），是所有風險思維的母標準（不限於資安）。",
       "relation": "27001 條款 6.1 的風險方法骨架取自 ISO 31000，而 27005 則是它在資安領域的專門化版本。",
-      "view": "risk"
+      "view": "risk",
+      "parent": [],
+      "nodes": [
+        "risk-assessment",
+        "risk-treatment-options"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-31010",
@@ -129,7 +203,16 @@
       "family": "風險",
       "role": "收錄數十種具體的風險評估手法（如腦力激盪、情境分析、失效模式分析），讓你挑工具來做評估；由 IEC 主導（非 ISO/IEC）。",
       "relation": "搭配 ISO 31000／27005 使用；當 27001 條款 6.1 要你做風險評估時，這裡提供可選的技術工具箱。",
-      "view": "risk"
+      "view": "risk",
+      "parent": [
+        "iso-31000"
+      ],
+      "nodes": [
+        "risk-identification",
+        "risk-analysis",
+        "risk-evaluation"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-5338",
@@ -139,7 +222,21 @@
       "family": "AI",
       "role": "定義 AI 系統從構想、開發、部署到退役的各階段流程，給 AI 工程治理一套生命週期地圖。",
       "relation": "當 ISMS 範圍納入 AI 系統時提供生命週期視角，讓 27001 的運作管制（條款 8）對得上 AI 開發實務。",
-      "view": "ai"
+      "view": "ai",
+      "parent": [
+        "iso-15288",
+        "iso-12207"
+      ],
+      "nodes": [
+        "ai-inception",
+        "ai-design-dev",
+        "ai-vnv",
+        "ai-deployment",
+        "ai-operation-monitoring",
+        "ai-reevaluation",
+        "ai-retirement"
+      ],
+      "certifiable": false
     },
     {
       "id": "iso-22989",
@@ -149,7 +246,186 @@
       "family": "AI",
       "role": "為人工智慧建立共通的概念框架與名詞定義，例如機器學習、訓練資料、AI 系統等。",
       "relation": "AI 治理的詞彙底座；當 27001 延伸到 AI 風險時，提供與 27000 詞彙互補的 AI 專用語言。",
-      "view": "ai"
+      "view": "ai",
+      "parent": [],
+      "nodes": [
+        "ai-inception"
+      ],
+      "certifiable": false
+    },
+    {
+      "id": "iso-27001",
+      "number": "ISO/IEC 27001:2022",
+      "title": "資訊安全管理系統 — 要求",
+      "title_en": "Information security management systems — Requirements",
+      "family": "核心 ISMS",
+      "role": "本工具五張圖的主體：可驗證的 ISMS 要求標準，條款 4–10 + 附錄 A 93 控制。",
+      "relation": "整個家族的核心；其他標準多是它的指引、延伸或平行管理系統。",
+      "view": "pdca",
+      "parent": [],
+      "nodes": [
+        "clause-4.4"
+      ],
+      "certifiable": true
+    },
+    {
+      "id": "iso-12207",
+      "number": "ISO/IEC/IEEE 12207:2017",
+      "title": "軟體生命週期流程",
+      "title_en": "Systems and software engineering — Software life cycle processes",
+      "family": "工程生命週期",
+      "role": "定義軟體從開發、運作到維護的標準流程，內含驗證(Verification)與確證(Validation)兩個技術流程。",
+      "relation": "5338 的 AI 生命週期框架繼承自此；AI 系統內含傳統軟體元件時直接用它落地。",
+      "view": "ai",
+      "parent": [],
+      "nodes": [
+        "ai-design-dev",
+        "ai-vnv"
+      ],
+      "certifiable": false
+    },
+    {
+      "id": "iso-15288",
+      "number": "ISO/IEC/IEEE 15288:2023",
+      "title": "系統生命週期流程",
+      "title_en": "Systems and software engineering — System life cycle processes",
+      "family": "工程生命週期",
+      "role": "定義系統(軟硬體＋人＋流程)從構想到汰除的標準流程，含 V&V 技術流程；2023 為第二版。",
+      "relation": "與 12207 同為 5338 的母框架；5338 把這套系統生命週期流程『AI 化』。",
+      "view": "ai",
+      "parent": [],
+      "nodes": [
+        "ai-design-dev",
+        "ai-vnv",
+        "ai-continuous-validation"
+      ],
+      "certifiable": false
+    },
+    {
+      "id": "iso-23053",
+      "number": "ISO/IEC 23053:2022",
+      "title": "使用機器學習的 AI 系統框架",
+      "title_en": "Framework for Artificial Intelligence (AI) Systems Using Machine Learning (ML)",
+      "family": "AI",
+      "role": "描述以機器學習建構 AI 系統的共通框架與元件(資料、模型、訓練、推論)。",
+      "relation": "與 22989 一起，是 5338 在 AI 生命週期中加入的『AI 專屬流程』來源。",
+      "view": "ai",
+      "parent": [],
+      "nodes": [
+        "ai-design-dev"
+      ],
+      "certifiable": false
+    },
+    {
+      "id": "iso-42001",
+      "number": "ISO/IEC 42001:2023",
+      "title": "AI 管理系統 (AIMS)",
+      "title_en": "Information technology — Artificial intelligence — Management system",
+      "family": "AI",
+      "role": "全球第一個可驗證的 AI 管理系統標準：政策、角色、風險與衝擊、內稽、持續改善——AI 版的 27001。",
+      "relation": "與 27001 同為 Annex SL 管理系統、結構平行可整合導入；組織把 AI 納管時的治理外殼。",
+      "view": "pdca",
+      "parent": [],
+      "nodes": [
+        "clause-5.1",
+        "band-governance"
+      ],
+      "certifiable": true
+    },
+    {
+      "id": "iso-23894",
+      "number": "ISO/IEC 23894:2023",
+      "title": "AI 風險管理指引",
+      "title_en": "Artificial intelligence — Guidance on risk management",
+      "family": "風險",
+      "role": "把 31000 的風險流程套到 AI 特有風險(偏誤、可解釋性、資料品質、模型漂移)的操作指引。",
+      "relation": "31000 在 AI 領域的專門化版本(與 27005 之於資安平行)；42001 內部跑的就是這套風險流程。",
+      "view": "risk",
+      "parent": [
+        "iso-31000"
+      ],
+      "nodes": [
+        "risk-assessment",
+        "band-risk"
+      ],
+      "certifiable": false
+    },
+    {
+      "id": "iso-42005",
+      "number": "ISO/IEC 42005:2025",
+      "title": "AI 系統衝擊評鑑",
+      "title_en": "Artificial intelligence — AI system impact assessment",
+      "family": "風險",
+      "role": "指引組織評估 AI 系統對個人、群體與社會的衝擊(類似個資的 DPIA，但針對 AI 全生命週期)。",
+      "relation": "42001 的夥伴標準；把 AI 衝擊評鑑整合進 AI 風險管理與管理系統。",
+      "view": "risk",
+      "parent": [],
+      "nodes": [
+        "risk-assessment",
+        "band-risk"
+      ],
+      "certifiable": false
+    },
+    {
+      "id": "ieee-1012",
+      "number": "IEEE 1012-2016",
+      "title": "系統、軟體與硬體 V&V",
+      "title_en": "IEEE Standard for System, Software, and Hardware Verification and Validation",
+      "family": "稽核與驗證",
+      "role": "專門的 V&V 過程標準：用完整性等級(integrity level)決定要做多少驗證與確證任務。",
+      "relation": "把 15288/12207 的 V&V 流程講到最細；對應圖三的 V&V 與持續確證節點。",
+      "view": "ai",
+      "parent": [],
+      "nodes": [
+        "ai-vnv",
+        "ai-continuous-validation"
+      ],
+      "certifiable": false
+    },
+    {
+      "id": "iso-29119",
+      "number": "ISO/IEC/IEEE 29119（系列）",
+      "title": "軟體測試",
+      "title_en": "Software and systems engineering — Software testing",
+      "family": "稽核與驗證",
+      "role": "軟體測試的國際標準系列(概念/流程/文件/技術/關鍵字驅動)，是驗證階段的測試方法庫。",
+      "relation": "支援 V&V 中的『測試』部分；AI 系統的傳統軟體元件可用它做測試。",
+      "view": "ai",
+      "parent": [],
+      "nodes": [
+        "ai-vnv"
+      ],
+      "certifiable": false
+    },
+    {
+      "id": "iso-25010",
+      "number": "ISO/IEC 25010:2023",
+      "title": "軟體產品品質模型 (SQuaRE)",
+      "title_en": "Systems and software Quality Requirements and Evaluation (SQuaRE) — Product quality model",
+      "family": "稽核與驗證",
+      "role": "定義軟體品質 9 大特性(功能適合性、效能、可靠性、安全性…，2023 版新增 Safety)，當『確證的尺』。",
+      "relation": "Validation(建對東西了嗎)時用來衡量品質是否達標；補 V&V 的品質判準。",
+      "view": "ai",
+      "parent": [],
+      "nodes": [
+        "ai-vnv"
+      ],
+      "certifiable": false
+    },
+    {
+      "id": "iso-19011",
+      "number": "ISO 19011:2018",
+      "title": "管理系統稽核指引",
+      "title_en": "Guidelines for auditing management systems",
+      "family": "稽核與驗證",
+      "role": "所有管理系統稽核的通用方法指引：稽核原則、方案管理、稽核員能力與現場技巧。",
+      "relation": "27001 條款 9.2 內稽的方法母本；27007 是它在 ISMS 的專門化。",
+      "view": "pdca",
+      "parent": [],
+      "nodes": [
+        "clause-9.2"
+      ],
+      "certifiable": false
     }
   ]
 }

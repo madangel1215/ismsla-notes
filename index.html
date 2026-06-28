@@ -130,6 +130,10 @@ svg#canvas{width:100%;height:100%;display:block}
 .ctrl-chip{cursor:pointer}
 .ctrl-chip rect{fill:color-mix(in srgb,var(--accent) 12%,var(--surface));stroke:var(--accent);stroke-width:.8}
 .ctrl-chip text{fill:var(--accent);font-family:var(--mono);font-size:11px;text-anchor:middle}
+.std-chip{cursor:pointer}
+.std-chip .box{fill:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.std-chip:hover .box,.std-chip:focus-visible .box{stroke:var(--accent);filter:url(#glow)}
+.std-chip:focus{outline:none}
 
 /* controls grid (html) */
 #grid{position:absolute;inset:0;overflow-y:auto;padding:26px 32px 60px;display:none}
@@ -157,6 +161,8 @@ svg#canvas{width:100%;height:100%;display:block}
 .kbadge{font-family:var(--mono);font-size:10px;border-radius:5px;padding:2px 7px}
 .kbadge.doc{color:var(--cat-clause);border:1px solid color-mix(in srgb,var(--cat-clause) 45%,transparent)}
 .kbadge.rec{color:var(--cat-risk);border:1px solid color-mix(in srgb,var(--cat-risk) 45%,transparent)}
+.kbadge.cert{color:var(--cat-control);border:1px solid color-mix(in srgb,var(--cat-control) 45%,transparent)}
+.kbadge.guide{color:var(--text-3);border:1px solid var(--line-2)}
 .doc-clause{font-family:var(--mono);font-size:10.5px;color:var(--accent)}
 .doc-must{font-family:var(--mono);font-size:9.5px;color:var(--warn-strong)}
 .std-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
@@ -326,7 +332,7 @@ const scene=document.getElementById("scene"), svg=document.getElementById("canva
 const grid=document.getElementById("grid"), docsEl=document.getElementById("docs"), panel=document.getElementById("panel"), pbody=document.getElementById("pbody");
 const toastEl=document.getElementById("toast");
 let DATA=null, byId=new Map(), adj=new Map(), curView="pdca", selected=null, overlay=false, mode="learn";
-let DOCS=[], STDS=[], docsByNode=new Map();
+let DOCS=[], STDS=[], docsByNode=new Map(), stdsByNode=new Map(), stdById=new Map();
 
 const el=(t,a,k)=>{const n=document.createElementNS(SVGNS,t);for(const x in a)n.setAttribute(x,a[x]);if(k)for(const c of [].concat(k))if(c)n.append(c);return n;};
 const tx=(x,y,cls,s,ex)=>el("text",{x,y,class:cls,...(ex||{})},document.createTextNode(s));
@@ -488,6 +494,16 @@ function renderAI(){
   svg.setAttribute("viewBox","0 0 1420 938");
   const put=g=>{if(g)scene.append(g);};
   scene.append(tx(20,38,"grp-label","AI 系統生命週期技術流程 — ISO/IEC 5338"));
+  // 上游母框架 provenance：15288(系統) + 12207(軟體) → 5338(AI 化)。關係寫在標頭，晶片只放可點編號，避免水平碰撞
+  scene.append(tx(20,62,"note-h","上游母框架 · 5338 繼承自：15288(系統)＋12207(軟體) → AI 化（點晶片看血緣）"));
+  [["iso-15288","系統"],["iso-12207","軟體"]].forEach(([sid,tag],i)=>{const s=stdById.get(sid);if(!s)return;
+    const w=200,x=20+i*(w+14),y=72,hh=30;
+    const g=el("g",{class:"std-chip",tabindex:"0",role:"button","aria-label":s.number});
+    g.append(el("rect",{class:"box dash",x,y,width:w,height:hh,rx:7}));
+    g.append(tx(x+w/2,y+19,"sub",s.number.replace("ISO/IEC/IEEE ","")+"　"+tag,{"text-anchor":"middle"}));
+    g.addEventListener("click",ev=>{ev.stopPropagation();openStdPanel(s);});
+    g.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();openStdPanel(s);}});
+    scene.append(g);});
   const W=205,H=190,Y=128,GAP=12.4,X0=18;
   const main=["ai-inception","ai-design-dev","ai-vnv","ai-deployment","ai-operation-monitoring","ai-retirement"];
   const xs=main.map((_,i)=>X0+i*(W+GAP));
@@ -536,21 +552,22 @@ function renderDocs(){
   h+=`<div class="doc-grid">${must.map(docRow).join("")}</div>`;
   if(opt.length)h+=`<div class="sech" style="margin:18px 0 8px">關鍵紀錄（稽核常看，非逐字強制）</div><div class="doc-grid">${opt.map(docRow).join("")}</div>`;
   h+=`</div>`;
-  const fams=[...new Set(STDS.map(s=>s.family))];
+  const FAM_ORDER=["核心 ISMS","工程生命週期","風險","控制與實作","稽核與驗證","隱私","雲端","事故","AI"];
+  const fams=FAM_ORDER.filter(f=>STDS.some(s=>s.family===f)).concat([...new Set(STDS.map(s=>s.family))].filter(f=>!FAM_ORDER.includes(f)));
   h+=`<div class="theme"><div class="theme-h"><span class="th-ref">ISO 27000</span><span class="th-t">標準家族 · Standards family</span><span class="th-c">${STDS.length} 標準</span></div>`+
-    `<div class="docs-intro">圍繞 27001 的相關標準生態：核心 ISMS、控制實作、風險、稽核驗證、隱私、雲端、事故、AI。有對應圖者點卡片可跳轉。</div>`;
-  for(const f of fams){const cs=STDS.filter(s=>s.family===f);
+    `<div class="docs-intro">圍繞 27001 的標準生態。<b style="color:var(--cat-control)">可驗證</b>=能發證(27001/42001/27701)；其餘為指引/流程。卡片標「↳ 繼承自」=血緣上游。<b>點任一張卡看它的血緣＋是哪些節點的量尺</b>。</div>`;
+  for(const f of fams){const cs=STDS.filter(s=>s.family===f).sort((a,b)=>((a.parent||[]).length?1:0)-((b.parent||[]).length?1:0));
     h+=`<div class="sech" style="margin:14px 0 8px">${f}</div><div class="std-grid">`;
-    for(const s of cs){const jump=s.view&&VIEWS[s.view];
-      h+=`<div class="std-card${jump?" jump":""}"${jump?` data-view="${s.view}" tabindex="0" role="button" aria-label="${s.number}"`:""}>`+
-        `<div class="std-num">${s.number}</div><div class="std-title">${s.title}</div><div class="std-en">${s.title_en||""}</div>`+
-        `<div class="std-role">${s.role}</div><div class="std-rel">↔ 27001：${s.relation}</div>${jump?`<div class="std-jump">→ 看 ${VIEWS[s.view].n} ${VIEWS[s.view].t}</div>`:""}</div>`;}
+    for(const s of cs){const par=(s.parent||[])[0]?stdById.get((s.parent||[])[0]):null;
+      h+=`<div class="std-card jump" data-std="${s.id}" tabindex="0" role="button" aria-label="${s.number} ${s.title}">`+
+        `<div class="std-num">${s.number}</div><div class="std-title">${s.title} <span class="kbadge ${s.certifiable?"cert":"guide"}" style="margin-left:3px">${s.certifiable?"可驗證":"指引"}</span></div><div class="std-en">${s.title_en||""}</div>`+
+        `<div class="std-role">${s.role}</div>${par?`<div class="std-rel">↳ 繼承自 ${par.number}</div>`:""}<div class="std-rel">↔ 27001：${s.relation}</div></div>`;}
     h+=`</div>`;}
   h+=`</div>`;
   docsEl.innerHTML=h;
   docsEl.querySelectorAll(".doc-row[data-go]").forEach(r=>{const go=()=>select(r.dataset.go);
     r.addEventListener("click",go);r.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});});
-  docsEl.querySelectorAll(".std-card[data-view]").forEach(c=>{const go=()=>switchView(c.dataset.view);
+  docsEl.querySelectorAll(".std-card[data-std]").forEach(c=>{const go=()=>openStdPanel(stdById.get(c.dataset.std));
     c.addEventListener("click",go);c.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});});
 }
 
@@ -643,6 +660,8 @@ function openPanel(n){
   if(n.concepts?.length)h+=`<div class="sech">關鍵概念 · Key concepts</div>`+n.concepts.map(s=>`<div class="sc-item"><div class="sc-l">${s.label}</div>${s.note?`<div class="sc-n">${s.note}</div>`:""}</div>`).join("");
   const myDocs=docsByNode.get(n.id);
   if(myDocs?.length)h+=`<div class="sech ax">需要的文件化資訊 · Documents</div>`+myDocs.map(d=>`<div class="sc-item"><div class="sc-l">${d.name} <span style="color:var(--text-3);font-family:var(--mono);font-size:10px">${d.kind}${d.mandatory?" · 必備":""}</span></div>${d.why?`<div class="sc-n">${d.why}</div>`:""}</div>`).join("");
+  const myStds=stdsByNode.get(n.id);
+  if(myStds?.length)h+=`<div class="sech ax">相關標準 · Standards（量尺）</div>`+myStds.map(s=>`<div class="rel" data-std="${s.id}"><span class="rel-chip">${s.certifiable?"可驗證":"標準"}</span><span class="rel-t">${s.number}　${s.title}</span></div>`).join("");
   if(mode==="audit"&&n.audit){
     const L=(arr,cls)=>arr.map(x=>`<div class="audit-item${cls||""}">${x}</div>`).join("");
     if(n.audit.questions?.length)h+=`<div class="sech ax">稽核問句 · Audit Questions</div>${L(n.audit.questions)}`;
@@ -664,10 +683,30 @@ function openPanel(n){
     return `<div class="rel" data-go="${r.other}"><span class="rel-chip">${(r.rel||"").toUpperCase()}</span><span class="rel-arr">${r.dir==="out"?"→":"←"}</span><span class="rel-t">${o.ref?o.ref+" ":""}${o.title||o.id}</span>${cross?`<span class="rel-jump">跳 ${VIEWS[homeView(r.other)].n}</span>`:""}</div>`;}).join("");}
   pbody.innerHTML=h;
   pbody.querySelectorAll("[data-go]").forEach(r=>r.addEventListener("click",()=>select(r.dataset.go)));
+  pbody.querySelectorAll("[data-std]").forEach(r=>r.addEventListener("click",()=>openStdPanel(stdById.get(r.dataset.std))));
   panel.classList.add("open");panel.setAttribute("aria-hidden","false");
 }
 function closePanel(){panel.classList.remove("open");panel.setAttribute("aria-hidden","true");selected=null;
   scene.querySelectorAll(".node").forEach(g=>g.classList.remove("sel","linked","dim"));grid.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel","dim"));updateHash();}
+function openStdPanel(s){if(!s)return;
+  selected=null;scene.querySelectorAll(".node").forEach(g=>g.classList.remove("sel","linked","dim"));grid.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel","dim"));
+  let h=`<div class="ovl">STANDARD 標準 · ${s.family}</div><span class="ref">${s.number}</span><h2>${s.title}</h2>`;
+  if(s.title_en)h+=`<div class="en">${s.title_en}</div>`;
+  h+=`<div style="margin-top:10px"><span class="kbadge ${s.certifiable?"cert":"guide"}">${s.certifiable?"可驗證 (可發證)":"指引型"}</span></div>`;
+  if(s.role)h+=`<div class="sum">${s.role}</div>`;
+  h+=`<div class="sech ax">與 27001 的關係</div><div class="exp">${s.relation}</div>`;
+  const parents=(s.parent||[]).map(id=>stdById.get(id)).filter(Boolean);
+  if(parents.length)h+=`<div class="sech">繼承自 · Based on</div>`+parents.map(p=>`<div class="rel" data-std="${p.id}"><span class="rel-chip">上游</span><span class="rel-t">${p.number} ${p.title}</span></div>`).join("");
+  const kids=STDS.filter(x=>(x.parent||[]).includes(s.id));
+  if(kids.length)h+=`<div class="sech">衍生 · Derived</div>`+kids.map(c=>`<div class="rel" data-std="${c.id}"><span class="rel-chip">下游</span><span class="rel-t">${c.number} ${c.title}</span></div>`).join("");
+  const ns=(s.nodes||[]).map(id=>byId.get(id)).filter(Boolean);
+  if(ns.length)h+=`<div class="sech ax">量尺於 · Applies to</div>`+ns.map(n=>`<div class="rel" data-go="${n.id}"><span class="rel-chip">${n.ref||typeName(n.type).split(" ")[0]}</span><span class="rel-t">${n.title||n.id}</span><span class="rel-jump">跳 ${VIEWS[homeView(n.id)].n}</span></div>`).join("");
+  if(s.view&&VIEWS[s.view])h+=`<div class="sech">對應圖</div><div class="rel" data-view="${s.view}"><span class="rel-chip">圖</span><span class="rel-t">看 ${VIEWS[s.view].n} ${VIEWS[s.view].t}</span></div>`;
+  pbody.innerHTML=h;
+  pbody.querySelectorAll("[data-std]").forEach(r=>r.addEventListener("click",()=>openStdPanel(stdById.get(r.dataset.std))));
+  pbody.querySelectorAll("[data-go]").forEach(r=>r.addEventListener("click",()=>select(r.dataset.go)));
+  pbody.querySelectorAll("[data-view]").forEach(r=>r.addEventListener("click",()=>switchView(r.dataset.view)));
+  panel.classList.add("open");panel.setAttribute("aria-hidden","false");}
 document.getElementById("close").addEventListener("click",closePanel);
 svg.addEventListener("click",()=>{if(selected)closePanel();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){const ob=document.getElementById("onboard");if(ob.classList.contains("show"))closeOnboard();else closePanel();}if(e.key==="/"&&document.activeElement!==document.getElementById("q")){e.preventDefault();document.getElementById("q").focus();}});
@@ -767,6 +806,8 @@ document.getElementById("ob-tour").addEventListener("click",startTour);
   try{const dr=await fetch("./data/documents.json");if(dr.ok)DOCS=(await dr.json()).items||[];}catch(e){}
   try{const tr=await fetch("./data/standards.json");if(tr.ok)STDS=(await tr.json()).items||[];}catch(e){}
   for(const d of DOCS)if(d.nodeId&&byId.has(d.nodeId))(docsByNode.get(d.nodeId)||docsByNode.set(d.nodeId,[]).get(d.nodeId)).push(d);
+  stdById=new Map(STDS.map(s=>[s.id,s]));
+  for(const s of STDS)for(const nid of (s.nodes||[]))if(byId.has(nid))(stdsByNode.get(nid)||stdsByNode.set(nid,[]).get(nid)).push(s);
   for(const e of DATA.edges){(adj.get(e.from)||adj.set(e.from,[]).get(e.from)).push({other:e.to,rel:e.rel,dir:"out"});
     (adj.get(e.to)||adj.set(e.to,[]).get(e.to)).push({other:e.from,rel:e.rel,dir:"in"});}
   if(DATA.meta?.accent)document.documentElement.style.setProperty("--accent",DATA.meta.accent);

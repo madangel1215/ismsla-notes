@@ -220,4 +220,19 @@ describe("文件化資訊 + ISO 27000 家族 (參考資料)", () => {
     for (const k of ["27002", "27005", "27701", "31000"]) expect(nums).toContain(k);
     expect(standards.items.find((s) => s.id === "iso-31010")?.number).toContain("IEC 31010");
   });
+  it("標準 parent 血緣指向存在標準、nodes 量尺指向存在節點", () => {
+    const sids = new Set(standards.items.map((s) => s.id));
+    const badP = standards.items.flatMap((s) => (s.parent || []).filter((p) => !sids.has(p)).map((p) => `${s.id}->${p}`));
+    const badN = standards.items.flatMap((s) => (s.nodes || []).filter((n) => !nodeIds.has(n)).map((n) => `${s.id}->${n}`));
+    expect({ badP, badN }).toEqual({ badP: [], badN: [] });
+  });
+  it("可驗證(發證)標準限管理系統標準 27001/42001/27701", () => {
+    const cert = standards.items.filter((s) => s.certifiable).map((s) => s.id).sort();
+    expect(cert).toEqual(["iso-27001", "iso-27701", "iso-42001"]);
+  });
+  it("lifecycle 母標準 + AI 治理 + V&V 都已納入 (5338 血緣接回 15288/12207)", () => {
+    const ids = new Set(standards.items.map((s) => s.id));
+    expect(["iso-12207", "iso-15288", "iso-42001", "iso-23894", "iso-42005", "ieee-1012"].filter((x) => !ids.has(x))).toEqual([]);
+    expect(standards.items.find((s) => s.id === "iso-5338").parent.sort()).toEqual(["iso-12207", "iso-15288"]);
+  });
 });

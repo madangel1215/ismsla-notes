@@ -11,17 +11,20 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "number", "title", "title_en", "family", "role", "relation", "view"],
+        "required": ["id", "number", "title", "title_en", "family", "role", "relation", "view", "parent", "nodes", "certifiable"],
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string", "pattern": "^iso-[a-z0-9-]+$" },
+          "id": { "type": "string", "pattern": "^(iso|ieee)-[a-z0-9-]+$" },
           "number": { "type": "string", "minLength": 1 },
           "title": { "type": "string", "minLength": 1 },
           "title_en": { "type": "string", "minLength": 1 },
-          "family": { "type": "string", "enum": ["核心 ISMS", "控制與實作", "風險", "稽核與驗證", "隱私", "雲端", "事故", "AI"] },
+          "family": { "type": "string", "enum": ["核心 ISMS", "工程生命週期", "控制與實作", "風險", "稽核與驗證", "隱私", "雲端", "事故", "AI"] },
           "role": { "type": "string", "minLength": 1 },
           "relation": { "type": "string", "minLength": 1 },
-          "view": { "type": ["string", "null"], "enum": ["pdca", "risk", "ai", "controls", null] }
+          "view": { "type": ["string", "null"], "enum": ["pdca", "risk", "ai", "controls", null] },
+          "parent": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "nodes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "certifiable": { "type": "boolean" }
         }
       }
     }
