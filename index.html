@@ -366,21 +366,20 @@ details.exfb:not([open])>summary::after{transform:rotate(-90deg)}
 .theme-h .th-t{font-size:15px;font-weight:600}
 .theme-h .th-c{font-family:var(--mono);font-size:11px;color:var(--text-3);margin-left:auto}
 .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
-.chip{padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;cursor:pointer;
-  transition:all .16s var(--ease)}
-.chip:hover{border-color:var(--accent);background:var(--surface-2)}
-.chip.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.chip{transition:opacity .2s var(--ease)} .chip.dim{opacity:.3}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:10px;transition:border-color .16s var(--ease),background .16s var(--ease),box-shadow .16s var(--ease),transform .16s var(--ease),opacity .2s var(--ease);position:relative}
 .chip:hover{border-color:var(--accent);background:var(--surface-2);box-shadow:0 3px 12px rgba(0,0,0,.16);transform:translateY(-1px)}
-.chip{position:relative}
+.chip.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.chip.dim{opacity:.3}
+.chip-open{display:block;width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer;padding:10px 12px;border-radius:10px;position:relative}
+.chip-open:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .chip .c-ref{font-family:var(--mono);font-size:11.5px;color:var(--accent)}
 .chip .c-t{font-size:13.5px;color:var(--text);margin-top:3px;line-height:1.45}
 .chip .c-go{position:absolute;right:9px;top:9px;color:var(--text-3);opacity:0;transition:opacity .14s var(--ease);pointer-events:none}
-.chip:hover .c-go,.chip:focus-visible .c-go{opacity:.8}
+.chip:hover .c-go,.chip-open:focus-visible .c-go{opacity:.8}
 .chip.ws-conform{border-left:3px solid var(--cat-control)}
 .chip.ws-observe{border-left:3px solid var(--cat-risk)}
 .chip.ws-nc{border-left:3px solid var(--warn-strong)}
-.chip-ws{display:flex;gap:5px;margin-top:9px}
+.chip-ws{display:flex;gap:5px;margin-top:2px;padding:0 12px 11px}
 .chip-ws button{flex:1;font-size:12px;padding:5px 0;border-radius:6px;border:1px solid var(--line);background:var(--surface-2);color:var(--text-3);cursor:pointer;min-height:30px;transition:all .12s var(--ease)}
 .chip-ws button:hover{border-color:var(--line-2);color:var(--text)}
 .chip-ws button.on[data-wsq="conform"]{border-color:var(--cat-control);color:var(--cat-control);background:color-mix(in srgb,var(--cat-control) 14%,var(--surface))}
@@ -499,9 +498,11 @@ details.acc:not([open])>summary{margin-bottom:6px}
   .rail.collapsed .rail-item{justify-content:flex-start;padding:9px 10px}
   /* 觸控目標 ≥44px（行動裝置防誤觸）*/
   .ws-status button{min-height:44px;padding:8px 4px}
-  .lb-btn{min-height:44px;padding:10px 14px}
+  .lb-btn,.ctl-stat{min-height:44px;padding:10px 14px}
   .exo{padding:13px}
   .ex-ref,.toc-ov-item{min-height:40px}
+  .dsec-h{min-height:44px}
+  details.exfb>summary{min-height:40px}
 }
 /* ---------- command palette (⌘K) + help + glossary ---------- */
 .cmdk{position:fixed;inset:0;background:rgba(4,4,6,.6);backdrop-filter:blur(6px);display:none;justify-content:center;align-items:flex-start;padding-top:13vh;z-index:50}
@@ -1114,8 +1115,8 @@ function renderControls(){
   const marked=ctrls.filter(c=>WS[c.id]&&WS[c.id].status).length;
   const audit=mode==="audit", filtering=!!(ctlFilter||ctlSearch.trim());
   const chip=c=>{const st=(WS[c.id]&&WS[c.id].status)||"";
-    let s=`<div class="chip${st?" ws-"+st:""}" data-id="${c.id}" tabindex="0" role="button" aria-label="${c.ref} ${esc(c.title||"")}">`;
-    s+=`<div class="c-ref">${c.ref}<span class="chip-st st-${st||"none"}"></span></div><div class="c-t">${esc(c.title||"")}</div><span class="c-go">${icon("info",13)}</span>`;
+    let s=`<div class="chip${st?" ws-"+st:""}" data-id="${c.id}">`;
+    s+=`<button class="chip-open" aria-label="${esc(c.ref)} ${esc(c.title||"")}　看詳情"><div class="c-ref">${c.ref}<span class="chip-st st-${st||"none"}"></span></div><div class="c-t">${esc(c.title||"")}</div><span class="c-go">${icon("info",13)}</span></button>`;
     if(audit)s+=`<div class="chip-ws" role="group" aria-label="稽核狀態">`+[["conform","✓ 符合"],["observe","△ 觀察"],["nc","✗ 不符合"]].map(([v,t])=>`<button data-wsq="${v}" class="${st===v?"on":""}" aria-pressed="${st===v}">${t}</button>`).join("")+`</div>`;
     return s+`</div>`;
   };
@@ -1129,13 +1130,13 @@ function renderControls(){
   const themeTotal=p=>ctrls.filter(c=>(c.ref||"").startsWith(p)).length;
   let mx=1;for(const p of T4)for(const ty of TY)mx=Math.max(mx,cell(p,ty));
   const isF=(o)=>ctlFilter&&!ctlSearch.trim()&&JSON.stringify(ctlFilter)===JSON.stringify(o);
-  let heat=`<div class="heat" role="group" aria-label="覆蓋熱圖（點格子篩選）"><div class="heat-c heat-h"></div>`+TY.map(ty=>`<div class="heat-c heat-h hhead hclk${isF({type:ty})?" on":""}" data-hcol="${ty}" tabindex="0" role="button" title="篩選 ${ty}">${ty}</div>`).join("")+`<div class="heat-c heat-h">小計</div>`;
-  for(const p of T4)heat+=`<div class="heat-c heat-r hrow" data-hrow="${p}" tabindex="0" role="button" title="篩選 ${p}">${p}</div>`+TY.map(ty=>{const n=cell(p,ty);return `<div class="heat-c hcell" data-htheme="${p}" data-htype="${ty}" tabindex="0" role="button" style="background:color-mix(in srgb,var(--cat-control) ${6+Math.round(n/mx*42)}%,var(--surface))" title="篩選 ${p} × ${ty}（${n} 條）">${n}</div>`;}).join("")+`<div class="heat-c heat-tot hrow" data-hrow="${p}" tabindex="0" role="button" title="篩選 ${p}（${themeTotal(p)} 條）">${themeTotal(p)}</div>`;
+  let heat=`<div class="heat" role="group" aria-label="覆蓋熱圖（點格子篩選）"><div class="heat-c heat-h"></div>`+TY.map(ty=>`<div class="heat-c heat-h hhead hclk${isF({type:ty})?" on":""}" data-hcol="${ty}" tabindex="0" role="button" title="篩選 ${ty}" aria-label="篩選控制類型 ${ty}">${ty}</div>`).join("")+`<div class="heat-c heat-h">小計</div>`;
+  for(const p of T4)heat+=`<div class="heat-c heat-r hrow" data-hrow="${p}" tabindex="0" role="button" title="篩選 ${p}" aria-label="篩選主題 ${p}">${p}</div>`+TY.map(ty=>{const n=cell(p,ty);return `<div class="heat-c hcell" data-htheme="${p}" data-htype="${ty}" tabindex="0" role="button" style="background:color-mix(in srgb,var(--cat-control) ${6+Math.round(n/mx*42)}%,var(--surface))" title="篩選 ${p} × ${ty}（${n} 條）" aria-label="${p} ${ty} ${n} 條，點選篩選">${n}</div>`;}).join("")+`<div class="heat-c heat-tot hrow" data-hrow="${p}" tabindex="0" role="button" title="篩選 ${p}（${themeTotal(p)} 條）" aria-label="${p} 小計 ${themeTotal(p)} 條，點選篩選">${themeTotal(p)}</div>`;
   heat+=`</div>`;
   tocSections=[{id:"sec-heat",label:"覆蓋熱圖"},...(filtering?[]:groups.map(g=>({id:g.id,label:g.label})))];
   let html=`<button class="toc-fab" title="頁內目錄" aria-label="開啟頁內目錄">${icon("menu",18)}</button>`;
   html+=`<div class="ctl-toolbar"><div class="ctl-stats"><span class="ctl-hint">附錄 A · ${ctrls.length} 控制 · 已標記 <b style="color:var(--text)" id="ctl-marked">${marked}</b>/${ctrls.length}</span>`+
-    [["conform","✓ 符合"],["observe","△ 觀察"],["nc","✗ 不符合"],["unmarked","○ 未標"]].map(([v,t])=>`<button class="ctl-stat ${v}${ctlFilter&&ctlFilter.status===v?" on":""}" data-status="${v}">${t} <b>${v==="unmarked"?ctrls.length-marked:stN(v)}</b></button>`).join("")+
+    [["conform","✓ 符合"],["observe","△ 觀察"],["nc","✗ 不符合"],["unmarked","○ 未標"]].map(([v,t])=>`<button class="ctl-stat ${v}${ctlFilter&&ctlFilter.status===v?" on":""}" data-status="${v}" aria-pressed="${!!(ctlFilter&&ctlFilter.status===v)}">${t} <b>${v==="unmarked"?ctrls.length-marked:stN(v)}</b></button>`).join("")+
     `</div><div class="ctl-tools"><input class="ctl-search" type="text" placeholder="搜尋控制…" value="${esc(ctlSearch)}" aria-label="搜尋控制"><button id="oscal-btn">⤓ OSCAL</button></div></div>`;
   html+=`<div class="layerbar" role="radiogroup" aria-label="分層看法"><span class="lb-label">分層看法：</span>`+LAYERS.map(([k,n])=>`<button class="lb-btn${!filtering&&ctlLayer===k?" on":""}" data-layer="${k}" role="radio" aria-checked="${!filtering&&ctlLayer===k}">${n}</button>`).join("")+`</div>`;
   const LNOTE={cia:"多數控制三性兼具（機密 87／完整 84／可用 84 條），CIA 維度<b>區別力低</b>——主要用於反查具特定性質的控制，而非把控制硬分到單一性質。",operationalCapability:"ISO 27002:2022 屬性共 5 種，本工具收錄 4 種；第 5 種『Cybersecurity concepts（識別／保護／偵測／回應／復原，對齊 NIST CSF）』暫略。"};
@@ -1161,9 +1162,8 @@ function renderControls(){
   const ob=document.getElementById("oscal-btn");if(ob)ob.onclick=downloadOscal;
   wireDsec(grid);
   grid.querySelectorAll(".chip").forEach(ch=>{
-    ch.querySelectorAll(".chip-ws button").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();markCtl(ch.dataset.id,b.dataset.wsq);}));
-    ch.addEventListener("click",e=>{if(e.target.closest(".chip-ws"))return;select(ch.dataset.id);});
-    ch.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.target.closest(".chip-ws")){e.preventDefault();select(ch.dataset.id);}});
+    const op=ch.querySelector(".chip-open");if(op)op.addEventListener("click",()=>select(ch.dataset.id));
+    ch.querySelectorAll(".chip-ws button").forEach(b=>b.addEventListener("click",()=>markCtl(ch.dataset.id,b.dataset.wsq)));
   });
 }
 
@@ -1353,14 +1353,14 @@ function exCardHTML(q,opts){
         if(isAns){cls+=" correct";mark='<span class="exo-mark" style="color:var(--cat-control)">✓</span>';}
         else if(isPick){cls+=" wrong";mark='<span class="exo-mark" style="color:var(--warn-strong)">✗</span>';}}
       else if((picked||[]).includes(o.k))cls+=" sel";
-      s+=`<button class="${cls}" data-k="${o.k}"${graded?" disabled":""}><span class="exo-k">${o.k}</span><span class="exo-t">${esc(o.t)}</span>${mark}</button>`;}
+      s+=`<button class="${cls}" data-k="${o.k}"${graded?" disabled":""} aria-pressed="${(picked||[]).includes(o.k)}"><span class="exo-k">${o.k}</span><span class="exo-t">${esc(o.t)}</span>${mark}</button>`;}
     if(!graded&&!mock&&q.type==="multi")s+='<button class="ex-submit" data-submit="1">對答案</button>';
   }
   if(graded)s+=exFeedbackHTML(q,picked,opts.review);
   return s+`</div>`;
 }
 function renderPractice(){
-  let h=`<div class="ex-filter"><button class="lb-btn${!exTopic?" on":""}" data-extopic="">全部</button>`+examTopics().map(t=>`<button class="lb-btn${exTopic===t?" on":""}" data-extopic="${esc(t)}">${esc(t)}</button>`).join("")+`</div>`;
+  let h=`<div class="ex-filter" role="group" aria-label="主題篩選"><button class="lb-btn${!exTopic?" on":""}" data-extopic="" aria-pressed="${!exTopic}">全部</button>`+examTopics().map(t=>`<button class="lb-btn${exTopic===t?" on":""}" data-extopic="${esc(t)}" aria-pressed="${exTopic===t}">${esc(t)}</button>`).join("")+`</div>`;
   return h+EXAM.filter(q=>!exTopic||q.topic===exTopic).map(q=>exCardHTML(q)).join("");
 }
 function renderWrong(){
@@ -1422,11 +1422,12 @@ function wireCard(card){
   }
   const live=[...card.querySelectorAll(".exo:not(:disabled)")];if(!live.length)return;
   if(q.type==="multi"){
-    live.forEach(o=>o.onclick=()=>o.classList.toggle("sel"));
+    live.forEach(o=>o.onclick=()=>{const on=o.classList.toggle("sel");o.setAttribute("aria-pressed",String(on));});
     const sub=card.querySelector("[data-submit]");if(sub)sub.onclick=()=>commitAnswer(card,q,live.filter(o=>o.classList.contains("sel")).map(o=>o.dataset.k));
   }else live.forEach(o=>o.onclick=()=>commitAnswer(card,q,[o.dataset.k]));
 }
-function commitAnswer(card,q,picked){EX[q.id]={picked,correct:exGrade(q,picked),ts:Date.now()};exSave();rebuildCard(card,q,{});updateExStat();}
+function commitAnswer(card,q,picked){EX[q.id]={picked,correct:exGrade(q,picked),ts:Date.now()};exSave();rebuildCard(card,q,{});updateExStat();
+  const sm=examEl.querySelector('.exq[data-qid="'+q.id+'"] details.exfb>summary');if(sm)sm.focus();}  // 作答後焦點移到結果/解析(AT)
 function wireMock(){
   examEl.querySelectorAll("[data-startn]").forEach(b=>b.onclick=()=>startMock(+b.dataset.startn));
   examEl.querySelectorAll("[data-ref]").forEach(b=>b.onclick=()=>select(b.dataset.ref));
@@ -1454,7 +1455,7 @@ function renderExam(){
   if(mockTimer){clearInterval(mockTimer);mockTimer=null;}
   if(!EXAM.length){examEl.innerHTML=`<div class="ex-wrap"><div class="ex-empty">題庫尚未載入（data/exam.json 為空或需以 http 開啟）。</div></div>`;return;}
   const st=examStats(),modes=[["practice","練習"],["mock","模擬考"],["wrong","錯題本"]];
-  let h=`<div class="ex-wrap"><div class="ex-modes">`+modes.map(([k,n])=>`<button class="lb-btn${exMode===k?" on":""}" data-exmode="${k}">${n}${k==="wrong"&&st.wrong?` (${st.wrong})`:""}</button>`).join("")+`</div>`;
+  let h=`<div class="ex-wrap"><div class="ex-modes" role="tablist" aria-label="考題模式">`+modes.map(([k,n])=>`<button class="lb-btn${exMode===k?" on":""}" data-exmode="${k}" role="tab" aria-selected="${exMode===k}">${n}${k==="wrong"&&st.wrong?` (${st.wrong})`:""}</button>`).join("")+`</div>`;
   h+=`<div class="ex-stat">${statHTML()}</div>`;
   h+=exMode==="mock"?renderMock():exMode==="wrong"?renderWrong():renderPractice();
   examEl.innerHTML=h+`</div>`;
