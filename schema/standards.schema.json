@@ -18,7 +18,7 @@
           "number": { "type": "string", "minLength": 1 },
           "title": { "type": "string", "minLength": 1 },
           "title_en": { "type": "string", "minLength": 1 },
-          "family": { "type": "string", "enum": ["核心 ISMS", "工程生命週期", "控制與實作", "風險", "稽核與驗證", "隱私", "雲端", "事故", "AI"] },
+          "family": { "type": "string", "enum": ["核心 ISMS", "整合管理系統", "工程生命週期", "控制與實作", "風險", "稽核與驗證", "隱私", "雲端", "事故", "AI"] },
           "role": { "type": "string", "minLength": 1 },
           "relation": { "type": "string", "minLength": 1 },
           "view": { "type": ["string", "null"], "enum": ["pdca", "risk", "ai", "controls", null] },

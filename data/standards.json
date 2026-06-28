@@ -426,6 +426,66 @@
         "clause-9.2"
       ],
       "certifiable": false
+    },
+    {
+      "id": "iso-9000",
+      "number": "ISO 9000:2015",
+      "title": "品質管理系統—基礎與詞彙",
+      "title_en": "Quality management systems — Fundamentals and vocabulary",
+      "family": "整合管理系統",
+      "role": "QMS 的詞彙與七大品質管理原則(QMS 版的 27000)。",
+      "relation": "理解 9001 的字典；與 27001 共用 Annex SL 思維。",
+      "view": null,
+      "parent": [],
+      "nodes": [],
+      "certifiable": false
+    },
+    {
+      "id": "iso-9001",
+      "number": "ISO 9001:2015",
+      "title": "品質管理系統—要求",
+      "title_en": "Quality management systems — Requirements",
+      "family": "整合管理系統",
+      "role": "全球最普及的可驗證管理系統標準；2015 版引入 risk-based thinking。",
+      "relation": "與 27001 同 Annex SL 殼(條款4-10)、可整合導入與整合稽核；最常與 ISMS 一起跑的 MS。",
+      "view": "pdca",
+      "parent": [],
+      "nodes": [
+        "clause-4.4",
+        "clause-9.2",
+        "clause-10.2"
+      ],
+      "certifiable": true
+    },
+    {
+      "id": "iso-14001",
+      "number": "ISO 14001:2015",
+      "title": "環境管理系統—要求及使用指引",
+      "title_en": "Environmental management systems — Requirements with guidance for use",
+      "family": "整合管理系統",
+      "role": "環境管理系統(EMS)的可驗證要求。",
+      "relation": "與 27001 同 Annex SL 殼，可納入整合管理系統一起稽核。",
+      "view": "pdca",
+      "parent": [],
+      "nodes": [
+        "clause-4.4"
+      ],
+      "certifiable": true
+    },
+    {
+      "id": "iso-45001",
+      "number": "ISO 45001:2018",
+      "title": "職業安全衛生管理系統—要求及使用指引",
+      "title_en": "Occupational health and safety management systems — Requirements with guidance for use",
+      "family": "整合管理系統",
+      "role": "職業安全衛生(OH&S)管理系統的可驗證要求。",
+      "relation": "與 27001 同 Annex SL 殼，整合管理系統的常見成員。",
+      "view": "pdca",
+      "parent": [],
+      "nodes": [
+        "clause-4.4"
+      ],
+      "certifiable": true
     }
   ]
 }

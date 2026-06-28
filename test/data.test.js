@@ -226,9 +226,9 @@ describe("文件化資訊 + ISO 27000 家族 (參考資料)", () => {
     const badN = standards.items.flatMap((s) => (s.nodes || []).filter((n) => !nodeIds.has(n)).map((n) => `${s.id}->${n}`));
     expect({ badP, badN }).toEqual({ badP: [], badN: [] });
   });
-  it("可驗證(發證)標準限管理系統標準 27001/42001/27701", () => {
+  it("可驗證(發證)標準限管理系統標準 (27001/42001/27701/9001/14001/45001)", () => {
     const cert = standards.items.filter((s) => s.certifiable).map((s) => s.id).sort();
-    expect(cert).toEqual(["iso-27001", "iso-27701", "iso-42001"]);
+    expect(cert).toEqual(["iso-14001", "iso-27001", "iso-27701", "iso-42001", "iso-45001", "iso-9001"]);
   });
   it("lifecycle 母標準 + AI 治理 + V&V 都已納入 (5338 血緣接回 15288/12207)", () => {
     const ids = new Set(standards.items.map((s) => s.id));

@@ -428,7 +428,7 @@ details.acc:not([open])>summary{margin-bottom:6px}
       <div class="modal-card">
         <div class="ob-eyebrow">ISMS 主導稽核員 · 互動課程筆記</div>
         <h1>30 秒上手</h1>
-        <p>左側選單六個視圖：<b>① PDCA 運轉 ② 風險流程 ③ AI 生命週期 ④ 附錄A 控制 ⑤ 文件·標準 ⑥ 關係總覽</b>（☰ 可收合）。點任一節點看白話說明；右上 <b>⚙</b> 可切「學習者 / 稽核者(LA)視角」、深淺色、疊控制；點節點會把<b>相關的跨圖高亮</b>、其餘變暗。</p>
+        <p>左側選單七個視圖：<b>① PDCA ② 風險流程 ③ AI 生命週期 ④ AI 管理系統(42001) ⑤ 附錄A 控制 ⑥ 文件·標準 ⑦ 關係總覽</b>（☰ 可收合，⌘K 快速跳）。點任一節點看白話說明；右上 <b>⚙</b> 可切「學習者 / 稽核者(LA)視角」、深淺色、疊控制；點節點會把<b>相關的跨圖高亮</b>、其餘變暗。</p>
         <div class="ob-q">稽核三問當主線：<b>這是什麼架構？ · 有什麼風險？ · 產品/服務週期是什麼？</b></div>
         <div class="ob-actions">
           <button class="ob-go" id="ob-tour">▶ 帶我走一遍（稽核三問）</button>
@@ -660,6 +660,49 @@ function renderAI(){
   bands.forEach(([id,t],i)=>scene.append(bar(id,t,18,by0+i*(bh+8),bw,bh,false)));
 }
 
+// ---------- VIEW: 42001 AI 管理系統 (AIMS) ----------
+function renderAIMS(){
+  svg.setAttribute("viewBox","0 0 1240 880");
+  const click=(g,fn)=>{g.style.cursor="pointer";g.setAttribute("tabindex","0");g.setAttribute("role","button");
+    g.addEventListener("click",e=>{e.stopPropagation();fn();});
+    g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();fn();}});return g;};
+  scene.append(tx(28,42,"grp-label","ISO/IEC 42001 · AI 管理系統 (AIMS)"));
+  scene.append(tx(28,66,"note-h","與 27001 同 Annex SL 殼（條款 4–10）；環＝共用條款(點看)，側欄＝AI 專屬"));
+  scene.append(el("rect",{class:"boundary",x:250,y:96,width:740,height:716,rx:28}));
+  scene.append(tx(620,90,"boundary-label","AI 管理系統 — 範圍 [4.3]"));
+  const C={x:620,y:466,r:84};
+  const N={n6:{x:380,y:466,r:66},n78:{x:620,y:262,r:72},n9:{x:860,y:466,r:66},n10:{x:620,y:670,r:66}};
+  const ring=[[N.n6,N.n78,"計畫"],[N.n78,N.n9,"執行"],[N.n9,N.n10,"檢核"],[N.n10,N.n6,"行動"]];
+  for(const[a,b,lab]of ring){const p1=edgePt(a,b,6),p2=edgePt(b,a,6);const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2;
+    const ox=mx-C.x,oy=my-C.y,od=Math.hypot(ox,oy)||1;const cpx=mx+ox/od*46,cpy=my+oy/od*46;
+    scene.append(el("path",{class:"ring",d:`M${p1.x},${p1.y} Q${cpx},${cpy} ${p2.x},${p2.y}`,"marker-end":"url(#ah)"}));
+    scene.append(tx(mx+ox/od*66,my+oy/od*66+4,"ring-label",lab));}
+  for(const n of [N.n6,N.n78,N.n9,N.n10]){const p1=edgePt(C,n,2),p2=edgePt(n,C,2);scene.append(el("line",{class:"spoke",x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y}));}
+  const ringDisc=(cid,name,num,n,center)=>{const g=el("g",{class:"node","data-id":cid});
+    g.append(el("circle",{class:"disc"+(center?" center":""),cx:n.x,cy:n.y,r:n.r}));
+    g.append(tx(n.x,n.y+2,"nm",name));g.append(tx(n.x,n.y+22,"num","["+num+"]"));
+    click(g,()=>{selected=cid;scene.querySelectorAll(".node").forEach(x=>x.classList.toggle("sel",x===g));openPanel(byId.get(cid));updateHash();});scene.append(g);};
+  ringDisc("clause-6.1.1","規劃","6",N.n6);
+  ringDisc("clause-7.1","支援 / 運作","7 · 8",N.n78);
+  ringDisc("clause-9.1","績效評估","9",N.n9);
+  ringDisc("clause-10.1","改善","10",N.n10);
+  ringDisc("clause-5.1","領導作為","5",C,true);
+  // AI 專屬側欄（自訂導向：標準面板 / 圖三）
+  const aiSat=(label,sub,x,y,w,h,fn)=>{const g=el("g",{class:"node"});
+    g.append(el("rect",{class:"box dash",x,y,width:w,height:h,rx:10}));
+    g.append(tx(x+w/2,y+(sub?h/2-6:h/2+5),"nm sm",label,{"text-anchor":"middle"}));
+    if(sub)g.append(tx(x+w/2,y+h/2+13,"sub",sub,{"text-anchor":"middle"}));
+    click(g,fn);scene.append(g);return {x:x+w/2,y:y+h/2,w,h};};
+  const dl=(x1,y1,x2,y2)=>scene.append(el("line",{class:"flow-line",x1,y1,x2,y2,"marker-end":"url(#ah)"}));
+  const std=id=>()=>{const s=stdById.get(id);if(s)openStdPanel(s);};
+  const sLP=aiSat("AI 政策與治理","ISO/IEC 42001",34,150,184,62,std("iso-42001"));dl(218,181,edgePt(C,{x:218,y:181},6).x,edgePt(C,{x:218,y:181},6).y);
+  const sRisk=aiSat("AI 風險評鑑","ISO/IEC 23894",34,420,184,62,std("iso-23894"));dl(218,451,N.n6.x-N.n6.r,460);
+  const sImp=aiSat("AI 衝擊評鑑","ISO/IEC 42005",34,590,184,62,std("iso-42005"));dl(218,621,N.n6.x-40,N.n6.r+520);
+  const sLife=aiSat("AI 系統生命週期","→ 圖三 ISO/IEC 5338",1022,236,184,62,()=>switchView("ai"));dl(1022,267,N.n78.x+N.n78.r,300);
+  const sCtl=aiSat("AI 控制 · 附錄A","9 目標 / ~38 控制 (42001)",1022,436,184,62,std("iso-42001"));dl(1022,467,N.n9.x+N.n9.r,466);
+  scene.append(tx(620,856,"flow-label","可與 27001(ISMS) · 27701(PIMS) · 9001/14001/45001 整合為一套管理系統並整合稽核（Annex SL）"));
+}
+
 // ---------- VIEW: controls grid ----------
 function renderControls(){
   const themes=[["A.5","組織控制 Organizational"],["A.6","人員控制 People"],["A.7","實體控制 Physical"],["A.8","技術控制 Technological"]];
@@ -770,10 +813,11 @@ function renderExplorer(){
 const VIEWS={pdca:{n:"圖一",t:"PDCA 運轉",r:renderPDCA,cap:"圖一 · ISMS PDCA 運轉（條款 4–10）"},
   risk:{n:"圖二",t:"風險流程",r:renderRisk,cap:"圖二 · 風險管理流程（ISO 31000 / 27005）"},
   ai:{n:"圖三",t:"AI 生命週期",r:renderAI,cap:"圖三 · AI 系統生命週期（ISO/IEC 5338 / 22989）"},
+  aims:{n:"AIMS",t:"AI 管理系統",r:renderAIMS,cap:"ISO/IEC 42001 · AI 管理系統運轉（與 27001 同 Annex SL）"},
   controls:{n:"附錄A",t:"控制措施",r:renderControls,cap:"附錄 A · 93 控制措施（4 主題）"},
   docs:{n:"文件",t:"文件·標準",r:renderDocs,cap:"ISMS 文件化資訊清單（7.5）+ ISO 27000 標準家族"},
   explorer:{n:"總覽",t:"關係總覽",r:renderExplorer,cap:"關係總覽 · 只顯示有關係的節點（節點大小＝連線數；孤立控制見附錄A）"}};
-const RAIL_GROUPS=[["圖解 Diagrams",["pdca","risk","ai"]],["清單 Lists",["controls","docs"]],["探索 Explore",["explorer"]]];
+const RAIL_GROUPS=[["圖解 Diagrams",["pdca","risk","ai","aims"]],["清單 Lists",["controls","docs"]],["探索 Explore",["explorer"]]];
 function buildRail(){const r=document.getElementById("rail");r.innerHTML="";
   for(const[gname,keys]of RAIL_GROUPS){const g=document.createElement("div");g.className="rail-group";
     g.innerHTML=`<div class="rail-group-h">${gname}</div>`;
@@ -1016,7 +1060,7 @@ cmdkInput.addEventListener("keydown",e=>{
 cmdkEl.addEventListener("click",e=>{if(e.target===cmdkEl)closeCmdk();});
 
 // ---------- 鍵盤快捷鍵 + 說明 ----------
-const SHORTCUTS=[["⌘K / Ctrl K","命令面板（跳任何東西）"],["1 – 6","切換六個視圖"],["g","切 學習／稽核者視角"],["t","切 深／淺色"],["\\","收合／展開左側選單"],["/","聚焦搜尋"],["?","顯示此快捷鍵表"],["Esc","關閉面板／選單"]];
+const SHORTCUTS=[["⌘K / Ctrl K","命令面板（跳任何東西）"],["1 – 7","切換七個視圖"],["g","切 學習／稽核者視角"],["t","切 深／淺色"],["\\","收合／展開左側選單"],["/","聚焦搜尋"],["?","顯示此快捷鍵表"],["Esc","關閉面板／選單"]];
 function openHelp(){document.getElementById("help-grid").innerHTML=SHORTCUTS.map(([k,d])=>`<kbd>${k}</kbd><span>${d}</span>`).join("");document.getElementById("help").classList.add("show");}
 function closeHelp(){document.getElementById("help").classList.remove("show");}
 document.getElementById("help-close").addEventListener("click",closeHelp);
@@ -1024,7 +1068,7 @@ document.addEventListener("keydown",e=>{
   if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();openCmdk();return;}
   if(e.key==="Escape"){if(document.getElementById("help").classList.contains("show")){closeHelp();return;}if(cmdkEl.classList.contains("open")){closeCmdk();return;}}
   const tag=(e.target.tagName||"").toLowerCase();if(tag==="input"||tag==="textarea"||e.target.isContentEditable||e.metaKey||e.ctrlKey||e.altKey)return;
-  const vk={"1":"pdca","2":"risk","3":"ai","4":"controls","5":"docs","6":"explorer"};
+  const vk={"1":"pdca","2":"risk","3":"ai","4":"aims","5":"controls","6":"docs","7":"explorer"};
   if(vk[e.key])switchView(vk[e.key]);
   else if(e.key==="g"){setMode(mode==="learn"?"audit":"learn");if(selected)openPanel(byId.get(selected));updateHash();}
   else if(e.key==="t")setTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light");
