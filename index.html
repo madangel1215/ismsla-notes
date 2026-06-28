@@ -771,8 +771,8 @@ function renderRisk(){
   svg.setAttribute("viewBox","0 0 1120 1110");
   const cx=560;
   scene.append(el("rect",{class:"boundary",x:24,y:24,width:1072,height:946,rx:20}));
-  scene.append(bar("communication-consultation","溝通諮詢",40,150,118,690,true));
-  scene.append(bar("monitoring-review","監督審查",962,150,118,690,true));
+  scene.append(bar("communication-consultation","溝通諮詢",40,88,118,858,true));
+  scene.append(bar("monitoring-review","監督審查",962,88,118,858,true));
   scene.append(box("scope-context-criteria","範圍、全景、風險準則",null,cx-150,70,300,52,false));
   scene.append(el("rect",{class:"grp",x:cx-180,y:150,width:360,height:268,rx:12}));
   scene.append(tx(cx-168,172,"grp-label","風險評鑑 Risk assessment"));
@@ -806,8 +806,8 @@ function renderRisk(){
   // decision2 是 ↓ → 剩餘風險
   scene.append(arrow(`M${cx},885 L${cx},912`)); scene.append(tx(cx+16,905,"flow-label","是"));
   // ── 剩餘風險 wiring: ←溝通 / →監督 / ↓文件化 ──
-  scene.append(arrow(`M${cx-95},935 L160,935`));
-  scene.append(arrow(`M${cx+95},935 L960,935`));
+  scene.append(arrow(`M${cx-95},935 L158,935`));
+  scene.append(arrow(`M${cx+95},935 L962,935`));
   scene.append(arrow(`M${cx},958 L${cx},1000`));
   // ── decision1 否 → loop up to scope ──
   scene.append(el("path",{class:"flow-line",d:`M${cx+82},452 L862,452 L862,46 L${cx},46 L${cx},70`,"marker-end":"url(#ah)"}));
