@@ -52,4 +52,11 @@ CI（GitHub Actions，`.github/workflows/ci.yml`）每次 push 自動跑 `pnpm t
 
 ## 授權
 
-說明文字為原創白話轉譯；ISO/IEC、CNS、IEC 標準正文版權屬各標準組織所有，本專案未重製其正文。
+雙授權（程式與內容性質不同，分開授權）：
+
+- **程式碼**（HTML/CSS/JS、`scripts/`、`test/`、`schema/`）→ **MIT**（見 [`LICENSE`](./LICENSE)）。
+- **課程筆記內容**（`data/*.json` 的原創白話說明、稽核三件組、關鍵概念、文件/標準描述等）→ **CC BY-NC 4.0**（姓名標示—非商業性，見 [`CONTENT-LICENSE.md`](./CONTENT-LICENSE.md)）。
+
+ISO/IEC、CNS、IEC 標準**正文版權屬各標準組織所有，本專案未重製其正文**；僅引用事實性的編號/標題並以原創白話轉述。NIST SP 800-53 為美國政府公共領域。
+
+三張架構圖之教學編排啟發自講師 **Philip Ku** 的 ISMS 主導稽核員課程，本專案為學員自行重繪與白話轉譯、非官方教材。
