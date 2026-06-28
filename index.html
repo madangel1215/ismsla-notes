@@ -253,10 +253,15 @@ svg#canvas{width:100%;height:100%;display:block}
 .exo-mark{margin-left:auto;font-family:var(--mono);font-size:13px;flex:0 0 auto}
 .ex-submit{font-size:13px;padding:8px 16px;border-radius:9px;border:1px solid var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface));color:var(--text);cursor:pointer;margin-top:4px}
 .ex-submit:hover{background:color-mix(in srgb,var(--accent) 24%,var(--surface))}
-.exfb{margin-top:13px;border-top:1px solid var(--line);padding-top:12px}
-.exfb-h{font-size:13.5px;font-weight:600;margin-bottom:7px}
+details.exfb{margin-top:13px;border-top:1px solid var(--line);padding-top:12px}
+details.exfb>summary{list-style:none;cursor:pointer;display:flex;align-items:center;user-select:none;font-size:13.5px;font-weight:600}
+details.exfb>summary::-webkit-details-marker{display:none}
+details.exfb>summary::after{content:"▾";font-size:9px;color:var(--text-3);margin-left:auto;transition:transform .15s var(--ease)}
+details.exfb:not([open])>summary::after{transform:rotate(-90deg)}
 .exfb-h.ok{color:var(--cat-control)}
 .exfb-h.no{color:var(--warn-strong)}
+.exfb-toggle{font-size:11px;font-weight:400;color:var(--text-3);margin-left:8px}
+.exfb-body{margin-top:9px}
 .exfb-x{font-size:13.5px;line-height:1.75;color:var(--text-2);white-space:pre-wrap}
 .exfb-refs{margin-top:11px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .exfb-refs .rl{font-size:11px;color:var(--text-3)}
@@ -1282,13 +1287,13 @@ function exFeedbackHTML(q,picked,review){
   if(q.type==="order")head=ok?"✓ 順序正確":"✗ 順序不對";
   else if(q.type==="match")head=ok?"✓ 全部配對正確":"✗ 配對有誤";
   else head=(ok?"✓ 正確":"✗ "+((picked||[]).length?"答錯":"未作答"))+" — 正解 "+q.answer.join("、");
-  let s=`<div class="exfb"><div class="exfb-h ${ok?"ok":"no"}">${head}</div>`;
+  let s=`<details class="exfb" open><summary class="exfb-h ${ok?"ok":"no"}">${head}<span class="exfb-toggle">解析</span></summary><div class="exfb-body">`;
   if(q.type==="order")s+=`<div class="ord-ans"><span class="rl">正解順序：</span>`+q.answer.map((k,i)=>`<span class="ord-ans-i">${i+1}. ${esc((q.options.find(o=>o.k===k)||{}).t||k)}</span>`).join("")+`</div>`;
   s+=`<div class="exfb-x">${esc(q.explain)}</div>`;
   const refs=(q.refs||[]).map(r=>{const n=byId.get(r);return n?`<button class="ex-ref" data-ref="${r}">${esc((n.ref?n.ref+" ":"")+(n.title||r))}</button>`:"";}).filter(Boolean);
   if(refs.length)s+=`<div class="exfb-refs"><span class="rl">相關（點可跳回框架）：</span>${refs.join("")}</div>`;
   if(!review)s+=`<button class="ex-redo" data-redo="${q.id}">↺ 重做這題</button>`;
-  return s+`</div>`;
+  return s+`</div></details>`;
 }
 function exOrderBody(q,seq,graded,mock){
   seq=seq||[];const placed=new Set(seq);
@@ -1529,7 +1534,8 @@ function select(id){
 }
 function typeName(t){return({clause:"CLAUSE 條款",control:"CONTROL 控制","risk-step":"RISK 風險流程","risk-technique":"TECHNIQUE 技術","lifecycle-stage":"LIFECYCLE 生命週期","cross-cutting-band":"BAND 橫向關注帶",bridge:"BRIDGE 橋樑"})[t]||"NODE";}
 function accordionize(c){const kids=[...c.children];let det=null;const frag=document.createDocumentFragment();
-  for(const el of kids){if(el.classList.contains("sech")){det=document.createElement("details");det.open=true;det.className="acc";
+  const SECONDARY=/對映參考|NIST|相關標準|同章節|關聯|Relations|繼承自|衍生|要求來源|Sources|補充/;
+  for(const el of kids){if(el.classList.contains("sech")){det=document.createElement("details");det.open=!SECONDARY.test(el.textContent);det.className="acc";
       const s=document.createElement("summary");s.className=el.className;s.innerHTML=`<span class="mic" style="margin-right:1px">${icon(sechIcon(el.textContent),13)}</span>`+el.innerHTML;det.appendChild(s);frag.appendChild(det);}
     else if(det){det.appendChild(el);}else{frag.appendChild(el);}}
   c.innerHTML="";c.appendChild(frag);}
