@@ -1091,7 +1091,7 @@ function switchView(k){
     svg.style.display=htmlView?"none":"block";grid.classList.toggle("show",isGrid);docsEl.classList.toggle("show",isDocs);cyEl.classList.toggle("show",isExp);
     document.getElementById("cap").style.display=(isGrid||isDocs)?"none":"block";  // 滾動型 HTML 視圖不浮 caption
     if(isGrid)renderControls();else if(isExp)renderExplorer();else if(isDocs)renderDocs();else{scene.replaceChildren();VIEWS[k].r();}
-    if(selected){if(isExp)cyHighlight(selected);else if(!isDocs)highlight(selected);}
+    if(selected){if(isExp)cyHighlight(selected);else if(isGrid)highlight(selected);else if(!isDocs&&scene.querySelector('.node[data-id="'+CSS.escape(selected)+'"]'))highlight(selected);}
     updateHash();showHint(k);};
   // View Transitions API：切視圖平滑過場（尊重 reduced-motion；同視圖不過場）
   if(changed&&document.startViewTransition&&!REDUCE_MOTION)document.startViewTransition(run);else run();}
@@ -1099,7 +1099,7 @@ function switchView(k){
 // ---------- selection + panel ----------
 function highlight(id){
   const nb=new Set([id]);for(const e of (adj.get(id)||[]))nb.add(e.other);
-  scene.querySelectorAll(".node").forEach(g=>{const on=g.dataset.id===id,lk=nb.has(g.dataset.id);
+  scene.querySelectorAll(".node").forEach(g=>{if(!g.dataset.id)return;const on=g.dataset.id===id,lk=nb.has(g.dataset.id);
     g.classList.toggle("sel",on);g.classList.toggle("linked",lk&&!on);g.classList.toggle("dim",!lk);});
   grid.querySelectorAll(".chip").forEach(c=>{const on=c.dataset.id===id,lk=nb.has(c.dataset.id);
     c.classList.toggle("sel",on);c.classList.toggle("dim",!lk);});
