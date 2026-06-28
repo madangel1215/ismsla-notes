@@ -329,6 +329,20 @@ details.acc:not([open])>summary{margin-bottom:6px}
 .term-pop{position:fixed;max-width:290px;background:var(--glass);backdrop-filter:blur(20px) saturate(1.4);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.5);padding:10px 12px;font-size:12.5px;line-height:1.55;color:var(--text-2);z-index:60;display:none;pointer-events:none}
 .term-pop.show{display:block}
 .term-pop b{color:var(--text);display:block;margin-bottom:3px;font-size:13px}
+/* ---------- 稽核工作底稿 ---------- */
+.ws-status{display:flex;gap:6px;margin:2px 0 8px}
+.ws-status button{flex:1;font-size:12px;padding:6px 3px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--text-2);cursor:pointer;transition:all .14s var(--ease)}
+.ws-status button:hover{border-color:var(--line-2);color:var(--text)}
+.ws-status button.on{font-weight:600;color:var(--text)}
+.ws-status button.on[data-st="conform"]{border-color:var(--cat-control);color:var(--cat-control)}
+.ws-status button.on[data-st="observe"]{border-color:var(--cat-risk);color:var(--cat-risk)}
+.ws-status button.on[data-st="nc"]{border-color:var(--warn-strong);color:var(--warn)}
+.ws-status button.on[data-st=""]{border-color:var(--line-2)}
+.ws-note{width:100%;min-height:62px;resize:vertical;background:var(--surface);border:1px solid var(--line);border-radius:8px;color:var(--text);font-size:12.5px;line-height:1.5;padding:8px 10px;font-family:var(--font);outline:none}
+.ws-note:focus{border-color:var(--accent)}
+.chip-st{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--faint);margin-left:7px;vertical-align:middle}
+.chip-st.st-conform{background:var(--cat-control)}.chip-st.st-observe{background:var(--cat-risk)}.chip-st.st-nc{background:var(--warn-strong)}
+.chip-st.st-none{display:none}
 /* ---------- 列印稽核清單 ---------- */
 #print-area{display:none}
 @media print{
@@ -376,6 +390,7 @@ details.acc:not([open])>summary{margin-bottom:6px}
         <div class="menu-sep"></div>
         <button class="mrow" id="tour-btn2" role="menuitem"><span class="dot" style="background:var(--accent)"></span><span>▶ 稽核三問導覽</span></button>
         <button class="mrow" id="print-btn" role="menuitem"><span class="dot"></span><span>⎙ 列印稽核清單 (PDF)</span></button>
+        <button class="mrow" id="wsexport-btn" role="menuitem"><span class="dot"></span><span>⤓ 匯出稽核底稿 (CSV)</span></button>
       </div>
     </div>
   </header>
@@ -448,6 +463,10 @@ const grid=document.getElementById("grid"), docsEl=document.getElementById("docs
 const toastEl=document.getElementById("toast");
 let DATA=null, byId=new Map(), adj=new Map(), curView="pdca", selected=null, overlay=false, mode="learn";
 let DOCS=[], STDS=[], docsByNode=new Map(), stdsByNode=new Map(), stdById=new Map();
+let WS={};try{WS=JSON.parse(localStorage.getItem("ismsla_ws")||"{}");}catch(e){}
+function wsSave(){try{localStorage.setItem("ismsla_ws",JSON.stringify(WS));}catch(e){}}
+function wsSet(id,patch){WS[id]={...(WS[id]||{}),...patch};if(!WS[id].status&&!(WS[id].note||"").trim())delete WS[id];wsSave();}
+function updateChipStatus(id){const ch=grid.querySelector(`.chip[data-id="${id}"] .chip-st`);if(ch)ch.className="chip-st st-"+((WS[id]&&WS[id].status)||"none");}
 
 const el=(t,a,k)=>{const n=document.createElementNS(SVGNS,t);for(const x in a)n.setAttribute(x,a[x]);if(k)for(const c of [].concat(k))if(c)n.append(c);return n;};
 const tx=(x,y,cls,s,ex)=>el("text",{x,y,class:cls,...(ex||{})},document.createTextNode(s));
@@ -646,7 +665,7 @@ function renderControls(){
   let html='<div class="ctl-toolbar"><span class="ctl-hint">附錄 A · 93 控制（4 主題）— 可匯出為 NIST OSCAL 機讀格式</span><button id="oscal-btn">⤓ 匯出 OSCAL</button></div>';
   for(const[pre,tt]of themes){const cs=DATA.nodes.filter(n=>n.type==="control"&&(n.ref||"").startsWith(pre));
     html+=`<div class="theme"><div class="theme-h"><span class="th-ref">${pre}</span><span class="th-t">${tt}</span><span class="th-c">${cs.length} 控制</span></div><div class="chips">`;
-    for(const c of cs)html+=`<div class="chip" data-id="${c.id}" tabindex="0" role="button" aria-label="${c.ref} ${c.title||""}"><div class="c-ref">${c.ref}</div><div class="c-t">${c.title||""}</div></div>`;
+    for(const c of cs)html+=`<div class="chip" data-id="${c.id}" tabindex="0" role="button" aria-label="${c.ref} ${c.title||""}"><div class="c-ref">${c.ref}<span class="chip-st st-${(WS[c.id]&&WS[c.id].status)||"none"}"></span></div><div class="c-t">${c.title||""}</div></div>`;
     html+=`</div></div>`;}
   grid.innerHTML=html;
   grid.querySelectorAll(".chip").forEach(ch=>{ch.addEventListener("click",()=>select(ch.dataset.id));
@@ -807,6 +826,11 @@ function openPanel(n){
     if(n.audit.evidence?.length)h+=`<div class="sech ax">應備證據 · Evidence</div>${L(n.audit.evidence)}`;
     if(n.audit.nonconformities?.length)h+=`<div class="sech ax">常見不符合 · Nonconformities</div>${L(n.audit.nonconformities," nc")}`;
   }
+  if(n.type==="control"||n.type==="clause"){const w=WS[n.id]||{};
+    h+=`<div class="sech ax">稽核工作底稿 · Worksheet</div><div class="ws-status" data-ws="${n.id}">`+
+      [["","未查"],["conform","符合"],["observe","觀察"],["nc","不符合"]].map(([v,t])=>`<button data-st="${v}" class="${(w.status||"")===v?"on":""}">${t}</button>`).join("")+
+      `</div><textarea class="ws-note" data-wsnote="${n.id}" placeholder="稽核筆記（自動存本機，可匯出 CSV）">${(w.note||"").replace(/</g,"&lt;")}</textarea>`;
+  }
   if(n.attributes){const a=n.attributes;
     if(a.cia?.length){h+=`<div class="sech">CIA</div><div class="attrs">`+["機密性","完整性","可用性"].map(c=>`<span class="led ${a.cia.includes(c)?"on":""}"><span class="d"></span>${c}</span>`).join("")+`</div>`;}
     const more=[["控制類型",a.controlType],["作業能力",a.operationalCapability],["安全領域",a.securityDomain]].filter(([_,v])=>v?.length);
@@ -824,6 +848,10 @@ function openPanel(n){
   accordionize(pbody);tagGlossary(pbody);
   pbody.querySelectorAll("[data-go]").forEach(r=>r.addEventListener("click",()=>select(r.dataset.go)));
   pbody.querySelectorAll("[data-std]").forEach(r=>r.addEventListener("click",()=>openStdPanel(stdById.get(r.dataset.std))));
+  const wsBox=pbody.querySelector("[data-ws]");
+  if(wsBox){const id=wsBox.dataset.ws;
+    wsBox.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{wsSet(id,{status:b.dataset.st});wsBox.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));updateChipStatus(id);}));
+    const ta=pbody.querySelector("[data-wsnote]");if(ta){let t;ta.addEventListener("input",()=>{clearTimeout(t);t=setTimeout(()=>wsSet(id,{note:ta.value}),300);});}}
   panel.classList.add("open");panel.setAttribute("aria-hidden","false");
 }
 function closePanel(){panel.classList.remove("open");panel.setAttribute("aria-hidden","true");selected=null;
@@ -959,6 +987,8 @@ function buildCmdk(){cmdkItems=[
   {kind:"動作",label:"開始 稽核三問導覽",run:()=>startTour()},
   {kind:"動作",label:"匯出 OSCAL（93 控制）",run:()=>downloadOscal()},
   {kind:"動作",label:"列印 稽核清單（PDF）",run:()=>printChecklist()},
+  {kind:"動作",label:"匯出 稽核底稿（CSV）",run:()=>exportWorksheet()},
+  {kind:"動作",label:"清空 稽核底稿",run:()=>{if(confirm("確定清空所有稽核底稿標記與筆記？")){WS={};wsSave();if(curView==="controls")renderControls();toast("已清空稽核底稿");}}},
   {kind:"動作",label:"鍵盤快捷鍵說明",run:()=>openHelp()},
   ...DATA.nodes.map(n=>({kind:n.type==="control"?"控制":n.type==="clause"?"條款":"節點",label:(n.ref?n.ref+" ":"")+(n.title||n.id),hint:"前往",run:()=>select(n.id)})),
   ...STDS.map(s=>({kind:"標準",label:s.number+" "+s.title,hint:"開標準",run:()=>openStdPanel(s)})),
@@ -999,11 +1029,13 @@ document.addEventListener("keydown",e=>{
 function buildPrintChecklist(){
   const pa=document.getElementById("print-area");
   const theme=document.documentElement.getAttribute("data-theme")||"dark";
-  const prNode=(n)=>{let s=`<div class="pr-node"><h3><span class="pr-ref">${n.ref||""}</span>${n.title||""}</h3>`;
+  const stName={conform:"✔ 符合",observe:"△ 觀察",nc:"✘ 不符合"};
+  const prNode=(n)=>{const w=WS[n.id]||{};let s=`<div class="pr-node"><h3><span class="pr-ref">${n.ref||""}</span>${n.title||""}${w.status?` — ${stName[w.status]||""}`:""}</h3>`;
     if(n.audit?.questions?.length)s+=`<div class="pr-block"><b>稽核問句</b>`+n.audit.questions.map(q=>`<div class="pr-q">${q}</div>`).join("")+`</div>`;
     if(n.audit?.evidence?.length)s+=`<div class="pr-block"><b>應備證據</b>`+n.audit.evidence.map(x=>`<div class="pr-e">· ${x}</div>`).join("")+`</div>`;
     if(n.audit?.nonconformities?.length)s+=`<div class="pr-block"><b>常見不符合</b>`+n.audit.nonconformities.map(x=>`<div class="pr-nc">! ${x}</div>`).join("")+`</div>`;
     const docs=docsByNode.get(n.id);if(docs?.length)s+=`<div class="pr-block"><b>必備/相關文件</b>`+docs.map(d=>`<div class="pr-e">· ${d.name}（${d.kind}${d.mandatory?"·必備":""}）</div>`).join("")+`</div>`;
+    if(w.note)s+=`<div class="pr-block"><b>稽核筆記</b><div class="pr-e">${w.note.replace(/</g,"&lt;")}</div></div>`;
     return s+`</div>`;};
   const clauses=DATA.nodes.filter(n=>n.type==="clause"),controls=DATA.nodes.filter(n=>n.type==="control");
   pa.innerHTML=`<div class="pr-h1">ISMS 稽核清單 · ISO/IEC 27001:2022</div>`+
@@ -1013,6 +1045,16 @@ function buildPrintChecklist(){
 }
 function printChecklist(){buildPrintChecklist();setTimeout(()=>window.print(),60);}
 document.getElementById("print-btn").addEventListener("click",()=>{closeSettings();printChecklist();});
+function exportWorksheet(){
+  const stName={conform:"符合",observe:"觀察",nc:"不符合"};
+  const rows=[["nodeId","ref","title","type","status","note"]];
+  for(const id in WS){const n=byId.get(id);if(!n)continue;const w=WS[id];
+    rows.push([id,n.ref||"",n.title||"",n.type,stName[w.status]||"未查",(w.note||"").replace(/\s+/g," ").trim()]);}
+  if(rows.length===1){toast("底稿是空的——先在面板標記控制/條款");return;}
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="isms-audit-worksheet.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast(`已匯出稽核底稿（${rows.length-1} 筆）`);}
+document.getElementById("wsexport-btn").addEventListener("click",()=>{closeSettings();exportWorksheet();});
 
 // deep-link
 function updateHash(){const p=new URLSearchParams();p.set("view",curView);if(overlay)p.set("ov","1");if(mode==="audit")p.set("mode","audit");if(document.documentElement.getAttribute("data-theme")==="light")p.set("theme","light");if(selected)p.set("sel",selected);
