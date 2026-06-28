@@ -86,6 +86,7 @@ svg#canvas{width:100%;height:100%;display:block}
 .flow-line{stroke:var(--line-2);stroke-width:1.6;fill:none}
 .flow-label{fill:var(--text-3);font-family:var(--mono);font-size:12.5px;text-anchor:middle}
 .iso-tag{fill:var(--accent);font-family:var(--mono);font-size:11.5px}
+.iso-line{color:var(--accent);font-family:var(--mono);font-size:13px;margin:-2px 0 4px}
 .grp{fill:rgba(255,255,255,.015);stroke:var(--line);stroke-width:1;stroke-dasharray:5 5}
 .grp-label{fill:var(--text-2);font-size:14.5px;font-weight:600;letter-spacing:.04em}
 .sidebar-rect{fill:var(--surface);stroke:var(--line);stroke-width:1}
@@ -343,7 +344,7 @@ function renderPDCA(){
     g.append(tx(28,y+16,"num",nn));g.append(tx(46,y+16,"sub",t));wire(g,"clause-4.2",{x:95,y:y+12,r:12});scene.append(g);});
   const ay=496;scene.append(el("path",{class:"bigarrow",d:`M20,${ay} L182,${ay} L182,${ay-15} L224,${ay+8} L182,${ay+31} L182,${ay+16} L20,${ay+16} Z`}));
   scene.append(tx(101,ay+11,"bigarrow-label","風險與改善機會"));
-  scene.append(tx(392,284,"note-h","規劃產出 ▸ 執行"));["風險評鑑結果","風險處理結果","管理系統目標","規劃變更"].forEach((t,i)=>scene.append(tx(392,302+i*16,"note",t)));
+  // 「計畫產出→執行」已移到 規劃[6] 面板的關鍵概念，避免與弧線「計畫」標籤疊字
   [["合規",380],["達成目標",440],["管理風險",500]].forEach(([t,y])=>{scene.append(el("path",{class:"flow-line",d:`M842,440 C900,440 920,${y} 980,${y}`,"marker-end":"url(#aha)"}));scene.append(tx(992,y+4,"out-label",t));});
   scene.append(disc("clause-6.1.1","規劃","6",N.n6.x,N.n6.y,N.n6.r));
   scene.append(disc("clause-7.1","支援 / 運作","7 · 8",N.n78.x,N.n78.y,N.n78.r));
@@ -353,18 +354,22 @@ function renderPDCA(){
   if(overlay)drawOverlay({"clause-6.1.1":N.n6,"clause-7.1":N.n78,"clause-9.1":N.n9,"clause-10.1":N.n10,"clause-5.1":C});
 }
 function drawOverlay(anchors){
-  // scatter control chips near the clause node they implement (control -> clause edges)
-  const byClause={};
-  for(const e of DATA.edges){if(e.from.startsWith("control-")&&anchors[e.to]){(byClause[e.to]=byClause[e.to]||[]).push(e.from);}}
-  for(const cl in byClause){const a=anchors[cl];byClause[cl].forEach((cid,i)=>{const n=byId.get(cid);if(!n)return;
-    const ang=-Math.PI/2+i*0.5;const cx=a.x+Math.cos(ang)*(a.r+44),cy=a.y+Math.sin(ang)*(a.r+44);
-    const w=46,h=18;const g=el("g",{class:"ctrl-chip","data-id":cid});g.append(el("rect",{x:cx-w/2,y:cy-h/2,width:w,height:h,rx:5}));
-    g.append(tx(cx,cy+3,null,n.ref));g.addEventListener("click",ev=>{ev.stopPropagation();select(cid);});scene.append(g);});}
+  // 控制(control)→條款 的 edge，依條款章節對到圖一畫出來的圈，把控制 chip 疊上去
+  const SEC={"4":"clause-6.1.1","5":"clause-5.1","6":"clause-6.1.1","7":"clause-7.1","8":"clause-7.1","9":"clause-9.1","10":"clause-10.1"};
+  const byAnchor={};
+  for(const e of DATA.edges){ if(!e.from.startsWith("control-")) continue;
+    const ref=byId.get(e.to)?.ref||""; const sec=(ref.match(/\d+/)||[""])[0];
+    const aid=SEC[sec]; if(aid&&anchors[aid]) (byAnchor[aid]=byAnchor[aid]||[]).push(e.from); }
+  for(const aid in byAnchor){const a=anchors[aid];const arr=byAnchor[aid];
+    arr.forEach((cid,i)=>{const n=byId.get(cid);if(!n)return;
+      const ang=-Math.PI/2+(i-(arr.length-1)/2)*0.6;const ccx=a.x+Math.cos(ang)*(a.r+48),ccy=a.y+Math.sin(ang)*(a.r+48);
+      const w=52,h=18;const g=el("g",{class:"ctrl-chip","data-id":cid});g.append(el("rect",{x:ccx-w/2,y:ccy-h/2,width:w,height:h,rx:5}));
+      g.append(tx(ccx,ccy+3,null,n.ref));g.addEventListener("click",ev=>{ev.stopPropagation();select(cid);});scene.append(g);});}
 }
 
 // ---------- VIEW: RISK (ISO 31000/27005) ----------
 function renderRisk(){
-  svg.setAttribute("viewBox","0 0 1120 1060");
+  svg.setAttribute("viewBox","0 0 1120 1110");
   const cx=560;
   scene.append(el("rect",{class:"boundary",x:24,y:24,width:1072,height:946,rx:20}));
   scene.append(bar("communication-consultation","溝通諮詢",40,150,118,690,true));
@@ -420,7 +425,7 @@ function aiBox(id,x,y,w,h){const n=byId.get(id);if(!n)return;
     g.append(tx(x+14,yy,"ai-sub",t));yy+=16;}
   wire(g,id,{x:x+w/2,y:y+h/2,r:Math.max(w,h)/2});scene.append(g);}
 function renderAI(){
-  svg.setAttribute("viewBox","0 0 1420 868");
+  svg.setAttribute("viewBox","0 0 1420 938");
   scene.append(tx(20,38,"grp-label","AI 系統生命週期技術流程 — ISO/IEC 5338"));
   const W=205,H=190,Y=128,GAP=12.4,X0=18;
   const main=["ai-inception","ai-design-dev","ai-vnv","ai-deployment","ai-operation-monitoring","ai-retirement"];
@@ -537,7 +542,7 @@ function openPanel(n){
   let h=`<div class="ovl">${typeName(n.type)}</div><span class="ref">${n.ref||n.id}</span><h2>${n.title||n.id}</h2>`;
   if(n.title_en)h+=`<div class="en">${n.title_en}</div>`;
   if(n.summary)h+=`<div class="sum">${n.summary}</div>`;
-  if(n.iso27001)h+=`<div class="sech ax">對應 ISO 27001 · §${n.iso27001}</div>`;
+  if(n.iso27001)h+=`<div class="sech ax">對應 ISO 27001</div><div class="iso-line">§${n.iso27001}</div>`;
   if(n.explanation)h+=`<div class="sech">白話說明 · Explanation</div><div class="exp">${n.explanation}</div>`;
   if(n.supplements?.length)h+=`<div class="sech ax">補充 · 老師補充 / 相關標準</div>`+n.supplements.map(s=>`<div class="sc-item"><div class="sc-l">${s.ref?s.ref+" · ":""}${s.title||""}</div>${s.note?`<div class="sc-n">${s.note}</div>`:""}</div>`).join("");
   if(n.concepts?.length)h+=`<div class="sech">關鍵概念 · Key concepts</div>`+n.concepts.map(s=>`<div class="sc-item"><div class="sc-l">${s.label}</div>${s.note?`<div class="sc-n">${s.note}</div>`:""}</div>`).join("");
