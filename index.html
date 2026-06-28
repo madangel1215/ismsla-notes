@@ -208,16 +208,17 @@ svg#canvas{width:100%;height:100%;display:block}
 .dsec.collapsed>.dsec-h::before{transform:rotate(-90deg)}
 .dsec.collapsed>.dsec-body{display:none}
 .dsec.collapsed>.theme-h.dsec-h{margin-bottom:0;border-bottom-color:transparent}
-.doc-toc{position:fixed;right:14px;top:64px;width:180px;max-height:calc(100vh - 96px);overflow-y:auto;background:var(--glass);backdrop-filter:blur(18px) saturate(1.4);border:1px solid var(--line);border-radius:12px;padding:7px;z-index:7;display:flex;flex-direction:column;gap:1px;transition:width .18s var(--ease)}
-.doc-toc.collapsed{width:40px}
-.doc-toc-h{display:flex;align-items:center;gap:8px;padding:6px 8px;color:var(--text-3);font-family:var(--mono);font-size:11px;letter-spacing:.06em;cursor:pointer;background:transparent;border:0;text-align:left}
-.doc-toc-h:hover{color:var(--text)}
-.doc-toc.collapsed .toc-item{display:none}
-.toc-item{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--text-2);padding:6px 9px;border-radius:7px;cursor:pointer;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.toc-item:hover{background:var(--surface-2);color:var(--text)}
-.toc-item.sub{padding-left:20px;font-size:11.5px;color:var(--text-3)}
-.toc-item.sub:hover{color:var(--text)}
-@media(max-width:900px){.doc-toc{display:none}}
+/* 頁內目錄：☰ 按鈕 → 置中彈出(Notion 風) */
+.toc-fab{position:fixed;bottom:20px;right:20px;z-index:6;width:44px;height:44px;border-radius:12px;background:var(--glass);backdrop-filter:blur(16px) saturate(1.4);border:1px solid var(--line-2);color:var(--text);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+.toc-fab:hover{color:var(--text);border-color:var(--accent)}
+.toc-overlay{position:fixed;inset:0;background:rgba(4,4,6,.5);backdrop-filter:blur(5px);display:none;justify-content:center;align-items:flex-start;padding-top:15vh;z-index:50}
+.toc-overlay.open{display:flex}
+.toc-ov-card{width:min(440px,92vw);background:var(--glass);backdrop-filter:blur(30px) saturate(1.4);border:1px solid var(--line-2);border-radius:16px;box-shadow:0 40px 100px rgba(0,0,0,.6);padding:8px}
+.toc-ov-h{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--text-3);text-transform:uppercase;padding:8px 12px 6px}
+.toc-ov-list{max-height:60vh;overflow-y:auto}
+.toc-ov-item{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--text);padding:11px 14px;border-radius:9px;cursor:pointer;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toc-ov-item:hover{background:var(--surface-2)}
+.toc-ov-item.sub{padding-left:30px;font-size:13px;color:var(--text-2)}
 .doc-row{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;background:var(--surface);border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:all .16s var(--ease)}
 .doc-row:hover{border-color:var(--accent);background:var(--surface-2)}
 .doc-row:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
@@ -493,6 +494,12 @@ details.acc:not([open])>summary{margin-bottom:6px}
     </div>
   </div>
   <div class="term-pop" id="term-pop" aria-hidden="true"></div>
+  <div class="toc-overlay" id="toc-ov" aria-hidden="true">
+    <div class="toc-ov-card" role="dialog" aria-label="頁內目錄">
+      <div class="toc-ov-h">頁內目錄 · 跳到段落</div>
+      <div class="toc-ov-list" id="toc-ov-list"></div>
+    </div>
+  </div>
 </div>
 <div id="print-area"></div>
 
@@ -791,21 +798,18 @@ function renderControls(){
   const ctrls=DATA.nodes.filter(n=>n.type==="control");
   const stN=s=>ctrls.filter(c=>WS[c.id]&&WS[c.id].status===s).length;
   const marked=ctrls.filter(c=>WS[c.id]&&WS[c.id].status).length;
-  let html=`<nav class="doc-toc${tocCollapsed?" collapsed":""}" id="doc-toc" aria-label="頁內目錄"><button class="doc-toc-h" id="toc-toggle" aria-label="收合目錄">☰ <span class="toc-label">主題</span></button>`+
-    themes.map(([p,t])=>`<button class="toc-item" data-target="sec-ctl-${p}">${p}　${t.split(" ")[0]}</button>`).join("")+`</nav>`;
+  tocSections=themes.map(([p,t])=>({id:"sec-ctl-"+p,label:p+"　"+t}));
+  let html=`<button class="toc-fab" id="toc-fab" title="頁內目錄" aria-label="開啟頁內目錄">☰</button>`;
   html+=`<div class="ctl-toolbar"><span class="ctl-hint">附錄 A · 93 控制（4 主題）· 稽核底稿已標記 <b style="color:var(--text)">${marked}/93</b>（符合 ${stN("conform")} · 觀察 ${stN("observe")} · 不符合 ${stN("nc")}）</span><button id="oscal-btn">⤓ 匯出 OSCAL</button></div>`;
   for(const[pre,tt]of themes){const cs=ctrls.filter(c=>(c.ref||"").startsWith(pre));const id="sec-ctl-"+pre;
     const chips=cs.map(c=>`<div class="chip" data-id="${c.id}" tabindex="0" role="button" aria-label="${c.ref} ${c.title||""}"><div class="c-ref">${c.ref}<span class="chip-st st-${(WS[c.id]&&WS[c.id].status)||"none"}"></span></div><div class="c-t">${c.title||""}</div></div>`).join("");
     html+=`<section class="dsec${docCollapsed.has(id)?" collapsed":""}" id="${id}"><div class="theme-h dsec-h" data-sec="${id}"><span class="th-ref">${pre}</span><span class="th-t">${tt}</span><span class="th-c">${cs.length} 控制</span></div><div class="dsec-body"><div class="chips">${chips}</div></div></section>`;}
-  grid.innerHTML=html;
-  grid.style.paddingRight=(window.innerWidth>900?(tocCollapsed?56:200):32)+"px";
+  grid.innerHTML=html;grid.style.paddingRight="";
+  grid.querySelector("#toc-fab").addEventListener("click",openTocOv);
   grid.querySelectorAll(".chip").forEach(ch=>{ch.addEventListener("click",()=>select(ch.dataset.id));
     ch.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(ch.dataset.id);}});});
   const ob=document.getElementById("oscal-btn");if(ob)ob.onclick=downloadOscal;
   grid.querySelectorAll(".dsec-h[data-sec]").forEach(hd=>hd.addEventListener("click",()=>{const sid=hd.dataset.sec,s=document.getElementById(sid);const c=s.classList.toggle("collapsed");c?docCollapsed.add(sid):docCollapsed.delete(sid);}));
-  const toc=document.getElementById("doc-toc");
-  document.getElementById("toc-toggle").addEventListener("click",()=>{tocCollapsed=!tocCollapsed;toc.classList.toggle("collapsed",tocCollapsed);grid.style.paddingRight=(window.innerWidth>900?(tocCollapsed?56:200):32)+"px";});
-  grid.querySelectorAll(".toc-item[data-target]").forEach(b=>b.addEventListener("click",()=>{const s=document.getElementById(b.dataset.target);if(s){s.classList.remove("collapsed");docCollapsed.delete(b.dataset.target);s.scrollIntoView({behavior:REDUCE_MOTION?"auto":"smooth",block:"start"});}}));
 }
 
 // ---------- VIEW: 文件化資訊 + ISO 27000 家族 ----------
@@ -836,14 +840,13 @@ function renderDocs(){
   let sB=`<div class="docs-intro">圍繞 27001 的標準生態。<b style="color:var(--cat-control)">可驗證</b>=能發證；其餘為指引/流程。卡片標「↳ 繼承自」=血緣。<b>點卡看血緣＋它是哪些節點的量尺</b>。</div>`;
   fams.forEach((f,i)=>{const fid="sec-fam-"+i;const cs=STDS.filter(s=>s.family===f).sort((a,b)=>((a.parent||[]).length?1:0)-((b.parent||[]).length?1:0));
     sB+=sec(fid,{cls:"sech",html:`${f} <span class="th-c" style="margin-left:auto;font-family:var(--mono)">${cs.length}</span>`},`<div class="std-grid">${cs.map(stdCard).join("")}</div>`);});
-  // 右側頁內目錄 (TOC)
-  let h=`<nav class="doc-toc${tocCollapsed?" collapsed":""}" id="doc-toc" aria-label="頁內目錄"><button class="doc-toc-h" id="toc-toggle" aria-label="收合目錄">☰ <span class="toc-label">目錄</span></button>`+
-    `<button class="toc-item" data-target="sec-docs">文件化資訊</button><button class="toc-item" data-target="sec-stds">標準家族</button>`+
-    fams.map((f,i)=>`<button class="toc-item sub" data-target="sec-fam-${i}">${f}</button>`).join("")+`</nav>`;
+  // 頁內目錄資料（☰ 置中彈出）
+  tocSections=[{id:"sec-docs",label:"文件化資訊"},{id:"sec-stds",label:"標準家族"},...fams.map((f,i)=>({id:"sec-fam-"+i,label:f,sub:true}))];
+  let h=`<button class="toc-fab" id="toc-fab" title="頁內目錄" aria-label="開啟頁內目錄">☰</button>`;
   h+=sec("sec-docs",{cls:"theme-h",html:`<span class="th-ref">7.5</span><span class="th-t">ISMS 文件化資訊 · Documented information</span><span class="th-c">${DOCS.length} 項</span>`},dB);
   h+=sec("sec-stds",{cls:"theme-h",html:`<span class="th-ref">ISO 27000</span><span class="th-t">標準家族 · Standards family</span><span class="th-c">${STDS.length} 標準</span>`},sB);
-  docsEl.innerHTML=h;
-  docsEl.style.paddingRight=(window.innerWidth>900?(tocCollapsed?56:200):32)+"px";
+  docsEl.innerHTML=h;docsEl.style.paddingRight="";
+  docsEl.querySelector("#toc-fab").addEventListener("click",openTocOv);
   docsEl.querySelectorAll(".pyr-band[data-tier]").forEach(b=>b.addEventListener("click",()=>{const t=b.dataset.tier;docTierFilter=(docTierFilter===t)?null:t;renderDocs();}));
   docsEl.querySelectorAll(".pyr-clear").forEach(b=>b.addEventListener("click",()=>{docTierFilter=null;renderDocs();}));
   docsEl.querySelectorAll(".doc-row[data-go]").forEach(r=>{const go=()=>select(r.dataset.go);
@@ -851,11 +854,6 @@ function renderDocs(){
   docsEl.querySelectorAll(".std-card[data-std]").forEach(c=>{const go=()=>openStdPanel(stdById.get(c.dataset.std));
     c.addEventListener("click",go);c.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});});
   docsEl.querySelectorAll(".dsec-h[data-sec]").forEach(hd=>hd.addEventListener("click",()=>{const id=hd.dataset.sec,s=document.getElementById(id);const c=s.classList.toggle("collapsed");c?docCollapsed.add(id):docCollapsed.delete(id);}));
-  const toc=document.getElementById("doc-toc");
-  document.getElementById("toc-toggle").addEventListener("click",()=>{tocCollapsed=!tocCollapsed;toc.classList.toggle("collapsed",tocCollapsed);docsEl.style.paddingRight=(window.innerWidth>900?(tocCollapsed?56:200):32)+"px";});
-  docsEl.querySelectorAll(".toc-item[data-target]").forEach(b=>b.addEventListener("click",()=>{const t=b.dataset.target;
-    if(t.startsWith("sec-fam")){const p=document.getElementById("sec-stds");if(p){p.classList.remove("collapsed");docCollapsed.delete("sec-stds");}}
-    const s=document.getElementById(t);if(s){s.classList.remove("collapsed");docCollapsed.delete(t);s.scrollIntoView({behavior:REDUCE_MOTION?"auto":"smooth",block:"start"});}}));
 }
 
 // ---------- relationship explorer (Cytoscape) ----------
@@ -939,6 +937,17 @@ const HINTS={
   docs:"文件·標準＝上方文件金字塔(點層篩選)＋下方標準家族(可收合，點卡看血緣)；右側目錄可跳段。",
   explorer:"關係總覽＝知識圖，只顯示有關係的節點(大小＝連線數)。點節點看它連到誰；點圖例可篩選類別。",
 };
+// 頁內目錄 overlay（☰ → 置中彈出）
+let tocSections=[];
+const tocOv=document.getElementById("toc-ov"),tocOvList=document.getElementById("toc-ov-list");
+function tocJump(id){const s=document.getElementById(id);if(!s)return;
+  if(id.startsWith("sec-fam")){const p=document.getElementById("sec-stds");if(p){p.classList.remove("collapsed");docCollapsed.delete("sec-stds");}}
+  s.classList.remove("collapsed");docCollapsed.delete(id);s.scrollIntoView({behavior:REDUCE_MOTION?"auto":"smooth",block:"start"});}
+function openTocOv(){tocOvList.innerHTML=tocSections.map(s=>`<button class="toc-ov-item${s.sub?" sub":""}" data-target="${s.id}">${s.label}</button>`).join("");
+  tocOvList.querySelectorAll("[data-target]").forEach(b=>b.addEventListener("click",()=>{tocJump(b.dataset.target);closeTocOv();}));
+  tocOv.classList.add("open");tocOv.setAttribute("aria-hidden","false");}
+function closeTocOv(){tocOv.classList.remove("open");tocOv.setAttribute("aria-hidden","true");}
+tocOv.addEventListener("click",e=>{if(e.target===tocOv)closeTocOv();});
 const vhint=document.getElementById("vhint"),vhintT=document.getElementById("vhint-t");
 function showHint(k){if(!HINTS[k]||hintDismissed.has(k)){vhint.classList.remove("show");return;}vhintT.textContent=HINTS[k];vhint.classList.add("show");}
 document.getElementById("vhint-x").addEventListener("click",()=>{hintDismissed.add(curView);try{localStorage.setItem("iso_hints",JSON.stringify([...hintDismissed]));}catch(e){}vhint.classList.remove("show");});
@@ -1299,6 +1308,7 @@ document.getElementById("ob-tour").addEventListener("click",startTour);
 // ---------- 統一 Esc（單一優先序，只關最上層；不會誤關詳情面板） ----------
 document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;
   if(document.getElementById("help").classList.contains("show")){closeHelp();return;}
+  if(tocOv.classList.contains("open")){closeTocOv();return;}
   if(cmdkEl.classList.contains("open")){closeCmdk();return;}
   if(settingsMenu.classList.contains("open")){closeSettings();return;}
   if(tourIdx>=0){exitTour();return;}
