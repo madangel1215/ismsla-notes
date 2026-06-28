@@ -169,6 +169,22 @@ svg#canvas{width:100%;height:100%;display:block}
 /* 鍵盤焦點：SVG <g> 預設不畫 outline，用與 hover/選取一致的描邊+光暈 */
 .node:focus{outline:none}
 .node:focus-visible .disc,.node:focus-visible .box,.node:focus-visible .bar{stroke:var(--accent);filter:url(#glow)}
+/* 控制分層看法 + 覆蓋熱圖 + 控制層外環 */
+.layerbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 16px}
+.layerbar .lb-label{font-size:12px;color:var(--text-3);margin-right:2px}
+.lb-btn{font-size:12.5px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text-2);cursor:pointer;transition:all .14s var(--ease)}
+.lb-btn:hover{border-color:var(--line-2);color:var(--text)}
+.lb-btn.on{border-color:var(--accent);color:var(--text);background:var(--surface-2)}
+.heat{display:grid;grid-template-columns:auto repeat(3,minmax(60px,110px));gap:4px;margin:2px 0 4px}
+.heat-c{padding:10px 8px;border-radius:6px;text-align:center;font-size:13px;color:var(--text);font-family:var(--mono)}
+.heat-h{color:var(--text-3);font-size:11.5px;background:transparent;padding:4px 8px}
+.heat-r{color:var(--accent);background:transparent!important;text-align:left}
+.ovl-chip{cursor:pointer}
+.ovl-chip:focus{outline:none}
+.ovl-chip rect{fill:color-mix(in srgb,var(--cat-control) 14%,var(--surface));stroke:var(--cat-control);stroke-width:1.2;stroke-dasharray:6 4}
+.ovl-chip:hover rect,.ovl-chip:focus-visible rect{fill:color-mix(in srgb,var(--cat-control) 26%,var(--surface))}
+.ovl-chip .ot{fill:var(--text);font-size:15px;font-weight:600;text-anchor:middle}
+.ovl-chip .oc{fill:var(--cat-control);font-family:var(--mono);font-size:12px;text-anchor:middle}
 .ctrl-chip{cursor:pointer}
 .ctrl-chip rect{fill:color-mix(in srgb,var(--accent) 12%,var(--surface));stroke:var(--accent);stroke-width:.8}
 .ctrl-chip text{fill:var(--accent);font-family:var(--mono);font-size:11px;text-anchor:middle}
@@ -513,7 +529,7 @@ const toastEl=document.getElementById("toast");
 let DATA=null, byId=new Map(), adj=new Map(), curView="pdca", selected=null, overlay=false, mode="learn";
 let DOCS=[], STDS=[], docsByNode=new Map(), stdsByNode=new Map(), stdById=new Map();
 let WS={};try{WS=JSON.parse(localStorage.getItem("ismsla_ws")||"{}");}catch(e){}
-let docTierFilter=null, docCollapsed=new Set(), tocCollapsed=false;
+let docTierFilter=null, docCollapsed=new Set(), tocCollapsed=false, ctlLayer="theme";
 function wsSave(){try{localStorage.setItem("ismsla_ws",JSON.stringify(WS));}catch(e){}}
 function wsSet(id,patch){WS[id]={...(WS[id]||{}),...patch};if(!WS[id].status&&!(WS[id].note||"").trim())delete WS[id];wsSave();}
 function updateChipStatus(id){const ch=grid.querySelector(`.chip[data-id="${id}"] .chip-st`);if(ch)ch.className="chip-st st-"+((WS[id]&&WS[id].status)||"none");}
@@ -553,9 +569,19 @@ const ICONS={
   alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
   clipboard:'<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
   lightbulb:'<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+  cloud:'<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+  lock:'<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',
+  wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
 };
+const TIER_IC={政策:"flag",程序:"clipboard",作業:"wrench",紀錄:"check2",外部:"link"};
+const FAM_IC={"核心 ISMS":"shield","整合管理系統":"layers","工程生命週期":"settings","風險":"alert","控制與實作":"controls","稽核與驗證":"audit","隱私":"lock","雲端":"cloud","事故":"zap","AI":"ai"};
 function icon(name,size){const p=ICONS[name];if(!p)return"";return `<svg class="ic" viewBox="0 0 24 24" width="${size||16}" height="${size||16}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;}
 function sechIcon(t){if(/對應 ISO|相關標準/.test(t))return"link";if(/白話說明/.test(t))return"info";if(/補充|關鍵概念/.test(t))return"lightbulb";if(/需要的文件|文件化/.test(t))return"docs";if(/稽核問句/.test(t))return"question";if(/應備證據/.test(t))return"check2";if(/常見不符合/.test(t))return"alert";if(/工作底稿/.test(t))return"clipboard";if(/要求來源|同章節|關聯|繼承|衍生|量尺|對應圖/.test(t))return"link";return"dot";}
+// SVG 場景內的 icon（嵌套 <svg>，給圖表方框用）
+function svgIcon(name,x,y,size){const s=el("svg",{x,y,width:size||16,height:size||16,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":2,"stroke-linecap":"round","stroke-linejoin":"round",class:"svgic"});s.innerHTML=ICONS[name]||"";return s;}
 
 // which view a node belongs to — 依 type 分類（單一來源，與 CAT/renderControls 一致）
 function homeView(id){const n=byId.get(id);if(!n)return "pdca";
@@ -626,20 +652,22 @@ function renderPDCA(){
   scene.append(disc("clause-9.1","績效評估","9",N.n9.x,N.n9.y,N.n9.r));
   scene.append(disc("clause-10.1","改善","10",N.n10.x,N.n10.y,N.n10.r));
   scene.append(disc("clause-5.1","領導作為","5",C.x,C.y,C.r,true));
-  if(overlay)drawOverlay({"clause-6.1.1":N.n6,"clause-7.1":N.n78,"clause-9.1":N.n9,"clause-10.1":N.n10,"clause-5.1":C});
+  if(overlay)drawOverlay(N,C);
 }
-function drawOverlay(anchors){
-  // 控制(control)→條款 的 edge，依條款章節對到圖一畫出來的圈，把控制 chip 疊上去
-  const SEC={"4":"clause-6.1.1","5":"clause-5.1","6":"clause-6.1.1","7":"clause-7.1","8":"clause-7.1","9":"clause-9.1","10":"clause-10.1"};
-  const byAnchor={};
-  for(const e of DATA.edges){ if(byId.get(e.from)?.type!=="control") continue;
-    const ref=byId.get(e.to)?.ref||""; const sec=(ref.match(/\d+/)||[""])[0];
-    const aid=SEC[sec]; if(aid&&anchors[aid]) (byAnchor[aid]=byAnchor[aid]||[]).push(e.from); }
-  for(const aid in byAnchor){const a=anchors[aid];const arr=byAnchor[aid];
-    arr.forEach((cid,i)=>{const n=byId.get(cid);if(!n)return;
-      const ang=-Math.PI/2+(i-(arr.length-1)/2)*0.6;const ccx=a.x+Math.cos(ang)*(a.r+48),ccy=a.y+Math.sin(ang)*(a.r+48);
-      const w=52,h=18;const g=el("g",{class:"ctrl-chip","data-id":cid});g.append(el("rect",{x:ccx-w/2,y:ccy-h/2,width:w,height:h,rx:5}));
-      g.append(tx(ccx,ccy+3,null,n.ref));g.addEventListener("click",ev=>{ev.stopPropagation();select(cid);});scene.append(g);});}
+function drawOverlay(N,C){
+  // 控制層外環：附錄A 4 主題置於 PDCA 四角(＝包在管理系統外的落地層)；點主題→附錄A 該主題
+  const cnt=p=>DATA.nodes.filter(n=>n.type==="control"&&(n.ref||"").startsWith(p)).length;
+  scene.append(tx(560,100,"flow-label","附錄A 控制層 — 93 控制經 6.1.3 SoA 選出、在 7·8 運作落地（點主題看控制）"));
+  // 連到 支援/運作[7·8]（控制真正落地處）
+  scene.append(el("line",{class:"flow-line",x1:N.n78.x,y1:N.n78.y-N.n78.r,x2:N.n78.x,y2:118,"marker-end":"url(#ah)"}));
+  const C4=[["A.5","組織控制",250,116],["A.8","技術控制",790,116],["A.6","人員控制",250,748],["A.7","實體控制",790,748]];
+  for(const[pre,nm,x,y]of C4){const w=160,h=46;const g=el("g",{class:"ovl-chip",tabindex:"0",role:"button","aria-label":pre+" "+nm+" "+cnt(pre)+"控制"});
+    g.append(el("rect",{x,y,width:w,height:h,rx:10}));
+    g.append(tx(x+w/2,y+20,"ot",pre+" "+nm));
+    g.append(tx(x+w/2,y+37,"oc",cnt(pre)+" 控制"));
+    const go=()=>{ctlLayer="theme";switchView("controls");setTimeout(()=>{const s=document.getElementById("sec-ctl-"+pre);if(s){s.classList.remove("collapsed");docCollapsed.delete("sec-ctl-"+pre);s.scrollIntoView({behavior:REDUCE_MOTION?"auto":"smooth",block:"start"});}},140);};
+    g.addEventListener("click",e=>{e.stopPropagation();go();});g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}});
+    scene.append(g);}
 }
 
 // ---------- VIEW: RISK (ISO 31000/27005) ----------
@@ -870,19 +898,35 @@ function renderAuditFlow(){
 }
 
 // ---------- VIEW: controls grid ----------
+const LAYERS=[["theme","主題"],["controlType","控制類型"],["cia","CIA"],["securityDomain","安全領域"],["operationalCapability","操作能力"]];
+const themeName={"A.5":"組織控制 Organizational","A.6":"人員控制 People","A.7":"實體控制 Physical","A.8":"技術控制 Technological"};
 function renderControls(){
-  const themes=[["A.5","組織控制 Organizational"],["A.6","人員控制 People"],["A.7","實體控制 Physical"],["A.8","技術控制 Technological"]];
   const ctrls=DATA.nodes.filter(n=>n.type==="control");
   const stN=s=>ctrls.filter(c=>WS[c.id]&&WS[c.id].status===s).length;
   const marked=ctrls.filter(c=>WS[c.id]&&WS[c.id].status).length;
-  tocSections=themes.map(([p,t])=>({id:"sec-ctl-"+p,label:p+"　"+t}));
+  const chip=c=>`<div class="chip" data-id="${c.id}" tabindex="0" role="button" aria-label="${c.ref} ${c.title||""}"><div class="c-ref">${c.ref}<span class="chip-st st-${(WS[c.id]&&WS[c.id].status)||"none"}"></span></div><div class="c-t">${c.title||""}</div></div>`;
+  // 依「分層看法」分組
+  let groups=[];
+  if(ctlLayer==="theme"){for(const p of ["A.5","A.6","A.7","A.8"]){groups.push({id:"sec-ctl-"+p,label:`${p}　${themeName[p]}`,items:ctrls.filter(c=>(c.ref||"").startsWith(p))});}}
+  else{const ORD={controlType:["預防","偵測","矯正"],cia:["機密性","完整性","可用性"],securityDomain:["治理與生態系","保護","防禦","韌性"]};
+    let vals=ORD[ctlLayer]||[...new Set(ctrls.flatMap(c=>c.attributes?.[ctlLayer]||[]))].sort((a,b)=>ctrls.filter(c=>(c.attributes?.[ctlLayer]||[]).includes(b)).length-ctrls.filter(c=>(c.attributes?.[ctlLayer]||[]).includes(a)).length);
+    for(const v of vals){const items=ctrls.filter(c=>(c.attributes?.[ctlLayer]||[]).includes(v));if(items.length)groups.push({id:"sec-ctl-"+v,label:v,items});}}
+  // 覆蓋熱圖：主題 × 控制類型
+  const T4=["A.5","A.6","A.7","A.8"],TY=["預防","偵測","矯正"];
+  const cell=(p,ty)=>ctrls.filter(c=>(c.ref||"").startsWith(p)&&(c.attributes?.controlType||[]).includes(ty)).length;
+  let mx=1;for(const p of T4)for(const ty of TY)mx=Math.max(mx,cell(p,ty));
+  let heat=`<div class="heat"><div class="heat-c heat-h"></div>`+TY.map(ty=>`<div class="heat-c heat-h">${ty}</div>`).join("");
+  for(const p of T4)heat+=`<div class="heat-c heat-r">${p}</div>`+TY.map(ty=>{const n=cell(p,ty);return `<div class="heat-c" style="background:color-mix(in srgb,var(--cat-control) ${8+Math.round(n/mx*64)}%,var(--surface))" title="${p} ${ty}：${n} 控制">${n||""}</div>`;}).join("");
+  heat+=`</div>`;
+  tocSections=[{id:"sec-heat",label:"覆蓋熱圖"},...groups.map(g=>({id:g.id,label:g.label}))];
   let html=`<button class="toc-fab" id="toc-fab" title="頁內目錄" aria-label="開啟頁內目錄">${icon("menu",18)}</button>`;
-  html+=`<div class="ctl-toolbar"><span class="ctl-hint">附錄 A · 93 控制（4 主題）· 稽核底稿已標記 <b style="color:var(--text)">${marked}/93</b>（符合 ${stN("conform")} · 觀察 ${stN("observe")} · 不符合 ${stN("nc")}）</span><button id="oscal-btn">⤓ 匯出 OSCAL</button></div>`;
-  for(const[pre,tt]of themes){const cs=ctrls.filter(c=>(c.ref||"").startsWith(pre));const id="sec-ctl-"+pre;
-    const chips=cs.map(c=>`<div class="chip" data-id="${c.id}" tabindex="0" role="button" aria-label="${c.ref} ${c.title||""}"><div class="c-ref">${c.ref}<span class="chip-st st-${(WS[c.id]&&WS[c.id].status)||"none"}"></span></div><div class="c-t">${c.title||""}</div></div>`).join("");
-    html+=`<section class="dsec${docCollapsed.has(id)?" collapsed":""}" id="${id}"><div class="theme-h dsec-h" data-sec="${id}"><span class="th-ref">${pre}</span><span class="th-t">${tt}</span><span class="th-c">${cs.length} 控制</span></div><div class="dsec-body"><div class="chips">${chips}</div></div></section>`;}
+  html+=`<div class="ctl-toolbar"><span class="ctl-hint">附錄 A · 93 控制 · 稽核底稿已標記 <b style="color:var(--text)">${marked}/93</b>（符合 ${stN("conform")} · 觀察 ${stN("observe")} · 不符合 ${stN("nc")}）</span><button id="oscal-btn">⤓ 匯出 OSCAL</button></div>`;
+  html+=`<div class="layerbar"><span class="lb-label">分層看法：</span>`+LAYERS.map(([k,n])=>`<button class="lb-btn${ctlLayer===k?" on":""}" data-layer="${k}">${n}</button>`).join("")+`</div>`;
+  html+=`<section class="dsec${docCollapsed.has("sec-heat")?" collapsed":""}" id="sec-heat"><div class="theme-h dsec-h" data-sec="sec-heat"><span class="th-ref">覆蓋</span><span class="th-t">覆蓋熱圖 · 主題 × 控制類型</span><span class="th-c">深=控制多</span></div><div class="dsec-body">${heat}<div class="docs-intro" style="margin-top:8px">看哪格淺＝該主題該類型控制少（稽核常問：有沒有偵測/矯正控制）。下方依「分層看法」切換分組。</div></div></section>`;
+  for(const g of groups)html+=`<section class="dsec${docCollapsed.has(g.id)?" collapsed":""}" id="${g.id}"><div class="theme-h dsec-h" data-sec="${g.id}"><span class="th-t">${g.label}</span><span class="th-c">${g.items.length} 控制</span></div><div class="dsec-body"><div class="chips">${g.items.map(chip).join("")}</div></div></section>`;
   grid.innerHTML=html;grid.style.paddingRight="";
   grid.querySelector("#toc-fab").addEventListener("click",openTocOv);
+  grid.querySelectorAll(".lb-btn[data-layer]").forEach(b=>b.addEventListener("click",()=>{ctlLayer=b.dataset.layer;renderControls();}));
   grid.querySelectorAll(".chip").forEach(ch=>{ch.addEventListener("click",()=>select(ch.dataset.id));
     ch.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(ch.dataset.id);}});});
   const ob=document.getElementById("oscal-btn");if(ob)ob.onclick=downloadOscal;
