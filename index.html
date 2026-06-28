@@ -753,9 +753,42 @@ function renderAIMS(){
   sat("AI 控制 · 附錄A","42001 附錄A → 績效[9]",1022,436,std("iso-42001"),N.n9,1022,467);
 }
 
+// ---------- 稽核實務內容(d) + 面板 ----------
+const AUDIT={
+  nc:{title:"不符合 NC · 分級與報告",lead:"稽核發現分三級；開立『不符合』必須三要件齊全才成立。",std:["iso-19011"],sections:[
+    {h:"分級",items:["主要 Major：系統性失效、整個要求缺漏，或多個次要累積使系統失效；危及 ISMS 達成預期結果。通常須限期矯正、影響發證。","次要 Minor：單一、偶發、非系統性的疏漏，不致使系統失效。","觀察／改善機會 OFI：不算不符合，但有改善空間或潛在風險。"]},
+    {h:"NC 報告三要件（缺一不可）",items:["① 客觀證據：看到／聽到／量到的事實（文件、紀錄、現場觀察）。","② 違反的要求：對到 27001 哪一條款／SoA／組織自訂要求。","③ 不符合陳述：清楚說明『事實』與『要求』如何不符。"]},
+    {h:"撰寫原則",items:["對事不對人、可追溯、用詞中性。","現場由受稽方確認，避免事後爭議。","不替受稽方寫矯正方式（那是對方的責任）。"]},
+  ]},
+  stage:{title:"驗證旅程 · Stage 1 / Stage 2",lead:"第三方驗證的完整旅程；依 ISO/IEC 17021-1 ＋ 27006。",std:["iso-27006","iso-19011"],sections:[
+    {h:"Stage 1 · 文件審查／準備度",items:["審查文件化資訊，確認範圍／SoA／風險流程已就緒。","評估場址與受稽準備度、規劃 Stage 2、找出潛在不符合區域。"]},
+    {h:"Stage 2 · 實施審查",items:["現場查 ISMS 是否『有效實施並維持』。","蒐集符合／不符合的客觀證據、開立不符合、做出發證建議。"]},
+    {h:"發證後",items:["矯正不符合 → 驗證機構審查 → 核發證書（效期 3 年）。","監督稽核 Surveillance：通常每年一次，抽查維持。","再驗證 Recertification：第 3 年完整重稽、換證。"]},
+  ]},
+  tech:{title:"稽核技巧 · Techniques",lead:"用對方法才問得出客觀證據。",std:["iso-19011"],sections:[
+    {h:"提問與晤談",items:["開放式問句(5W1H)，少用是／否封閉問句，讓受稽方多說。","對到實際做事的人、營造安全氛圍、追問到證據。"]},
+    {h:"取證",items:["抽樣 Sampling：風險基礎、樣本具代表性，記錄抽樣依據（無法 100% 查）。","客觀證據：文件／紀錄／觀察／陳述（陳述需佐證），避免臆測。","稽核軌跡 Audit trail：循一線索前後追（如 事故→通報→處理→改善→紀錄）。","三角驗證：問＋看＋查紀錄，多來源交叉佐證。"]},
+  ]},
+  competence:{title:"稽核員能力與行為 · ISO 19011 §7",lead:"主導稽核員(LA)的資格基礎。",std:["iso-19011"],sections:[
+    {h:"個人行為",items:["正直、開放心態、外交手腕、善觀察、敏銳、適應、堅毅、果斷、自立、有韌性、行為合乎倫理。"]},
+    {h:"知識與技能",items:["管理系統與標準、稽核原則／程序／技巧、組織背景、適用法規、ISMS 與資安／風險專業。"]},
+    {h:"稽核組長(LA) 額外",items:["領導稽核組、管理稽核全程、溝通與衝突解決、做成稽核結論。"]},
+    {h:"能力取得與維持",items:["教育／訓練／工作與稽核經驗 → 評鑑（審查紀錄、回饋、見證稽核）→ 持續提升。"]},
+  ]},
+};
+function openAuditPanel(k){const a=AUDIT[k];if(!a)return;
+  selected=null;scene.querySelectorAll(".node").forEach(g=>g.classList.remove("sel","linked","dim"));
+  let h=`<div class="ovl">稽核實務 · How to audit</div><h2>${a.title}</h2>`;
+  if(a.lead)h+=`<div class="sum">${a.lead}</div>`;
+  for(const s of a.sections)h+=`<div class="sech ax">${s.h}</div>`+s.items.map(x=>`<div class="audit-item">${x}</div>`).join("");
+  if(a.std&&a.std.length)h+=`<div class="sech">相關標準</div>`+a.std.map(id=>{const s=stdById.get(id);return s?`<div class="rel" data-std="${id}"><span class="rel-chip">標準</span><span class="rel-t">${s.number} ${s.title}</span></div>`:"";}).join("");
+  pbody.innerHTML=h;accordionize(pbody);tagGlossary(pbody);
+  pbody.querySelectorAll("[data-std]").forEach(r=>r.addEventListener("click",()=>openStdPanel(stdById.get(r.dataset.std))));
+  panel.classList.add("open");panel.setAttribute("aria-hidden","false");}
+
 // ---------- VIEW: 稽核流程 (ISO 19011 · 如何稽核) ----------
 function renderAuditFlow(){
-  svg.setAttribute("viewBox","0 0 1380 480");
+  svg.setAttribute("viewBox","0 0 1380 564");
   const click=(g,fn)=>{g.style.cursor="pointer";g.setAttribute("tabindex","0");g.setAttribute("role","button");
     g.addEventListener("click",e=>{e.stopPropagation();fn();});
     g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();fn();}});return g;};
@@ -790,6 +823,14 @@ function renderAuditFlow(){
     g.append(tx(x+pw/2,ty+24,"nm sm",t,{"text-anchor":"middle"}));
     g.append(tx(x+pw/2,ty+43,"sub",sub,{"text-anchor":"middle"}));
     click(g,fn);scene.append(g);});
+  // 稽核實務深入(d)：點看細節面板
+  const dy=ty+92;scene.append(tx(28,dy-14,"note-h","稽核實務深入 · 點看細節"));
+  const deep=[["不符合 NC","分級 ＋ 報告三要件","nc"],["驗證旅程","Stage 1/2 → 監督 → 再驗證","stage"],["稽核技巧","問句／晤談／抽樣／證據","tech"],["稽核員能力","ISO 19011 §7 行為與知識","competence"]];
+  const dw=(1344/4)-12;deep.forEach(([t,sub,k],i)=>{const x=18+i*(1344/4);const g=el("g",{class:"node","aria-label":t});
+    g.append(el("rect",{class:"box",x,y:dy,width:dw,height:60,rx:9}));
+    g.append(tx(x+dw/2,dy+26,"nm sm",t,{"text-anchor":"middle"}));
+    g.append(tx(x+dw/2,dy+45,"sub",sub,{"text-anchor":"middle"}));
+    click(g,()=>openAuditPanel(k));scene.append(g);});
 }
 
 // ---------- VIEW: controls grid ----------
@@ -932,7 +973,7 @@ const HINTS={
   risk:"圖二＝風險流程(31000/27005)：中央主流程 識別→分析→評估→處理→剩餘風險(◇＝決策點)；左右『溝通諮詢/監督審查』貫穿全程；左側 IEC 31010 技術。",
   ai:"圖三＝AI 生命週期(5338)：6 階段橫向流＋持續確證(上)＋重新評估(下，迴圈回開發)；底部 22989 橫向關注帶；頂部標明上游母框架 15288/12207。",
   aims:"AIMS＝42001 與 27001 同 PDCA 殼；環上點看共用條款，側欄是 AI 專屬(政策/風險/衝擊評鑑/生命週期/控制)，點看對應標準。",
-  audit:"稽核流程＝ISO 19011『怎麼稽核』：啟動→文審(Stage 1)→現場(Stage 2)→報告→跟催；下方為三方稽核。點框看對應標準/條款。",
+  audit:"稽核流程＝ISO 19011『怎麼稽核』：啟動→文審(Stage 1)→現場(Stage 2)→報告→跟催；下方三方稽核＋『稽核實務深入』(NC分級/Stage1·2/技巧/能力，點看細節)。",
   controls:"附錄A＝93 控制(4 主題，標題可收合)。切『稽核者視角』每條看稽核三件組；面板可標稽核底稿狀態，這裡看進度。右側目錄可跳主題。",
   docs:"文件·標準＝上方文件金字塔(點層篩選)＋下方標準家族(可收合，點卡看血緣)；右側目錄可跳段。",
   explorer:"關係總覽＝知識圖，只顯示有關係的節點(大小＝連線數)。點節點看它連到誰；點圖例可篩選類別。",
@@ -1179,6 +1220,10 @@ function buildCmdk(){cmdkItems=[
   {kind:"動作",label:"匯出 稽核底稿（CSV）",run:()=>exportWorksheet()},
   {kind:"動作",label:"清空 稽核底稿",run:()=>{if(confirm("確定清空所有稽核底稿標記與筆記？")){WS={};wsSave();if(curView==="controls")renderControls();toast("已清空稽核底稿");}}},
   {kind:"動作",label:"重新顯示 視圖提示（怎麼看）",run:()=>resetHints()},
+  {kind:"稽核",label:"不符合 NC · 分級與報告三要件",run:()=>{switchView("audit");openAuditPanel("nc");}},
+  {kind:"稽核",label:"驗證旅程 · Stage 1 / Stage 2",run:()=>{switchView("audit");openAuditPanel("stage");}},
+  {kind:"稽核",label:"稽核技巧 · 問句/晤談/抽樣/證據",run:()=>{switchView("audit");openAuditPanel("tech");}},
+  {kind:"稽核",label:"稽核員能力與行為 · 19011 §7",run:()=>{switchView("audit");openAuditPanel("competence");}},
   {kind:"動作",label:"鍵盤快捷鍵說明",run:()=>openHelp()},
   ...DATA.nodes.map(n=>({kind:n.type==="control"?"控制":n.type==="clause"?"條款":"節點",label:(n.ref?n.ref+" ":"")+(n.title||n.id),hint:"前往",run:()=>select(n.id)})),
   ...STDS.map(s=>({kind:"標準",label:s.number+" "+s.title,hint:"開標準",run:()=>openStdPanel(s)})),
