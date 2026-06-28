@@ -64,6 +64,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-famil
 .icon-btn{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;color:var(--text-2);cursor:pointer;
   height:32px;min-width:32px;padding:0 9px;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .16s var(--ease)}
 .icon-btn:hover{color:var(--text);border-color:var(--line-2)}
+.ic{display:inline-block;vertical-align:middle;flex-shrink:0}
+.mic{display:inline-flex;align-items:center;color:var(--text-3);flex-shrink:0}
 .menu-wrap{position:relative;display:flex;gap:8px}
 .menu{position:absolute;top:40px;right:0;min-width:214px;background:var(--glass);backdrop-filter:blur(22px) saturate(1.4);
   border:1px solid var(--line);border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.5);padding:6px;display:none;z-index:30}
@@ -72,7 +74,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-famil
   color:var(--text-2);font-size:13px;cursor:pointer;text-align:left}
 .menu .mrow:hover{background:var(--surface-2);color:var(--text)}
 .menu .mrow .dot{width:8px;height:8px;border-radius:50%;background:var(--faint);flex-shrink:0}
-.menu .mrow.on{color:var(--text)} .menu .mrow.on .dot{background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.menu .mrow.on{color:var(--accent)} .menu .mrow.on .dot{background:var(--accent);box-shadow:0 0 6px var(--accent)} .menu .mrow.on .mic{color:var(--accent)}
 .menu-sep{height:1px;background:var(--line);margin:5px 4px}
 .tour-btn{color:var(--accent)!important;border-color:color-mix(in srgb,var(--accent) 45%,var(--line))!important}
 /* ---------- body + left rail ---------- */
@@ -423,13 +425,13 @@ details.acc:not([open])>summary{margin-bottom:6px}
       <button class="icon-btn tour-btn" id="tour-btn" title="導覽">▶</button>
       <button class="icon-btn" id="settings-btn" title="設定" aria-haspopup="true" aria-expanded="false">⚙</button>
       <div class="menu" id="settings-menu" role="menu">
-        <button class="mrow" id="theme-btn" role="menuitem"><span class="dot" id="theme-ico">🌙</span><span>深／淺色</span></button>
-        <button class="mrow" id="mode-btn" role="menuitem"><span class="dot"></span><span id="mode-label">學習者視角</span></button>
-        <button class="mrow" id="overlay-btn" role="menuitem"><span class="dot"></span><span>疊控制措施</span></button>
+        <button class="mrow" id="theme-btn" role="menuitem"><span class="mic" id="theme-ico"></span><span>深／淺色</span></button>
+        <button class="mrow" id="mode-btn" role="menuitem"><span class="mic"></span><span id="mode-label">學習者視角</span></button>
+        <button class="mrow" id="overlay-btn" role="menuitem"><span class="mic"></span><span>疊控制措施</span></button>
         <div class="menu-sep"></div>
-        <button class="mrow" id="tour-btn2" role="menuitem"><span class="dot" style="background:var(--accent)"></span><span>▶ 稽核三問導覽</span></button>
-        <button class="mrow" id="print-btn" role="menuitem"><span class="dot"></span><span>⎙ 列印稽核清單 (PDF)</span></button>
-        <button class="mrow" id="wsexport-btn" role="menuitem"><span class="dot"></span><span>⤓ 匯出稽核底稿 (CSV)</span></button>
+        <button class="mrow" id="tour-btn2" role="menuitem"><span class="mic"></span><span>稽核三問導覽</span></button>
+        <button class="mrow" id="print-btn" role="menuitem"><span class="mic"></span><span>列印稽核清單 (PDF)</span></button>
+        <button class="mrow" id="wsexport-btn" role="menuitem"><span class="mic"></span><span>匯出稽核底稿 (CSV)</span></button>
       </div>
     </div>
   </header>
@@ -520,6 +522,40 @@ const el=(t,a,k)=>{const n=document.createElementNS(SVGNS,t);for(const x in a)n.
 const tx=(x,y,cls,s,ex)=>el("text",{x,y,class:cls,...(ex||{})},document.createTextNode(s));
 const edgePt=(c,t,pad)=>{const dx=t.x-c.x,dy=t.y-c.y,d=Math.hypot(dx,dy)||1;return{x:c.x+dx/d*(c.r+(pad||0)),y:c.y+dy/d*(c.r+(pad||0))};};
 function toast(m){toastEl.textContent=m;toastEl.classList.add("show");setTimeout(()=>toastEl.classList.remove("show"),1800);}
+// ---------- 圖示系統（inline SVG, Lucide 風, currentColor）----------
+const ICONS={
+  pdca:'<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M21 21v-5h-5"/>',
+  risk:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  ai:'<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/>',
+  aims:'<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  audit:'<circle cx="11" cy="11" r="7"/><path d="m21 21-3.4-3.4"/><path d="m8.5 11 2 2 3.2-3.4"/>',
+  controls:'<path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/>',
+  docs:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  explorer:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/>',
+  menu:'<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>',
+  settings:'<path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/>',
+  play:'<polygon points="6 3 20 12 6 21 6 3"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  eye:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  layers:'<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.84Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+  printer:'<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+  zap:'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  book:'<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>',
+  shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  hash:'<line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>',
+  dot:'<circle cx="12" cy="12" r="3.5"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  question:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  check2:'<path d="M20 6 9 17l-5-5"/>',
+  alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  clipboard:'<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
+  lightbulb:'<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+};
+function icon(name,size){const p=ICONS[name];if(!p)return"";return `<svg class="ic" viewBox="0 0 24 24" width="${size||16}" height="${size||16}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;}
+function sechIcon(t){if(/對應 ISO|相關標準/.test(t))return"link";if(/白話說明/.test(t))return"info";if(/補充|關鍵概念/.test(t))return"lightbulb";if(/需要的文件|文件化/.test(t))return"docs";if(/稽核問句/.test(t))return"question";if(/應備證據/.test(t))return"check2";if(/常見不符合/.test(t))return"alert";if(/工作底稿/.test(t))return"clipboard";if(/要求來源|同章節|關聯|繼承|衍生|量尺|對應圖/.test(t))return"link";return"dot";}
 
 // which view a node belongs to — 依 type 分類（單一來源，與 CAT/renderControls 一致）
 function homeView(id){const n=byId.get(id);if(!n)return "pdca";
@@ -840,7 +876,7 @@ function renderControls(){
   const stN=s=>ctrls.filter(c=>WS[c.id]&&WS[c.id].status===s).length;
   const marked=ctrls.filter(c=>WS[c.id]&&WS[c.id].status).length;
   tocSections=themes.map(([p,t])=>({id:"sec-ctl-"+p,label:p+"　"+t}));
-  let html=`<button class="toc-fab" id="toc-fab" title="頁內目錄" aria-label="開啟頁內目錄">☰</button>`;
+  let html=`<button class="toc-fab" id="toc-fab" title="頁內目錄" aria-label="開啟頁內目錄">${icon("menu",18)}</button>`;
   html+=`<div class="ctl-toolbar"><span class="ctl-hint">附錄 A · 93 控制（4 主題）· 稽核底稿已標記 <b style="color:var(--text)">${marked}/93</b>（符合 ${stN("conform")} · 觀察 ${stN("observe")} · 不符合 ${stN("nc")}）</span><button id="oscal-btn">⤓ 匯出 OSCAL</button></div>`;
   for(const[pre,tt]of themes){const cs=ctrls.filter(c=>(c.ref||"").startsWith(pre));const id="sec-ctl-"+pre;
     const chips=cs.map(c=>`<div class="chip" data-id="${c.id}" tabindex="0" role="button" aria-label="${c.ref} ${c.title||""}"><div class="c-ref">${c.ref}<span class="chip-st st-${(WS[c.id]&&WS[c.id].status)||"none"}"></span></div><div class="c-t">${c.title||""}</div></div>`).join("");
@@ -883,7 +919,7 @@ function renderDocs(){
     sB+=sec(fid,{cls:"sech",html:`${f} <span class="th-c" style="margin-left:auto;font-family:var(--mono)">${cs.length}</span>`},`<div class="std-grid">${cs.map(stdCard).join("")}</div>`);});
   // 頁內目錄資料（☰ 置中彈出）
   tocSections=[{id:"sec-docs",label:"文件化資訊"},{id:"sec-stds",label:"標準家族"},...fams.map((f,i)=>({id:"sec-fam-"+i,label:f,sub:true}))];
-  let h=`<button class="toc-fab" id="toc-fab" title="頁內目錄" aria-label="開啟頁內目錄">☰</button>`;
+  let h=`<button class="toc-fab" id="toc-fab" title="頁內目錄" aria-label="開啟頁內目錄">${icon("menu",18)}</button>`;
   h+=sec("sec-docs",{cls:"theme-h",html:`<span class="th-ref">7.5</span><span class="th-t">ISMS 文件化資訊 · Documented information</span><span class="th-c">${DOCS.length} 項</span>`},dB);
   h+=sec("sec-stds",{cls:"theme-h",html:`<span class="th-ref">ISO 27000</span><span class="th-t">標準家族 · Standards family</span><span class="th-c">${STDS.length} 標準</span>`},sB);
   docsEl.innerHTML=h;docsEl.style.paddingRight="";
@@ -998,7 +1034,7 @@ function buildRail(){const r=document.getElementById("rail");r.innerHTML="";
   for(const[gname,keys]of RAIL_GROUPS){const g=document.createElement("div");g.className="rail-group";
     g.innerHTML=`<div class="rail-group-h">${gname}</div>`;
     for(const k of keys){const v=VIEWS[k];const b=document.createElement("button");b.className="rail-item"+(k===curView?" on":"");b.title=v.n+" "+v.t;
-      b.innerHTML=`<span class="ri-ico">${v.n}</span><span class="ri-label">${v.t}</span>`;b.onclick=()=>{switchView(k);if(window.innerWidth<=760)document.getElementById("rail").classList.remove("open");};g.append(b);}
+      b.innerHTML=`<span class="ri-ico">${icon(k,18)}</span><span class="ri-label">${v.t}</span>`;b.onclick=()=>{switchView(k);if(window.innerWidth<=760)document.getElementById("rail").classList.remove("open");};g.append(b);}
     r.append(g);}}
 const REDUCE_MOTION=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function switchView(k){
@@ -1031,7 +1067,7 @@ function select(id){
 function typeName(t){return({clause:"CLAUSE 條款",control:"CONTROL 控制","risk-step":"RISK 風險流程","risk-technique":"TECHNIQUE 技術","lifecycle-stage":"LIFECYCLE 生命週期","cross-cutting-band":"BAND 橫向關注帶",bridge:"BRIDGE 橋樑"})[t]||"NODE";}
 function accordionize(c){const kids=[...c.children];let det=null;const frag=document.createDocumentFragment();
   for(const el of kids){if(el.classList.contains("sech")){det=document.createElement("details");det.open=true;det.className="acc";
-      const s=document.createElement("summary");s.className=el.className;s.innerHTML=el.innerHTML;det.appendChild(s);frag.appendChild(det);}
+      const s=document.createElement("summary");s.className=el.className;s.innerHTML=`<span class="mic" style="margin-right:1px">${icon(sechIcon(el.textContent),13)}</span>`+el.innerHTML;det.appendChild(s);frag.appendChild(det);}
     else if(det){det.appendChild(el);}else{frag.appendChild(el);}}
   c.innerHTML="";c.appendChild(frag);}
 function openPanel(n){
@@ -1126,7 +1162,14 @@ function setMode(m){mode=m;modeBtn.classList.toggle("on",m==="audit");modeBtn.se
 modeBtn.addEventListener("click",()=>{setMode(mode==="learn"?"audit":"learn");if(selected)openPanel(byId.get(selected));updateHash();});
 // theme (dark / light)
 const themeBtn=document.getElementById("theme-btn");
-function setTheme(t){document.documentElement.setAttribute("data-theme",t);const ti=document.getElementById("theme-ico");if(ti)ti.textContent=t==="light"?"☀":"🌙";try{localStorage.setItem("iso_theme",t);}catch(e){}applyCyTheme();}
+function setTheme(t){document.documentElement.setAttribute("data-theme",t);const ti=document.getElementById("theme-ico");if(ti)ti.innerHTML=icon(t==="light"?"sun":"moon");try{localStorage.setItem("iso_theme",t);}catch(e){}applyCyTheme();}
+function initIcons(){
+  document.getElementById("rail-toggle").innerHTML=icon("menu",18);
+  document.getElementById("settings-btn").innerHTML=icon("settings",17);
+  document.getElementById("tour-btn").innerHTML=icon("play",14);
+  const set=(id,n)=>{const e=document.getElementById(id)?.querySelector(".mic");if(e)e.innerHTML=icon(n);};
+  set("mode-btn","eye");set("overlay-btn","layers");set("tour-btn2","play");set("print-btn","printer");set("wsexport-btn","download");
+}
 themeBtn.addEventListener("click",()=>setTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light"));
 (function(){let t=null;try{t=localStorage.getItem("iso_theme");}catch(e){}if(!t)t=(window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark";setTheme(t);})();
 // OSCAL export (client-side, NIST catalog format)
@@ -1234,7 +1277,8 @@ function closeCmdk(){cmdkEl.classList.remove("open");cmdkEl.setAttribute("aria-h
 function filterCmdk(q){q=q.trim().toLowerCase();
   cmdkShown=(q?cmdkItems.filter(it=>it.label.toLowerCase().includes(q)||it.kind.includes(q)):cmdkItems).slice(0,50);
   cmdkSel=0;renderCmdk();}
-function renderCmdk(){cmdkList.innerHTML=cmdkShown.map((it,i)=>`<div class="cmdk-item${i===cmdkSel?" on":""}" data-i="${i}"><span class="cmdk-kind">${it.kind}</span><span class="cmdk-label">${it.label}</span>${it.hint?`<span class="cmdk-hint">${it.hint}</span>`:""}</div>`).join("")||`<div class="cmdk-item"><span class="cmdk-label" style="color:var(--text-3)">無結果</span></div>`;
+const KIND_IC={視圖:"layers",動作:"zap",控制:"shield",條款:"hash",標準:"book",節點:"dot",稽核:"audit"};
+function renderCmdk(){cmdkList.innerHTML=cmdkShown.map((it,i)=>`<div class="cmdk-item${i===cmdkSel?" on":""}" data-i="${i}"><span class="cmdk-kind">${it.kind}</span><span class="cmdk-label"><span class="mic" style="margin-right:6px;color:var(--text-3)">${icon(KIND_IC[it.kind]||"dot",13)}</span>${it.label}</span>${it.hint?`<span class="cmdk-hint">${it.hint}</span>`:""}</div>`).join("")||`<div class="cmdk-item"><span class="cmdk-label" style="color:var(--text-3)">無結果</span></div>`;
   cmdkList.querySelectorAll("[data-i]").forEach(el=>el.addEventListener("click",()=>runCmdk(+el.dataset.i)));}
 function runCmdk(i){const it=cmdkShown[i];if(!it)return;closeCmdk();it.run();}
 cmdkInput.addEventListener("input",e=>filterCmdk(e.target.value));
@@ -1345,7 +1389,7 @@ document.getElementById("ob-tour").addEventListener("click",startTour);
   for(const e of DATA.edges){(adj.get(e.from)||adj.set(e.from,[]).get(e.from)).push({other:e.to,rel:e.rel,dir:"out"});
     (adj.get(e.to)||adj.set(e.to,[]).get(e.to)).push({other:e.from,rel:e.rel,dir:"in"});}
   if(DATA.meta?.accent)document.documentElement.style.setProperty("--accent",DATA.meta.accent);
-  buildRail();
+  buildRail();initIcons();
   const firstVisit = location.hash.length<=1;   // capture before switchView rewrites the hash
   if(location.hash.length>1)applyHash();else switchView("pdca");
   try{ if(firstVisit && !localStorage.getItem("iso_seen")){ document.getElementById("onboard").classList.add("show"); document.getElementById("ob-tour").focus(); } }catch(e){}
