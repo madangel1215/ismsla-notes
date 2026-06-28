@@ -127,3 +127,21 @@ describe("補充活檔 (supplements — 老師補充，防打錯)", () => {
     expect(bad).toEqual([]);
   });
 });
+
+describe("ISO 27001 對應 + 關鍵概念 (對抗式一致性)", () => {
+  const find = (id) => data.nodes.find((n) => n.id === id);
+  it("風險流程/AI生命週期/橫向帶/技術 節點都標了 iso27001 對應", () => {
+    const need = ["risk-step", "bridge", "risk-technique", "lifecycle-stage", "cross-cutting-band"];
+    const bad = data.nodes.filter((n) => need.includes(n.type) && !n.iso27001).map((n) => n.id);
+    expect(bad).toEqual([]);
+  });
+  it("風險相關章節都有關鍵概念說明 (資產/資產擁有者/風險擁有者…)", () => {
+    const must = ["clause-6.1.2", "clause-6.1.3", "risk-identification", "risk-assessment", "risk-treatment-options", "residual-risks"];
+    const bad = must.filter((id) => !(find(id)?.concepts?.length));
+    expect(bad).toEqual([]);
+  });
+  it("剩餘風險接到 監督審查/溝通諮詢/文件化 (圖二關鍵連線必存在)", () => {
+    const out = new Set(data.edges.filter((e) => e.from === "residual-risks").map((e) => e.to));
+    expect(["monitoring-review", "communication-consultation", "documented-information"].filter((t) => !out.has(t))).toEqual([]);
+  });
+});

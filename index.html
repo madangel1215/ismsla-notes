@@ -85,6 +85,7 @@ svg#canvas{width:100%;height:100%;display:block}
 .spoke-label{fill:var(--text-3);font-family:var(--mono);font-size:12px;text-anchor:middle}
 .flow-line{stroke:var(--line-2);stroke-width:1.6;fill:none}
 .flow-label{fill:var(--text-3);font-family:var(--mono);font-size:12.5px;text-anchor:middle}
+.iso-tag{fill:var(--accent);font-family:var(--mono);font-size:11.5px}
 .grp{fill:rgba(255,255,255,.015);stroke:var(--line);stroke-width:1;stroke-dasharray:5 5}
 .grp-label{fill:var(--text-2);font-size:14.5px;font-weight:600;letter-spacing:.04em}
 .sidebar-rect{fill:var(--surface);stroke:var(--line);stroke-width:1}
@@ -298,11 +299,13 @@ function disc(id,name,num,x,y,r,center){const g=el("g",{class:"node","data-id":i
   wire(g,id,{x,y,r});return g;}
 function box(id,title,sub,x,y,w,h,dash){const g=el("g",{class:"node","data-id":id,tabindex:"0",role:"button"});
   g.append(el("rect",{class:"box"+(dash?" dash":""),x,y,width:w,height:h,rx:10}));
+  {const _n=byId.get(id);if(_n&&_n.iso27001)g.append(tx(x+w-8,y+15,"iso-tag",_n.iso27001,{"text-anchor":"end"}));}
   g.append(tx(x+w/2,y+(sub?h/2-4:h/2+5),"nm sm",title,{"text-anchor":"middle"}));
   if(sub)g.append(tx(x+w/2,y+h/2+14,"sub",sub,{"text-anchor":"middle"}));
   wire(g,id,{x:x+w/2,y:y+h/2,r:Math.max(w,h)/2});return g;}
 function bar(id,title,x,y,w,h,vertical){const g=el("g",{class:"node","data-id":id,tabindex:"0",role:"button"});
   g.append(el("rect",{class:"bar",x,y,width:w,height:h,rx:10}));
+  {const _n=byId.get(id);if(_n&&_n.iso27001){if(vertical)g.append(tx(x+w/2,y+16,"iso-tag",_n.iso27001,{"text-anchor":"middle"}));else g.append(tx(x+w-12,y+h/2,"iso-tag",_n.iso27001,{"text-anchor":"end","dominant-baseline":"central"}));}}
   if(vertical){const cx=x+w/2,lh=26,sy=y+h/2-(title.length-1)*lh/2;
     [...title].forEach((ch,i)=>g.append(tx(cx,sy+i*lh,"nm sm",ch,{"text-anchor":"middle","dominant-baseline":"central"})));}
   else g.append(tx(x+w/2,y+h/2,"nm sm",title,{"text-anchor":"middle","dominant-baseline":"central"}));
@@ -409,6 +412,7 @@ function renderRisk(){
 function aiBox(id,x,y,w,h){const n=byId.get(id);if(!n)return;
   const g=el("g",{class:"node","data-id":id,tabindex:"0",role:"button"});
   g.append(el("rect",{class:"box",x,y,width:w,height:h,rx:10}));
+  if(n.iso27001)g.append(tx(x+w-12,y+22,"iso-tag",n.iso27001,{"text-anchor":"end"}));
   g.append(tx(x+14,y+26,"lab",n.title));
   if(n.title_en)g.append(tx(x+14,y+43,"sub",n.title_en));
   let yy=y+66;
@@ -533,8 +537,10 @@ function openPanel(n){
   let h=`<div class="ovl">${typeName(n.type)}</div><span class="ref">${n.ref||n.id}</span><h2>${n.title||n.id}</h2>`;
   if(n.title_en)h+=`<div class="en">${n.title_en}</div>`;
   if(n.summary)h+=`<div class="sum">${n.summary}</div>`;
+  if(n.iso27001)h+=`<div class="sech ax">對應 ISO 27001 · §${n.iso27001}</div>`;
   if(n.explanation)h+=`<div class="sech">白話說明 · Explanation</div><div class="exp">${n.explanation}</div>`;
   if(n.supplements?.length)h+=`<div class="sech ax">補充 · 老師補充 / 相關標準</div>`+n.supplements.map(s=>`<div class="sc-item"><div class="sc-l">${s.ref?s.ref+" · ":""}${s.title||""}</div>${s.note?`<div class="sc-n">${s.note}</div>`:""}</div>`).join("");
+  if(n.concepts?.length)h+=`<div class="sech">關鍵概念 · Key concepts</div>`+n.concepts.map(s=>`<div class="sc-item"><div class="sc-l">${s.label}</div>${s.note?`<div class="sc-n">${s.note}</div>`:""}</div>`).join("");
   if(mode==="audit"&&n.audit){
     const L=(arr,cls)=>arr.map(x=>`<div class="audit-item${cls||""}">${x}</div>`).join("");
     if(n.audit.questions?.length)h+=`<div class="sech ax">稽核問句 · Audit Questions</div>${L(n.audit.questions)}`;

@@ -99,6 +99,19 @@
               "nist_800_53": { "type": "array", "items": { "type": "string" } },
               "note": { "type": "string" }
             }
+          },
+          "iso27001": { "type": "string" },
+          "concepts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label"],
+              "additionalProperties": false,
+              "properties": {
+                "label": { "type": "string", "minLength": 1 },
+                "note": { "type": "string" }
+              }
+            }
           }
         }
       }
