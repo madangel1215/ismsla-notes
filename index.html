@@ -52,6 +52,7 @@
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--font);
   -webkit-font-smoothing:antialiased;overflow:hidden}
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.22s;animation-timing-function:var(--ease)}
 
 /* ---------- header (slim top bar) ---------- */
 .hdr{display:flex;align-items:center;gap:12px;height:52px;padding:0 12px 0 10px;
@@ -779,14 +780,19 @@ function buildRail(){const r=document.getElementById("rail");r.innerHTML="";
     for(const k of keys){const v=VIEWS[k];const b=document.createElement("button");b.className="rail-item"+(k===curView?" on":"");b.title=v.n+" "+v.t;
       b.innerHTML=`<span class="ri-ico">${v.n}</span><span class="ri-label">${v.t}</span>`;b.onclick=()=>{switchView(k);if(window.innerWidth<=760)document.getElementById("rail").classList.remove("open");};g.append(b);}
     r.append(g);}}
-function switchView(k){curView=k;buildRail();document.getElementById("cap").textContent=VIEWS[k].cap;
-  document.getElementById("view-title").textContent=VIEWS[k].n+" · "+VIEWS[k].t;
-  const isGrid=k==="controls",isExp=k==="explorer",isDocs=k==="docs",htmlView=isGrid||isExp||isDocs;
-  svg.style.display=htmlView?"none":"block";grid.classList.toggle("show",isGrid);docsEl.classList.toggle("show",isDocs);cyEl.classList.toggle("show",isExp);
-  document.getElementById("cap").style.display=(isGrid||isDocs)?"none":"block";  // 滾動型 HTML 視圖不浮 caption（避免疊到內容）
-  if(isGrid)renderControls();else if(isExp)renderExplorer();else if(isDocs)renderDocs();else{scene.replaceChildren();VIEWS[k].r();}
-  if(selected){if(isExp)cyHighlight(selected);else if(!isDocs)highlight(selected);}
-  updateHash();}
+const REDUCE_MOTION=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function switchView(k){
+  const changed=k!==curView;
+  const run=()=>{curView=k;buildRail();document.getElementById("cap").textContent=VIEWS[k].cap;
+    document.getElementById("view-title").textContent=VIEWS[k].n+" · "+VIEWS[k].t;
+    const isGrid=k==="controls",isExp=k==="explorer",isDocs=k==="docs",htmlView=isGrid||isExp||isDocs;
+    svg.style.display=htmlView?"none":"block";grid.classList.toggle("show",isGrid);docsEl.classList.toggle("show",isDocs);cyEl.classList.toggle("show",isExp);
+    document.getElementById("cap").style.display=(isGrid||isDocs)?"none":"block";  // 滾動型 HTML 視圖不浮 caption
+    if(isGrid)renderControls();else if(isExp)renderExplorer();else if(isDocs)renderDocs();else{scene.replaceChildren();VIEWS[k].r();}
+    if(selected){if(isExp)cyHighlight(selected);else if(!isDocs)highlight(selected);}
+    updateHash();};
+  // View Transitions API：切視圖平滑過場（尊重 reduced-motion；同視圖不過場）
+  if(changed&&document.startViewTransition&&!REDUCE_MOTION)document.startViewTransition(run);else run();}
 
 // ---------- selection + panel ----------
 function highlight(id){
