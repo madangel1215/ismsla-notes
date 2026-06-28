@@ -10,8 +10,12 @@ const here = dirname(fileURLToPath(import.meta.url));
 const data = JSON.parse(readFileSync(join(here, "../data/data.json"), "utf8"));
 const schema = JSON.parse(readFileSync(join(here, "../schema/data.schema.json"), "utf8"));
 const suppSchema = JSON.parse(readFileSync(join(here, "../schema/supplements.schema.json"), "utf8"));
+const docSchema = JSON.parse(readFileSync(join(here, "../schema/documents.schema.json"), "utf8"));
+const stdSchema = JSON.parse(readFileSync(join(here, "../schema/standards.schema.json"), "utf8"));
 
 const supplements = JSON.parse(readFileSync(join(here, "../data/supplements.json"), "utf8"));
+const documents = JSON.parse(readFileSync(join(here, "../data/documents.json"), "utf8"));
+const standards = JSON.parse(readFileSync(join(here, "../data/standards.json"), "utf8"));
 
 const nodeIds = new Set(data.nodes.map((n) => n.id));
 const archIds = new Set(data.architectures.map((a) => a.id));
@@ -172,5 +176,48 @@ describe("建置可重現性 (zones → data.json，防手改衍生檔漂移)", 
       for (const n of arr) if (!validateNode(n)) bad.push(`${f}:${n.id} ${JSON.stringify(validateNode.errors)}`);
     }
     expect(bad).toEqual([]);
+  });
+});
+
+describe("文件化資訊 + ISO 27000 家族 (參考資料)", () => {
+  const ajvV = (sch, doc) => {
+    const ajv = new Ajv({ allErrors: true });
+    addFormats(ajv);
+    const v = ajv.compile(sch);
+    const ok = v(doc);
+    if (!ok) console.error(v.errors);
+    return { ok, errors: v.errors };
+  };
+  it("documents.json 通過 JSON Schema 驗證", () => {
+    const { ok, errors } = ajvV(docSchema, documents);
+    expect(ok, JSON.stringify(errors, null, 2)).toBe(true);
+  });
+  it("standards.json 通過 JSON Schema 驗證", () => {
+    const { ok, errors } = ajvV(stdSchema, standards);
+    expect(ok, JSON.stringify(errors, null, 2)).toBe(true);
+  });
+  it("文件 id 不重複、nodeId 為 null 或指向存在節點", () => {
+    const ids = documents.items.map((d) => d.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const bad = documents.items.filter((d) => d.nodeId !== null && !nodeIds.has(d.nodeId)).map((d) => d.id);
+    expect(bad).toEqual([]);
+  });
+  it("標準 id 不重複、view 為 null 或存在的視圖", () => {
+    const ids = standards.items.map((s) => s.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const views = new Set(["pdca", "risk", "ai", "controls"]);
+    const bad = standards.items.filter((s) => s.view !== null && !views.has(s.view)).map((s) => s.id);
+    expect(bad).toEqual([]);
+  });
+  it("涵蓋 27001:2022 強制文件化資訊核心 (4.3/5.2/6.1.2/6.1.3/6.2/8.2/8.3/9.1/9.2/9.3/10.2)", () => {
+    const mand = documents.items.filter((d) => d.mandatory).map((d) => d.clause);
+    const has = (p) => mand.some((c) => c.startsWith(p));
+    const missing = ["4.3", "5.2", "6.1.2", "6.1.3", "6.2", "8.2", "8.3", "9.1", "9.2", "9.3", "10.2"].filter((p) => !has(p));
+    expect(missing).toEqual([]);
+  });
+  it("標準家族含核心 (27002/27005/27701/31000) 且 IEC 31010 標註正確", () => {
+    const nums = standards.items.map((s) => s.number).join(" ");
+    for (const k of ["27002", "27005", "27701", "31000"]) expect(nums).toContain(k);
+    expect(standards.items.find((s) => s.id === "iso-31010")?.number).toContain("IEC 31010");
   });
 });

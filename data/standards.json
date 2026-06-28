@@ -1,0 +1,155 @@
+{
+  "_about": "ISO 27000 標準家族：圍繞 27001 的相關標準生態。role=該標準在做什麼，relation=與 27001 的關係，view=對應的圖(可點跳)。手維護＋schema 驗證，內容為原創白話。",
+  "items": [
+    {
+      "id": "iso-27000",
+      "number": "ISO/IEC 27000:2018",
+      "title": "資訊安全管理系統—概觀與詞彙",
+      "title_en": "Information technology — Security techniques — Information security management systems — Overview and vocabulary",
+      "family": "核心 ISMS",
+      "role": "整個 27000 家族的字典與導覽圖，把「風險」「控制」「資產」等名詞定義一致化，讓所有標準講同一種語言；本身免費提供，是入門第一站。",
+      "relation": "讀 27001 前的詞彙底座；27001 用到的專有名詞都回到這裡定義，避免各方各自解讀。",
+      "view": null
+    },
+    {
+      "id": "iso-27002",
+      "number": "ISO/IEC 27002:2022",
+      "title": "資訊安全控制措施實作指引",
+      "title_en": "Information security, cybersecurity and privacy protection — Information security controls",
+      "family": "控制與實作",
+      "role": "把 93 條控制措施一條條講清楚要怎麼做、為什麼做，等於附錄 A 的詳細說明書（屬指引型，非要求型）。",
+      "relation": "27001 附錄 A 只列控制標題，27002 補上每條控制的實作細節與目的，是挑選與落地控制的主要參考。",
+      "view": "controls"
+    },
+    {
+      "id": "iso-27003",
+      "number": "ISO/IEC 27003:2017",
+      "title": "ISMS 實作指引",
+      "title_en": "Information technology — Security techniques — Information security management systems — Guidance",
+      "family": "核心 ISMS",
+      "role": "逐條手把手教你把 27001 條款 4 到 10 真的建起來，提供導入專案的操作建議（指引型）。",
+      "relation": "27001 說「要做什麼」，27003 補上「怎麼一步步做」，是建置 ISMS 的施工說明書。",
+      "view": "pdca"
+    },
+    {
+      "id": "iso-27004",
+      "number": "ISO/IEC 27004:2016",
+      "title": "資訊安全管理—監視、量測、分析與評估",
+      "title_en": "Information technology — Security techniques — Information security management — Monitoring, measurement, analysis and evaluation",
+      "family": "核心 ISMS",
+      "role": "教你怎麼設計指標與量測，判斷 ISMS 與控制到底有沒有效，把成效變成看得見的數字（指引型）。",
+      "relation": "落地 27001 條款 9.1（績效監視與量測）的方法指引，提供指標設計與資料蒐集範例。",
+      "view": "pdca"
+    },
+    {
+      "id": "iso-27005",
+      "number": "ISO/IEC 27005:2022",
+      "title": "資訊安全風險管理指引",
+      "title_en": "Information security, cybersecurity and privacy protection — Guidance on managing information security risks",
+      "family": "風險",
+      "role": "專講資安風險怎麼識別、分析、評估與處理的完整方法，是風險作業的操作藍本（指引型）。",
+      "relation": "把 27001 條款 6.1 的風險評估與處理要求，落地成可執行的資安風險流程；為 ISO 31000 在資安領域的專門化版本。",
+      "view": "risk"
+    },
+    {
+      "id": "iso-27006",
+      "number": "ISO/IEC 27006-1:2024",
+      "title": "ISMS 稽核與驗證機構要求",
+      "title_en": "Information security, cybersecurity and privacy protection — Requirements for bodies providing audit and certification of information security management systems — Part 1: General",
+      "family": "稽核與驗證",
+      "role": "規範「發證書的驗證機構」自己要符合哪些條件（要求型），補充 ISO/IEC 17021-1，確保各家頒發的 27001 證書具備一致公信力。",
+      "relation": "27001 是被稽核的對象，27006-1 管的是稽核別人、發證的機構資格，撐起整個驗證制度的可信度；2024 版取代 27006:2015。",
+      "view": null
+    },
+    {
+      "id": "iso-27007",
+      "number": "ISO/IEC 27007:2020",
+      "title": "ISMS 稽核指引",
+      "title_en": "Information security, cybersecurity and privacy protection — Guidelines for information security management systems auditing",
+      "family": "稽核與驗證",
+      "role": "教稽核員怎麼規劃與執行一場 ISMS 稽核，從稽核方案、能力到現場技巧都給建議（指引型）。",
+      "relation": "支援 27001 條款 9.2 內部稽核，也是第三方稽核員的作業參考，與 ISO 19011 通用稽核指引搭配使用。",
+      "view": "pdca"
+    },
+    {
+      "id": "iso-27017",
+      "number": "ISO/IEC 27017:2015",
+      "title": "雲端服務資訊安全控制實務",
+      "title_en": "Information technology — Security techniques — Code of practice for information security controls based on ISO/IEC 27002 for cloud services",
+      "family": "雲端",
+      "role": "在 27002 基礎上加上雲端特有的控制與實作建議（指引型），並釐清雲端供應商與客戶各自的責任分工。",
+      "relation": "27002 的雲端加強版，為上雲的組織補上 27001 附錄 A 沒細談的雲端控制。",
+      "view": "controls"
+    },
+    {
+      "id": "iso-27018",
+      "number": "ISO/IEC 27018:2019",
+      "title": "公有雲個人資料（PII）保護實務",
+      "title_en": "Information technology — Security techniques — Code of practice for protection of personally identifiable information (PII) in public clouds acting as PII processors",
+      "family": "雲端",
+      "role": "針對「在公有雲處理個資的雲端業者」給出保護個人資料的控制建議（指引型），例如不得拿客戶資料做行銷。",
+      "relation": "把 27002／27017 的控制延伸到雲端個資情境，協助雲端處理者滿足 27001 中與個資相關的控制要求。",
+      "view": "controls"
+    },
+    {
+      "id": "iso-27035",
+      "number": "ISO/IEC 27035-1:2023",
+      "title": "資訊安全事故管理—原則與流程",
+      "title_en": "Information technology — Information security incident management — Part 1: Principles and process",
+      "family": "事故",
+      "role": "建立一套從偵測、通報、應變到記取教訓的事故管理流程（指引型），讓組織遇到資安事件時能有序處理。",
+      "relation": "把 27001 附錄 A 的事故管理控制（A.5.24–A.5.28）展開成完整流程，並回饋條款 10 的持續改善。",
+      "view": null
+    },
+    {
+      "id": "iso-27701",
+      "number": "ISO/IEC 27701:2025",
+      "title": "隱私資訊管理系統（PIMS）—要求與指引",
+      "title_en": "Information security, cybersecurity and privacy protection — Privacy information management systems — Requirements and guidance",
+      "family": "隱私",
+      "role": "建立專屬的隱私資訊管理系統（PIMS），對個資控制者與處理者訂出要求與控制；2025 年第二版改為可獨立實施的標準，協助對應 GDPR 等隱私法規（含要求型條款）。",
+      "relation": "與 27001／27002 緊密相連：2019 舊版原是兩者的延伸，2025 年第二版改為可獨立運作，但仍對齊 27001:2022／27002:2022 結構，可在既有 ISMS 上整合導入並一起驗證升級為 PIMS。",
+      "view": null
+    },
+    {
+      "id": "iso-31000",
+      "number": "ISO 31000:2018",
+      "title": "風險管理—原則與指導綱要",
+      "title_en": "Risk management — Guidelines",
+      "family": "風險",
+      "role": "提供放諸各領域皆通用的風險管理原則、架構與流程（指引型，不可驗證），是所有風險思維的母標準（不限於資安）。",
+      "relation": "27001 條款 6.1 的風險方法骨架取自 ISO 31000，而 27005 則是它在資安領域的專門化版本。",
+      "view": "risk"
+    },
+    {
+      "id": "iso-31010",
+      "number": "IEC 31010:2019",
+      "title": "風險管理—風險評估技術",
+      "title_en": "Risk management — Risk assessment techniques",
+      "family": "風險",
+      "role": "收錄數十種具體的風險評估手法（如腦力激盪、情境分析、失效模式分析），讓你挑工具來做評估；由 IEC 主導（非 ISO/IEC）。",
+      "relation": "搭配 ISO 31000／27005 使用；當 27001 條款 6.1 要你做風險評估時，這裡提供可選的技術工具箱。",
+      "view": "risk"
+    },
+    {
+      "id": "iso-5338",
+      "number": "ISO/IEC 5338:2023",
+      "title": "AI 系統生命週期流程",
+      "title_en": "Information technology — Artificial intelligence — AI system life cycle processes",
+      "family": "AI",
+      "role": "定義 AI 系統從構想、開發、部署到退役的各階段流程，給 AI 工程治理一套生命週期地圖。",
+      "relation": "當 ISMS 範圍納入 AI 系統時提供生命週期視角，讓 27001 的運作管制（條款 8）對得上 AI 開發實務。",
+      "view": "ai"
+    },
+    {
+      "id": "iso-22989",
+      "number": "ISO/IEC 22989:2022",
+      "title": "AI 概念與術語",
+      "title_en": "Information technology — Artificial intelligence — Artificial intelligence concepts and terminology",
+      "family": "AI",
+      "role": "為人工智慧建立共通的概念框架與名詞定義，例如機器學習、訓練資料、AI 系統等。",
+      "relation": "AI 治理的詞彙底座；當 27001 延伸到 AI 風險時，提供與 27000 詞彙互補的 AI 專用語言。",
+      "view": "ai"
+    }
+  ]
+}
