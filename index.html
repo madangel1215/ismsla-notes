@@ -676,7 +676,7 @@ function updateChipStatus(id){const chip=grid.querySelector(`.chip[data-id="${id
   const dot=chip.querySelector(".chip-st");if(dot)dot.className="chip-st st-"+(st||"none");
   chip.classList.remove("ws-conform","ws-observe","ws-nc");if(st)chip.classList.add("ws-"+st);
   chip.querySelectorAll(".chip-ws button").forEach(b=>{const on=b.dataset.wsq===st;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on);});
-  if(typeof updateCtlStats==="function")updateCtlStats();}
+  updateCtlStats();}
 
 const el=(t,a,k)=>{const n=document.createElementNS(SVGNS,t);for(const x in a)n.setAttribute(x,a[x]);if(k)for(const c of [].concat(k))if(c)n.append(c);return n;};
 const tx=(x,y,cls,s,ex)=>el("text",{x,y,class:cls,...(ex||{})},document.createTextNode(s));
@@ -718,7 +718,6 @@ const ICONS={
   flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',
   wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
   user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
   exam:'<path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.83l8.57 3.91a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
 };
 const TIER_IC={政策:"flag",程序:"clipboard",作業:"wrench",紀錄:"check2",外部:"link"};
@@ -1158,7 +1157,12 @@ function renderControls(){
   grid.querySelectorAll(".hhead.hclk").forEach(c=>kgo(c,()=>setF({type:c.dataset.hcol})));
   grid.querySelectorAll(".ctl-stat").forEach(b=>b.addEventListener("click",()=>{const v=b.dataset.status;ctlFilter=(ctlFilter&&ctlFilter.status===v)?null:{status:v};renderControls();}));
   const cf=grid.querySelector(".ctl-clearf");if(cf)cf.onclick=()=>{ctlFilter=null;ctlSearch="";renderControls();};
-  const si=grid.querySelector(".ctl-search");if(si)si.addEventListener("input",()=>{const pos=si.selectionStart;ctlSearch=si.value;renderControls();const ns=grid.querySelector(".ctl-search");if(ns){ns.focus();try{ns.setSelectionRange(pos,pos);}catch(e){}}});
+  const si=grid.querySelector(".ctl-search");
+  if(si){let composing=false,t;
+    const apply=()=>{const pos=si.selectionStart;ctlSearch=si.value;renderControls();const ns=grid.querySelector(".ctl-search");if(ns){ns.focus();try{ns.setSelectionRange(pos,pos);}catch(e){}}};
+    si.addEventListener("compositionstart",()=>{composing=true;});                       // 注音/拼音組字中
+    si.addEventListener("compositionend",()=>{composing=false;clearTimeout(t);apply();}); // 組字完成才套用
+    si.addEventListener("input",()=>{if(composing)return;clearTimeout(t);t=setTimeout(apply,160);});}  // debounce，不打斷輸入法
   const ob=document.getElementById("oscal-btn");if(ob)ob.onclick=downloadOscal;
   wireDsec(grid);
   grid.querySelectorAll(".chip").forEach(ch=>{
@@ -1571,7 +1575,7 @@ function openPanel(n){
   if(n.type==="control"||n.type==="clause"){const w=WS[n.id]||{};
     h+=`<div class="sech ax">稽核工作底稿 · Worksheet</div><div class="ws-status" data-ws="${n.id}" role="radiogroup" aria-label="稽核底稿狀態">`+
       [["","未查"],["conform","符合"],["observe","觀察"],["nc","不符合"]].map(([v,t])=>`<button data-st="${v}" role="radio" aria-checked="${(w.status||"")===v}" class="${(w.status||"")===v?"on":""}">${t}</button>`).join("")+
-      `</div><textarea class="ws-note" data-wsnote="${n.id}" placeholder="稽核筆記（自動存本機，可匯出 CSV）">${(w.note||"").replace(/</g,"&lt;")}</textarea>`;
+      `</div><textarea class="ws-note" data-wsnote="${n.id}" placeholder="稽核筆記（自動存本機，可匯出 CSV）">${esc(w.note||"")}</textarea>`;
   }
   if(n.attributes){const a=n.attributes;
     if(a.cia?.length){h+=`<div class="sech">CIA</div><div class="attrs">`+["機密性","完整性","可用性"].map(c=>`<span class="led ${a.cia.includes(c)?"on":""}"><span class="d"></span>${c}</span>`).join("")+`</div>`;}
@@ -1811,7 +1815,7 @@ function buildPrintChecklist(){
     if(n.audit?.evidence?.length)s+=`<div class="pr-block"><b>應備證據</b>`+n.audit.evidence.map(x=>`<div class="pr-e">· ${x}</div>`).join("")+`</div>`;
     if(n.audit?.nonconformities?.length)s+=`<div class="pr-block"><b>常見不符合</b>`+n.audit.nonconformities.map(x=>`<div class="pr-nc">! ${x}</div>`).join("")+`</div>`;
     const docs=docsByNode.get(n.id);if(docs?.length)s+=`<div class="pr-block"><b>必備/相關文件</b>`+docs.map(d=>`<div class="pr-e">· ${d.name}（${d.kind}${d.mandatory?"·必備":""}）</div>`).join("")+`</div>`;
-    if(w.note)s+=`<div class="pr-block"><b>稽核筆記</b><div class="pr-e">${w.note.replace(/</g,"&lt;")}</div></div>`;
+    if(w.note)s+=`<div class="pr-block"><b>稽核筆記</b><div class="pr-e">${esc(w.note)}</div></div>`;
     return s+`</div>`;};
   const clauses=DATA.nodes.filter(n=>n.type==="clause"),controls=DATA.nodes.filter(n=>n.type==="control");
   pa.innerHTML=`<div class="pr-h1">ISMS 稽核清單 · ISO/IEC 27001:2022</div>`+
