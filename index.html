@@ -242,7 +242,7 @@ svg#canvas{width:100%;height:100%;display:block}
         <radialGradient id="discFill" cx="50%" cy="30%" r="75%"><stop offset="0%" stop-color="#1b1b22"/><stop offset="100%" stop-color="#101015"/></radialGradient>
         <radialGradient id="discCenter" cx="50%" cy="30%" r="75%"><stop offset="0%" stop-color="#222530"/><stop offset="100%" stop-color="#121319"/></radialGradient>
         <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#3b82f6" flood-opacity="0.55"/></filter>
-        <marker id="ah" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L6.5,3 L0,6 Z" fill="#8c8c96"/></marker>
+        <marker id="ah" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L6.5,3 L0,6 Z" fill="#8c8c96"/></marker>
         <marker id="aha" markerWidth="10" markerHeight="10" refX="6.5" refY="3.2" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L7,3.2 L0,6.4 Z" fill="#3b82f6"/></marker>
       </defs>
       <g id="scene"></g>
@@ -360,35 +360,48 @@ function drawOverlay(anchors){
 
 // ---------- VIEW: RISK (ISO 31000/27005) ----------
 function renderRisk(){
-  svg.setAttribute("viewBox","0 0 1120 1000");
-  scene.append(el("rect",{class:"boundary",x:24,y:24,width:1072,height:952,rx:20}));
-  scene.append(bar("communication-consultation","溝通諮詢",40,120,118,640,true));
-  scene.append(bar("monitoring-review","監督審查",962,120,118,640,true));
+  svg.setAttribute("viewBox","0 0 1120 1060");
   const cx=560;
+  scene.append(el("rect",{class:"boundary",x:24,y:24,width:1072,height:946,rx:20}));
+  scene.append(bar("communication-consultation","溝通諮詢",40,150,118,690,true));
+  scene.append(bar("monitoring-review","監督審查",962,150,118,690,true));
   scene.append(box("scope-context-criteria","範圍、全景、風險準則",null,cx-150,70,300,52,false));
   scene.append(el("rect",{class:"grp",x:cx-180,y:150,width:360,height:268,rx:12}));
   scene.append(tx(cx-168,172,"grp-label","風險評鑑 Risk assessment"));
-  const ga=el("g",{class:"node","data-id":"risk-assessment"});ga.append(el("rect",{x:cx+70,y:158,width:100,height:20,rx:5,fill:"transparent"}));ga.append(tx(cx+120,172,"flow-label","（總覽）"));wire(ga,"risk-assessment",{x:cx,y:284,r:120});scene.append(ga);
+  const ga=el("g",{class:"node","data-id":"risk-assessment"});ga.append(el("rect",{x:cx+58,y:158,width:116,height:20,rx:5,fill:"transparent"}));ga.append(tx(cx+116,172,"flow-label","（總覽）"));wire(ga,"risk-assessment",{x:cx,y:284,r:120});scene.append(ga);
   scene.append(box("risk-identification","風險識別",null,cx-130,186,260,46,false));
   scene.append(box("risk-analysis","風險分析",null,cx-130,272,260,46,false));
   scene.append(box("risk-evaluation","評估風險",null,cx-130,358,260,46,false));
-  scene.append(diamond("評鑑滿意?",cx,452,150,52));
-  scene.append(el("rect",{class:"grp",x:cx-180,y:498,width:360,height:312,rx:12}));
-  scene.append(tx(cx-168,520,"grp-label","風險處理 Risk treatment"));
-  scene.append(box("risk-treatment-options","選擇風險處理選項",null,cx-130,532,260,44,false));
-  scene.append(box("select-implement-controls","選擇與實施控制措施",null,cx-130,608,260,44,false));
-  scene.append(box("soa","適用性聲明書 SoA",null,cx-130,684,260,44,true));
-  scene.append(box("risk-treatment-plan","風險處理計畫",null,cx-130,758,260,44,false));
-  scene.append(diamond("接受風險?",cx,846,150,52));
-  scene.append(box("residual-risks","剩餘風險",null,cx+150,824,180,44,false));
-  scene.append(box("documented-information","文件化資訊（記錄及報告）",null,cx-150,910,300,46,false));
-  // center flow arrows
-  const seg=[[122,186],[232,272],[318,358],[404,426],[478,532],[576,608],[652,684],[728,758],[802,820],[872,910]];
+  scene.append(diamond("評鑑滿意?",cx,452,160,54));
+  scene.append(el("rect",{class:"grp",x:cx-180,y:506,width:360,height:312,rx:12}));
+  scene.append(tx(cx-168,528,"grp-label","風險處理 Risk treatment"));
+  scene.append(box("risk-treatment-options","選擇風險處理選項",null,cx-130,540,260,44,false));
+  scene.append(box("select-implement-controls","選擇與實施控制措施",null,cx-130,616,260,44,false));
+  scene.append(box("soa","適用性聲明書 SoA",null,cx-130,692,260,44,true));
+  scene.append(box("risk-treatment-plan","風險處理計畫",null,cx-130,766,260,44,false));
+  scene.append(diamond("接受風險?",cx,858,160,54));
+  scene.append(box("residual-risks","剩餘風險",null,cx-95,912,190,46,false));
+  scene.append(box("documented-information","文件化資訊（記錄及報告）",null,cx-150,1000,300,46,false));
+  // ── central flow ──
+  const seg=[[122,186],[232,272],[318,358],[404,425],[479,540],[584,616],[660,692],[736,766],[810,831]];
   for(const[y1,y2]of seg)scene.append(arrow(`M${cx},${y1} L${cx},${y2}`));
-  // side bracket hints
-  scene.append(el("line",{class:"spoke",x1:158,y1:300,x2:cx-180,y2:300,"marker-end":"url(#ah)"}));
-  scene.append(el("line",{class:"spoke",x1:962,y1:284,x2:cx+180,y2:284,"marker-end":"url(#ah)"}));
-  scene.append(tx(cx+40,440,"flow-label","是↓"));
+  scene.append(tx(cx+16,500,"flow-label","是"));
+  // decision2 是 ↓ → 剩餘風險
+  scene.append(arrow(`M${cx},885 L${cx},912`)); scene.append(tx(cx+16,905,"flow-label","是"));
+  // ── 剩餘風險 wiring: ←溝通 / →監督 / ↓文件化 ──
+  scene.append(arrow(`M${cx-95},935 L160,935`));
+  scene.append(arrow(`M${cx+95},935 L960,935`));
+  scene.append(arrow(`M${cx},958 L${cx},1000`));
+  // ── decision1 否 → loop up to scope ──
+  scene.append(el("path",{class:"flow-line",d:`M${cx+82},452 L862,452 L862,46 L${cx},46 L${cx},70`,"marker-end":"url(#ah)"}));
+  scene.append(tx(cx+104,440,"flow-label","否"));
+  // ── decision2 否 → loop back to risk treatment ──
+  scene.append(el("path",{class:"flow-line",d:`M${cx+82},858 L894,858 L894,562 L${cx+130},562`,"marker-end":"url(#ah)"}));
+  scene.append(tx(cx+104,846,"flow-label","否"));
+  // ── side columns ↔ (溝通/監督 貫穿全程) ──
+  const dl=(x1,y1,x2,y2)=>scene.append(el("line",{class:"flow-line",x1,y1,x2,y2,"marker-start":"url(#ah)","marker-end":"url(#ah)"}));
+  dl(158,96,410,96); dl(158,300,380,300); dl(158,660,380,660);
+  dl(740,300,962,300); dl(740,706,962,706);
 }
 
 // ---------- VIEW: AI lifecycle (ISO 5338/22989) ----------
