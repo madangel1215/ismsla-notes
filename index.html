@@ -17,6 +17,8 @@
   --glass:rgba(15,15,19,.74);
   --disc1:#1b1b22; --disc2:#101015; --disc1c:#222530; --disc2c:#121319;
   --cy-node:#15151b; --cy-edge:rgba(255,255,255,.1); --cy-arrow:rgba(255,255,255,.18); --cy-label:#9a9aa3;
+  --cat-clause:#6ea8fe; --cat-control:#5ccfa8; --cat-risk:#e0a85f; --cat-ai:#b69bff;
+  --warn:#e7b09a; --warn-strong:#dd8a64;
   --font:"Inter","Noto Sans TC",-apple-system,system-ui,sans-serif;
   --mono:"SFMono-Regular",ui-monospace,"JetBrains Mono",monospace;
   --ease:cubic-bezier(.22,.61,.36,1);
@@ -29,9 +31,13 @@
   --glass:rgba(255,255,255,.8);
   --disc1:#ffffff; --disc2:#eef1f5; --disc1c:#f1f5fc; --disc2c:#e4eaf3;
   --cy-node:#ffffff; --cy-edge:rgba(0,0,0,.14); --cy-arrow:rgba(0,0,0,.3); --cy-label:#565a62;
+  --cat-clause:#2563eb; --cat-control:#0a8f63; --cat-risk:#9a6700; --cat-ai:#7c3aed;
+  --warn:#c0492b; --warn-strong:#a23218;
 }
+/* 漸層 stop + SVG 箭頭/光暈一律由 token 驅動（CSS 屬性勝過 presentation attribute），深淺色自動跟隨 */
 #discFill stop:first-child{stop-color:var(--disc1)} #discFill stop:last-child{stop-color:var(--disc2)}
 #discCenter stop:first-child{stop-color:var(--disc1c)} #discCenter stop:last-child{stop-color:var(--disc2c)}
+#ah path{fill:var(--text-3)} #aha path{fill:var(--accent)} #glow feDropShadow{flood-color:var(--accent)}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--font);
   -webkit-font-smoothing:antialiased;overflow:hidden}
@@ -60,7 +66,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-famil
   padding:5px;display:none;z-index:20}
 .results.open{display:block}
 .res-item{padding:8px 10px;border-radius:7px;cursor:pointer;display:flex;gap:8px;align-items:baseline}
-.res-item:hover{background:var(--surface-2)}
+.res-item:hover,.res-item:focus-visible{background:var(--surface-2);outline:none}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .res-ref{font-family:var(--mono);font-size:10px;color:var(--accent);min-width:54px}
 .res-t{font-size:12.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .toggle{font-size:12.5px;color:var(--text-2);background:var(--surface-1,transparent);border:1px solid var(--line);
@@ -117,6 +124,9 @@ svg#canvas{width:100%;height:100%;display:block}
 .node.sel .disc,.node.sel .box,.node.sel .bar{stroke:var(--accent);stroke-width:1.8;filter:url(#glow)}
 .node.sel .nm,.node.sel .lab{fill:var(--text)}
 .node.linked .disc,.node.linked .box,.node.linked .bar{stroke:color-mix(in srgb,var(--accent) 55%,var(--line-2))}
+/* 鍵盤焦點：SVG <g> 預設不畫 outline，用與 hover/選取一致的描邊+光暈 */
+.node:focus{outline:none}
+.node:focus-visible .disc,.node:focus-visible .box,.node:focus-visible .bar{stroke:var(--accent);filter:url(#glow)}
 .ctrl-chip{cursor:pointer}
 .ctrl-chip rect{fill:color-mix(in srgb,var(--accent) 12%,var(--surface));stroke:var(--accent);stroke-width:.8}
 .ctrl-chip text{fill:var(--accent);font-family:var(--mono);font-size:11px;text-anchor:middle}
@@ -128,7 +138,7 @@ svg#canvas{width:100%;height:100%;display:block}
 .cy-legend{position:absolute;left:18px;top:14px;font-size:12px;color:var(--text-3);background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:10px;padding:10px 12px;line-height:1.7;z-index:5;pointer-events:none}
 .cy-legend b{color:var(--text)}
 .cy-legend .lg{display:inline-block;margin-right:10px;margin-top:4px}
-.cy-legend .c{color:#6ea8fe}.cy-legend .o{color:#5ccfa8}.cy-legend .r{color:#e0a85f}.cy-legend .a{color:#b69bff}
+.cy-legend .c{color:var(--cat-clause)}.cy-legend .o{color:var(--cat-control)}.cy-legend .r{color:var(--cat-risk)}.cy-legend .a{color:var(--cat-ai)}
 #grid.show{display:block}
 .theme{margin-bottom:26px}
 .theme-h{display:flex;align-items:baseline;gap:10px;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
@@ -165,8 +175,8 @@ svg#canvas{width:100%;height:100%;display:block}
 .sech.ax{color:var(--accent)}
 .audit-item{font-size:13px;color:var(--text-2);line-height:1.62;padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
 .audit-item::before{content:"›";position:absolute;left:3px;top:8px;color:var(--accent);font-weight:600}
-.audit-item.nc{color:#e7b09a}
-.audit-item.nc::before{content:"!";color:#dd8a64}
+.audit-item.nc{color:var(--warn)}
+.audit-item.nc::before{content:"!";color:var(--warn-strong)}
 .exp{color:var(--text-2);font-size:14.5px;line-height:1.78}
 .sc-item{padding:9px 0;border-top:1px solid var(--line)}
 .sc-l{color:var(--text);font-size:13px;font-weight:500}
@@ -178,7 +188,7 @@ svg#canvas{width:100%;height:100%;display:block}
 .led.on .d{background:var(--accent);box-shadow:0 0 6px var(--accent)}
 .pill{font-size:11.5px;color:var(--text-2);background:var(--surface-2);border:1px solid var(--line);border-radius:99px;padding:4px 10px}
 .rel{display:flex;gap:9px;align-items:baseline;padding:9px 0;border-top:1px solid var(--line);cursor:pointer}
-.rel:hover .rel-t{color:#fff}
+.rel:hover .rel-t{color:var(--text)}
 .rel-chip{font-family:var(--mono);font-size:9px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);
   border-radius:5px;padding:2px 6px;white-space:nowrap}
 .rel-arr{color:var(--text-3);font-family:var(--mono);font-size:11px}
@@ -221,7 +231,7 @@ svg#canvas{width:100%;height:100%;display:block}
 .tour-btn{background:color-mix(in srgb,var(--accent) 16%,transparent)!important;border-color:var(--accent)!important;color:var(--text)!important}
 @media (max-width:880px){.tabs .t-txt{display:none}.search{width:150px}.panel{width:auto;left:14px}}
 </style>
-  <script src="https://unpkg.com/cytoscape@3/dist/cytoscape.min.js"></script>
+  <script src="https://unpkg.com/cytoscape@3.34.0/dist/cytoscape.min.js" integrity="sha384-K+k+ywfDuvV9dwg+bwsVE0WGkrTnqFamaER+ydBgMFQTtlI0jdI9no9AjkQHwh/T" crossorigin="anonymous"></script>
 </head>
 <body>
 <div id="app">
@@ -242,8 +252,8 @@ svg#canvas{width:100%;height:100%;display:block}
   <div class="stage">
     <svg id="canvas" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <radialGradient id="discFill" cx="50%" cy="30%" r="75%"><stop offset="0%" stop-color="#1b1b22"/><stop offset="100%" stop-color="#101015"/></radialGradient>
-        <radialGradient id="discCenter" cx="50%" cy="30%" r="75%"><stop offset="0%" stop-color="#222530"/><stop offset="100%" stop-color="#121319"/></radialGradient>
+        <radialGradient id="discFill" cx="50%" cy="30%" r="75%"><stop offset="0%"/><stop offset="100%"/></radialGradient>
+        <radialGradient id="discCenter" cx="50%" cy="30%" r="75%"><stop offset="0%"/><stop offset="100%"/></radialGradient>
         <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#3b82f6" flood-opacity="0.55"/></filter>
         <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.42"/></filter>
         <marker id="ah" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L6.5,3 L0,6 Z" fill="#8c8c96"/></marker>
@@ -285,27 +295,33 @@ const SVGNS="http://www.w3.org/2000/svg";
 const scene=document.getElementById("scene"), svg=document.getElementById("canvas");
 const grid=document.getElementById("grid"), panel=document.getElementById("panel"), pbody=document.getElementById("pbody");
 const toastEl=document.getElementById("toast");
-let DATA=null, byId=new Map(), byRef=new Map(), adj=new Map(), curView="pdca", selected=null, overlay=false, mode="learn";
+let DATA=null, byId=new Map(), adj=new Map(), curView="pdca", selected=null, overlay=false, mode="learn";
 
 const el=(t,a,k)=>{const n=document.createElementNS(SVGNS,t);for(const x in a)n.setAttribute(x,a[x]);if(k)for(const c of [].concat(k))if(c)n.append(c);return n;};
 const tx=(x,y,cls,s,ex)=>el("text",{x,y,class:cls,...(ex||{})},document.createTextNode(s));
 const edgePt=(c,t,pad)=>{const dx=t.x-c.x,dy=t.y-c.y,d=Math.hypot(dx,dy)||1;return{x:c.x+dx/d*(c.r+(pad||0)),y:c.y+dy/d*(c.r+(pad||0))};};
 function toast(m){toastEl.textContent=m;toastEl.classList.add("show");setTimeout(()=>toastEl.classList.remove("show"),1800);}
 
-// which view a node belongs to
-function homeView(id){const n=byId.get(id);if(!n)return "pdca";if(id.startsWith("control-"))return "controls";if(id.startsWith("ai-")||id.startsWith("band-"))return "ai";if(n.type==="risk-step"||n.type==="risk-technique"||n.type==="bridge")return "risk";return "pdca";}
+// which view a node belongs to — 依 type 分類（單一來源，與 CAT/renderControls 一致）
+function homeView(id){const n=byId.get(id);if(!n)return "pdca";
+  if(n.type==="control")return "controls";
+  if(n.type==="lifecycle-stage"||n.type==="cross-cutting-band")return "ai";
+  if(n.type==="risk-step"||n.type==="risk-technique"||n.type==="bridge")return "risk";
+  return "pdca";}  // clause
 
 // ---------- node builders ----------
-function disc(id,name,num,x,y,r,center){const g=el("g",{class:"node","data-id":id,tabindex:"0",role:"button"});
-  g.append(el("circle",{class:"disc"+(center?" center":""),cx:x,cy:y,r}));g.append(tx(x,y+2,"nm",name));g.append(tx(x,y+22,"num","["+num+"]"));
+function disc(id,name,num,x,y,r,center){const g=el("g",{class:"node","data-id":id});
+  g.append(el("circle",{class:"disc"+(center?" center":""),cx:x,cy:y,r}));
+  {const _n=byId.get(id);if(_n&&_n.iso27001)g.append(tx(x,y-r+15,"iso-tag",_n.iso27001,{"text-anchor":"middle"}));}
+  g.append(tx(x,y+2,"nm",name));g.append(tx(x,y+22,"num","["+num+"]"));
   wire(g,id,{x,y,r});return g;}
-function box(id,title,sub,x,y,w,h,dash){const g=el("g",{class:"node","data-id":id,tabindex:"0",role:"button"});
+function box(id,title,sub,x,y,w,h,dash){const g=el("g",{class:"node","data-id":id});
   g.append(el("rect",{class:"box"+(dash?" dash":""),x,y,width:w,height:h,rx:10}));
   {const _n=byId.get(id);if(_n&&_n.iso27001)g.append(tx(x+w-8,y+15,"iso-tag",_n.iso27001,{"text-anchor":"end"}));}
   g.append(tx(x+w/2,y+(sub?h/2-4:h/2+5),"nm sm",title,{"text-anchor":"middle"}));
   if(sub)g.append(tx(x+w/2,y+h/2+14,"sub",sub,{"text-anchor":"middle"}));
   wire(g,id,{x:x+w/2,y:y+h/2,r:Math.max(w,h)/2});return g;}
-function bar(id,title,x,y,w,h,vertical){const g=el("g",{class:"node","data-id":id,tabindex:"0",role:"button"});
+function bar(id,title,x,y,w,h,vertical){const g=el("g",{class:"node","data-id":id});
   g.append(el("rect",{class:"bar",x,y,width:w,height:h,rx:10}));
   {const _n=byId.get(id);if(_n&&_n.iso27001){if(vertical)g.append(tx(x+w/2,y+16,"iso-tag",_n.iso27001,{"text-anchor":"middle"}));else g.append(tx(x+w-12,y+h/2,"iso-tag",_n.iso27001,{"text-anchor":"end","dominant-baseline":"central"}));}}
   if(vertical){const cx=x+w/2,lh=26,sy=y+h/2-(title.length-1)*lh/2;
@@ -314,7 +330,10 @@ function bar(id,title,x,y,w,h,vertical){const g=el("g",{class:"node","data-id":i
   wire(g,id,{x:x+w/2,y:y+h/2,r:30});return g;}
 function diamond(label,x,y,w,h){const g=el("g",{class:""});g.append(el("polygon",{class:"diamond",points:`${x},${y-h/2} ${x+w/2},${y} ${x},${y+h/2} ${x-w/2},${y}`}));
   g.append(tx(x,y+4,"diamond-text",label));return g;}
-function wire(g,id,pos){g._pos=pos;g.addEventListener("click",e=>{e.stopPropagation();select(id);});
+function wire(g,id,pos){g._pos=pos;
+  g.setAttribute("tabindex","0");g.setAttribute("role","button");
+  const n=byId.get(id);if(n)g.setAttribute("aria-label",(n.ref?n.ref+" ":"")+(n.title||id));
+  g.addEventListener("click",e=>{e.stopPropagation();select(id);});
   g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(id);}});}
 function arrow(d,accent){return el("path",{class:"flow-line",d,"marker-end":accent?"url(#aha)":"url(#ah)"});}
 
@@ -340,7 +359,7 @@ function renderPDCA(){
   scene.append(el("line",{class:"spoke",x1:95,y1:232,x2:95,y2:262,"marker-end":"url(#ah)"}));
   scene.append(el("line",{class:"spoke",x1:95,y1:262,x2:95,y2:234,"marker-end":"url(#ah)"}));
   scene.append(box("clause-4.2","利益相關方","需要及期望",20,264,150,62,false));
-  [["1","法律"],["2","監管機構要求"],["3","合約義務"],["4","標準"],["5","政策與程序"]].forEach(([nn,t],i)=>{
+  [["1","法律"],["2","法規/立法"],["3","合約義務"],["4","標準"],["5","監管/客戶期待"]].forEach(([nn,t],i)=>{
     const y=340+i*28;const g=el("g",{class:"node","data-id":"clause-4.2"});g.append(el("rect",{class:"box",x:20,y,width:150,height:24,rx:6}));
     g.append(tx(28,y+16,"num",nn));g.append(tx(46,y+16,"sub",t));wire(g,"clause-4.2",{x:95,y:y+12,r:12});scene.append(g);});
   const ay=496;scene.append(el("path",{class:"bigarrow",d:`M20,${ay} L182,${ay} L182,${ay-15} L224,${ay+8} L182,${ay+31} L182,${ay+16} L20,${ay+16} Z`}));
@@ -358,7 +377,7 @@ function drawOverlay(anchors){
   // 控制(control)→條款 的 edge，依條款章節對到圖一畫出來的圈，把控制 chip 疊上去
   const SEC={"4":"clause-6.1.1","5":"clause-5.1","6":"clause-6.1.1","7":"clause-7.1","8":"clause-7.1","9":"clause-9.1","10":"clause-10.1"};
   const byAnchor={};
-  for(const e of DATA.edges){ if(!e.from.startsWith("control-")) continue;
+  for(const e of DATA.edges){ if(byId.get(e.from)?.type!=="control") continue;
     const ref=byId.get(e.to)?.ref||""; const sec=(ref.match(/\d+/)||[""])[0];
     const aid=SEC[sec]; if(aid&&anchors[aid]) (byAnchor[aid]=byAnchor[aid]||[]).push(e.from); }
   for(const aid in byAnchor){const a=anchors[aid];const arr=byAnchor[aid];
@@ -392,6 +411,15 @@ function renderRisk(){
   scene.append(diamond("接受風險?",cx,858,160,54));
   scene.append(box("residual-risks","剩餘風險",null,cx-95,912,190,46,false));
   scene.append(box("documented-information","文件化資訊（記錄及報告）",null,cx-150,1000,300,46,false));
+  // ── 風險評估技術 IEC 31010（左欄；支援識別/分析/評估，與評鑑步驟並排）──
+  scene.append(tx(172,168,"note-h","IEC 31010 風險評估技術"));
+  const TECH=[["technique-brainstorming","腦力激盪",180],["technique-hazop","HAZOP",220],["technique-checklists","檢核表法",260],
+    ["technique-fmea","FMEA",320],["technique-bow-tie","領結分析",362],["technique-scenario-analysis","情境分析",404]];
+  for(const[tid,short,ty]of TECH){if(!byId.get(tid))continue;
+    const g=el("g",{class:"node","data-id":tid});
+    g.append(el("rect",{class:"box dash",x:172,y:ty,width:150,height:32,rx:8}));
+    g.append(tx(172+75,ty+20,"sub",short,{"text-anchor":"middle"}));
+    wire(g,tid,{x:172+75,y:ty+16,r:75});scene.append(g);}
   // ── central flow ──
   const seg=[[122,186],[232,272],[318,358],[404,425],[479,540],[584,616],[660,692],[736,766],[810,831]];
   for(const[y1,y2]of seg)scene.append(arrow(`M${cx},${y1} L${cx},${y2}`));
@@ -415,8 +443,8 @@ function renderRisk(){
 }
 
 // ---------- VIEW: AI lifecycle (ISO 5338/22989) ----------
-function aiBox(id,x,y,w,h){const n=byId.get(id);if(!n)return;
-  const g=el("g",{class:"node","data-id":id,tabindex:"0",role:"button"});
+function aiBox(id,x,y,w,h){const n=byId.get(id);if(!n)return null;
+  const g=el("g",{class:"node","data-id":id});
   g.append(el("rect",{class:"box",x,y,width:w,height:h,rx:10}));
   if(n.iso27001)g.append(tx(x+w-12,y+22,"iso-tag",n.iso27001,{"text-anchor":"end"}));
   g.append(tx(x+14,y+26,"lab",n.title));
@@ -424,20 +452,21 @@ function aiBox(id,x,y,w,h){const n=byId.get(id);if(!n)return;
   let yy=y+66;
   for(const s of (n.subconcepts||[])){const t=(s.label||"").split("（")[0].split("(")[0].trim();
     g.append(tx(x+14,yy,"ai-sub",t));yy+=16;}
-  wire(g,id,{x:x+w/2,y:y+h/2,r:Math.max(w,h)/2});scene.append(g);}
+  wire(g,id,{x:x+w/2,y:y+h/2,r:Math.max(w,h)/2});return g;}
 function renderAI(){
   svg.setAttribute("viewBox","0 0 1420 938");
+  const put=g=>{if(g)scene.append(g);};
   scene.append(tx(20,38,"grp-label","AI 系統生命週期技術流程 — ISO/IEC 5338"));
   const W=205,H=190,Y=128,GAP=12.4,X0=18;
   const main=["ai-inception","ai-design-dev","ai-vnv","ai-deployment","ai-operation-monitoring","ai-retirement"];
   const xs=main.map((_,i)=>X0+i*(W+GAP));
-  main.forEach((id,i)=>aiBox(id,xs[i],Y,W,H));
+  main.forEach((id,i)=>put(aiBox(id,xs[i],Y,W,H)));
   for(let i=0;i<main.length-1;i++)scene.append(arrow(`M${xs[i]+W},${Y+H/2} L${xs[i+1]},${Y+H/2}`,true));
   // 持續確證 在 營運與監督 正上方（雙向）
-  const ox=xs[4];aiBox("ai-continuous-validation",ox,18,W,86);
+  const ox=xs[4];put(aiBox("ai-continuous-validation",ox,18,W,86));
   scene.append(el("line",{class:"flow-line",x1:ox+W/2,y1:104,x2:ox+W/2,y2:Y,"marker-start":"url(#ah)","marker-end":"url(#ah)"}));
   // 重新評估 在下方（營運與汰除之間），並迴圈回設計與開發
-  const rx=ox+44,ry=Y+H+64;aiBox("ai-reevaluation",rx,ry,252,128);
+  const rx=ox+44,ry=Y+H+64;put(aiBox("ai-reevaluation",rx,ry,252,128));
   scene.append(arrow(`M${ox+W/2},${Y+H} L${ox+W/2},${ry+18}`));
   const ddx=xs[1]+W/2;
   scene.append(el("path",{class:"flow-line",d:`M${rx+126},${ry+128} L${rx+126},${ry+168} L${ddx},${ry+168} L${ddx},${Y+H}`,"marker-end":"url(#ah)"}));
@@ -455,10 +484,11 @@ function renderControls(){
   let html='<div class="ctl-toolbar"><span class="ctl-hint">附錄 A · 93 控制（4 主題）— 可匯出為 NIST OSCAL 機讀格式</span><button id="oscal-btn">⤓ 匯出 OSCAL</button></div>';
   for(const[pre,tt]of themes){const cs=DATA.nodes.filter(n=>n.type==="control"&&(n.ref||"").startsWith(pre));
     html+=`<div class="theme"><div class="theme-h"><span class="th-ref">${pre}</span><span class="th-t">${tt}</span><span class="th-c">${cs.length} 控制</span></div><div class="chips">`;
-    for(const c of cs)html+=`<div class="chip" data-id="${c.id}"><div class="c-ref">${c.ref}</div><div class="c-t">${c.title||""}</div></div>`;
+    for(const c of cs)html+=`<div class="chip" data-id="${c.id}" tabindex="0" role="button" aria-label="${c.ref} ${c.title||""}"><div class="c-ref">${c.ref}</div><div class="c-t">${c.title||""}</div></div>`;
     html+=`</div></div>`;}
   grid.innerHTML=html;
-  grid.querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>select(ch.dataset.id)));
+  grid.querySelectorAll(".chip").forEach(ch=>{ch.addEventListener("click",()=>select(ch.dataset.id));
+    ch.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(ch.dataset.id);}});});
   const ob=document.getElementById("oscal-btn");if(ob)ob.onclick=downloadOscal;
 }
 
@@ -467,8 +497,8 @@ let cy=null;
 const cyEl=document.getElementById("cy");
 const CAT={clause:"clause",control:"control","risk-step":"risk",bridge:"risk","risk-technique":"risk","lifecycle-stage":"ai","cross-cutting-band":"ai"};
 function buildCyStyle(){const g=getComputedStyle(document.documentElement),v=n=>g.getPropertyValue(n).trim();
-  const A=v("--accent")||"#3b82f6",node=v("--cy-node")||"#15151b",edge=v("--cy-edge"),arrow=v("--cy-arrow"),label=v("--cy-label")||"#9a9aa3";
-  const C={clause:"#5b9bf3",control:"#2eb89a",risk:"#d2933a",ai:"#9a78ef"};
+  const A=v("--accent")||"#3b82f6",node=v("--cy-node")||"#15151b",edge=v("--cy-edge"),arrow=v("--cy-arrow"),label=v("--cy-label")||"#9a9aa3",text=v("--text")||"#ededf0";
+  const C={clause:v("--cat-clause")||"#6ea8fe",control:v("--cat-control")||"#5ccfa8",risk:v("--cat-risk")||"#e0a85f",ai:v("--cat-ai")||"#b69bff"};
   return [
     {selector:"node",style:{"background-color":node,"border-width":1.4,"label":"data(label)","color":label,"font-size":9,"font-family":"monospace","width":16,"height":16,"text-valign":"center","text-halign":"center"}},
     {selector:'node[cat="clause"]',style:{"border-color":C.clause,"shape":"round-rectangle","width":22,"height":22}},
@@ -478,7 +508,7 @@ function buildCyStyle(){const g=getComputedStyle(document.documentElement),v=n=>
     {selector:"edge",style:{"line-color":edge,"width":1,"curve-style":"bezier","target-arrow-shape":"triangle","target-arrow-color":arrow,"arrow-scale":.7}},
     {selector:".faded",style:{"opacity":.08}},
     {selector:".hl",style:{"opacity":1,"color":label}},
-    {selector:".sel",style:{"opacity":1,"border-color":A,"border-width":3,"background-color":A,"background-opacity":.2,"color":"#fff","width":30,"height":30,"font-size":11}},
+    {selector:".sel",style:{"opacity":1,"border-color":A,"border-width":3,"background-color":A,"background-opacity":.2,"color":text,"width":30,"height":30,"font-size":11}},
     {selector:".hledge",style:{"opacity":1,"line-color":A,"target-arrow-color":A,"width":2}},
   ];}
 function applyCyTheme(){if(cy)cy.style(buildCyStyle()).update();}
@@ -517,7 +547,7 @@ const VIEWS={pdca:{n:"圖一",t:"PDCA 運轉",r:renderPDCA,cap:"圖一 · ISMS P
 function buildTabs(){const tb=document.getElementById("tabs");tb.innerHTML="";
   for(const k in VIEWS){const v=VIEWS[k];const b=document.createElement("button");b.className="tab"+(k===curView?" on":"");
     b.innerHTML=`<span class="t-num">${v.n}</span><span class="t-txt">${v.t}</span>`;b.onclick=()=>switchView(k);tb.append(b);}}
-function switchView(k,keepSel){curView=k;buildTabs();document.getElementById("cap").textContent=VIEWS[k].cap;
+function switchView(k){curView=k;buildTabs();document.getElementById("cap").textContent=VIEWS[k].cap;
   const isGrid=k==="controls",isExp=k==="explorer";
   svg.style.display=(isGrid||isExp)?"none":"block";grid.classList.toggle("show",isGrid);cyEl.classList.toggle("show",isExp);
   if(isGrid)renderControls();else if(isExp)renderExplorer();else{scene.replaceChildren();VIEWS[k].r();}
@@ -535,7 +565,7 @@ function highlight(id){
 function select(id){
   const n=byId.get(id);if(!n)return;selected=id;
   if(curView==="explorer"){cyHighlight(id);openPanel(n);updateHash();return;}  // stay in explorer
-  const hv=homeView(id);if(hv!==curView)switchView(hv,true);
+  const hv=homeView(id);if(hv!==curView)switchView(hv);
   highlight(id);openPanel(n);updateHash();
 }
 function typeName(t){return({clause:"CLAUSE 條款",control:"CONTROL 控制","risk-step":"RISK 風險流程","risk-technique":"TECHNIQUE 技術","lifecycle-stage":"LIFECYCLE 生命週期","cross-cutting-band":"BAND 橫向關注帶",bridge:"BRIDGE 橋樑"})[t]||"NODE";}
@@ -574,7 +604,7 @@ function closePanel(){panel.classList.remove("open");panel.setAttribute("aria-hi
   scene.querySelectorAll(".node").forEach(g=>g.classList.remove("sel","linked","dim"));grid.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel","dim"));updateHash();}
 document.getElementById("close").addEventListener("click",closePanel);
 svg.addEventListener("click",()=>{if(selected)closePanel();});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closePanel();if(e.key==="/"){e.preventDefault();document.getElementById("q").focus();}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){const ob=document.getElementById("onboard");if(ob.classList.contains("show"))closeOnboard();else closePanel();}if(e.key==="/"&&document.activeElement!==document.getElementById("q")){e.preventDefault();document.getElementById("q").focus();}});
 
 // overlay toggle
 document.getElementById("overlay-btn").addEventListener("click",function(){overlay=!overlay;this.classList.toggle("on",overlay);
@@ -608,8 +638,17 @@ function downloadOscal(){const blob=new Blob([JSON.stringify(buildOscal(),null,2
 const q=document.getElementById("q"),results=document.getElementById("results");
 q.addEventListener("input",()=>{const s=q.value.trim().toLowerCase();if(!s){results.classList.remove("open");return;}
   const hits=DATA.nodes.filter(n=>[n.ref,n.title,n.title_en,n.summary].some(v=>(v||"").toLowerCase().includes(s))).slice(0,40);
-  results.innerHTML=hits.map(n=>`<div class="res-item" data-id="${n.id}"><span class="res-ref">${n.ref||""}</span><span class="res-t">${n.title||n.id}</span></div>`).join("")||`<div class="res-item"><span class="res-t" style="color:var(--text-3)">無結果</span></div>`;
-  results.classList.add("open");results.querySelectorAll("[data-id]").forEach(r=>r.addEventListener("click",()=>{select(r.dataset.id);results.classList.remove("open");q.value="";}));});
+  results.innerHTML=hits.map(n=>`<div class="res-item" data-id="${n.id}" tabindex="0" role="option" aria-label="${n.ref||""} ${n.title||n.id}"><span class="res-ref">${n.ref||""}</span><span class="res-t">${n.title||n.id}</span></div>`).join("")||`<div class="res-item"><span class="res-t" style="color:var(--text-3)">無結果</span></div>`;
+  results.classList.add("open");
+  const pick=r=>{select(r.dataset.id);results.classList.remove("open");q.value="";q.blur();};
+  results.querySelectorAll("[data-id]").forEach(r=>{r.addEventListener("click",()=>pick(r));
+    r.addEventListener("keydown",e=>{
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(r);}
+      else if(e.key==="ArrowDown"){e.preventDefault();(r.nextElementSibling||results.firstElementChild)?.focus();}
+      else if(e.key==="ArrowUp"){e.preventDefault();(r.previousElementSibling||q).focus();}});});});
+// 從搜尋框按 ↓ 跳進結果清單
+q.addEventListener("keydown",e=>{if(e.key==="ArrowDown"&&results.classList.contains("open")){e.preventDefault();results.querySelector("[data-id]")?.focus();}
+  else if(e.key==="Escape"){results.classList.remove("open");}});
 document.addEventListener("click",e=>{if(!e.target.closest(".search"))results.classList.remove("open");});
 
 // deep-link
@@ -619,13 +658,13 @@ function applyHash(){const p=new URLSearchParams(location.hash.replace(/^#/,""))
   if(p.get("theme"))setTheme(p.get("theme"));
   document.getElementById("overlay-btn").classList.toggle("on",overlay);
   setMode(p.get("mode")==="audit"?"audit":"learn");
-  switchView(v&&VIEWS[v]?v:"pdca",true);const s=p.get("sel");if(s&&byId.has(s))select(s);}
+  switchView(v&&VIEWS[v]?v:"pdca");const s=p.get("sel");if(s&&byId.has(s))select(s);}
 document.getElementById("copy").addEventListener("click",()=>{navigator.clipboard?.writeText(location.href);toast("已複製此視角連結");});
 
 // ---------- guided tour: 稽核三問 ----------
 const TOUR=[
   {view:"pdca",sel:"clause-5.1",title:"① 這是什麼架構？",text:"ISMS 用 PDCA 運轉：領導[5]為核心，規劃[6]→支援運作[7·8]→績效[9]→改善[10]，外圈計畫·執行·檢核·行動。範圍由條款 4.3 界定。"},
-  {view:"pdca",sel:"clause-4.2",title:"① 範圍與要求來源",text:"先確認利害關係人(4.2)的 5 類要求來源：法律／監管／合約／標準／政策 —— 它們轉成『風險與改善機會』餵進規劃[6]。"},
+  {view:"pdca",sel:"clause-4.2",title:"① 範圍與要求來源",text:"先確認利害關係人(4.2)的 5 類要求來源：法律／法規立法／合約／標準／監管客戶期待 —— 它們轉成『風險與改善機會』餵進規劃[6]。"},
   {view:"risk",sel:"risk-assessment",title:"② 有什麼風險？",text:"風險用 ISO 31000／27005 流程：風險評鑑(識別→分析→評估)。對應 27001 條款 6.1.2。"},
   {view:"risk",sel:"soa",title:"② 怎麼接到控制？",text:"風險處理選出控制、記入『適用性聲明 SoA』，再排風險處理計畫；剩餘風險須持續監督審查。對應條款 6.1.3。"},
   {view:"ai",sel:"ai-operation-monitoring",title:"③ 你們的產品／服務週期是什麼？",text:"AI 系統生命週期(ISO 5338／22989)：起始→開發→V&V→部署→營運監督→重新評估→汰除；治理／風險／安全等橫向帶貫穿全程。"},
@@ -635,7 +674,7 @@ let tourIdx=-1;
 const tcEl=document.getElementById("tourcard");
 function showStep(i){tourIdx=i;const s=TOUR[i];
   if(s.mode)setMode(s.mode);
-  switchView(s.view,true);if(s.sel)select(s.sel);
+  switchView(s.view);if(s.sel)select(s.sel);
   document.getElementById("tc-step").textContent=(i+1)+" / "+TOUR.length;
   document.getElementById("tc-title").textContent=s.title;
   document.getElementById("tc-text").textContent=s.text;
@@ -657,14 +696,14 @@ document.getElementById("ob-tour").addEventListener("click",startTour);
 // ---------- boot ----------
 (async function(){
   try{const r=await fetch("./data/data.json");DATA=await r.json();}catch(e){document.getElementById("cap").textContent="無法載入 data.json（需以 http 開啟）";return;}
-  byId=new Map(DATA.nodes.map(n=>[n.id,n]));byRef=new Map(DATA.nodes.map(n=>[String(n.ref),n]));
+  byId=new Map(DATA.nodes.map(n=>[n.id,n]));
   try{const sr=await fetch("./data/supplements.json");if(sr.ok){const sup=await sr.json();for(const it of (sup.items||[])){const n=byId.get(it.nodeId);if(n)(n.supplements=n.supplements||[]).push(it);}}}catch(e){}
   for(const e of DATA.edges){(adj.get(e.from)||adj.set(e.from,[]).get(e.from)).push({other:e.to,rel:e.rel,dir:"out"});
     (adj.get(e.to)||adj.set(e.to,[]).get(e.to)).push({other:e.from,rel:e.rel,dir:"in"});}
   if(DATA.meta?.accent)document.documentElement.style.setProperty("--accent",DATA.meta.accent);
   buildTabs();
   const firstVisit = location.hash.length<=1;   // capture before switchView rewrites the hash
-  if(location.hash.length>1)applyHash();else switchView("pdca",true);
+  if(location.hash.length>1)applyHash();else switchView("pdca");
   try{ if(firstVisit && !localStorage.getItem("iso_seen")) document.getElementById("onboard").classList.add("show"); }catch(e){}
 })();
 </script>

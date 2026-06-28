@@ -1,13 +1,15 @@
 import { describe, it, expect } from "vitest";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { build } from "../scripts/assemble.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const data = JSON.parse(readFileSync(join(here, "../data/data.json"), "utf8"));
 const schema = JSON.parse(readFileSync(join(here, "../schema/data.schema.json"), "utf8"));
+const suppSchema = JSON.parse(readFileSync(join(here, "../schema/supplements.schema.json"), "utf8"));
 
 const supplements = JSON.parse(readFileSync(join(here, "../data/supplements.json"), "utf8"));
 
@@ -118,6 +120,14 @@ describe("內容對帳 (覆蓋率 — 隨內容補完逐步收緊)", () => {
 
 describe("補充活檔 (supplements — 老師補充，防打錯)", () => {
   const items = supplements.items || [];
+  it("supplements.json 通過 JSON Schema 驗證", () => {
+    const ajv = new Ajv({ allErrors: true });
+    addFormats(ajv);
+    const validate = ajv.compile(suppSchema);
+    const ok = validate(supplements);
+    if (!ok) console.error(validate.errors);
+    expect(ok, JSON.stringify(validate.errors, null, 2)).toBe(true);
+  });
   it("每筆補充的 nodeId 都對應到存在的節點", () => {
     const bad = items.filter((s) => !nodeIds.has(s.nodeId)).map((s) => s.nodeId);
     expect(bad).toEqual([]);
@@ -143,5 +153,24 @@ describe("ISO 27001 對應 + 關鍵概念 (對抗式一致性)", () => {
   it("剩餘風險接到 監督審查/溝通諮詢/文件化 (圖二關鍵連線必存在)", () => {
     const out = new Set(data.edges.filter((e) => e.from === "residual-risks").map((e) => e.to));
     expect(["monitoring-review", "communication-consultation", "documented-information"].filter((t) => !out.has(t))).toEqual([]);
+  });
+});
+
+describe("建置可重現性 (zones → data.json，防手改衍生檔漂移)", () => {
+  it("data/data.json 與 assemble(_zones) 完全一致 (改 zone 沒重建 / 直接手改 data.json 都會被擋)", () => {
+    expect(build()).toEqual(data);
+  });
+
+  it("每個 zone 節點都通過 data.schema 的 node 子結構驗證", () => {
+    const ajv = new Ajv({ allErrors: true });
+    addFormats(ajv);
+    const validateNode = ajv.compile(schema.properties.nodes.items);
+    const zoneDir = join(here, "../data/_zones");
+    const bad = [];
+    for (const f of readdirSync(zoneDir).filter((f) => f.endsWith(".json"))) {
+      const arr = JSON.parse(readFileSync(join(zoneDir, f), "utf8"));
+      for (const n of arr) if (!validateNode(n)) bad.push(`${f}:${n.id} ${JSON.stringify(validateNode.errors)}`);
+    }
+    expect(bad).toEqual([]);
   });
 });

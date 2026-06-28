@@ -1,0 +1,72 @@
+[
+  {
+    "id": "band-devops",
+    "type": "cross-cutting-band",
+    "ref": "ISO/IEC 22989",
+    "title": "開發與營運",
+    "title_en": "Development and operations (MLOps)",
+    "summary": "建模、部署、監控、再訓練的迭代閉環，貫穿全程",
+    "explanation": "AI 不是上線就結束：要反覆建模、訓練、部署，上線後持續監控效能與資料漂移、必要時再訓練，形成不斷迭代的開發-營運閉環（MLOps）。這是工程實務層，對映 ISO/IEC 22989 生命週期裡「design and development」與「operation and monitoring」兩個階段之間的反覆迭代，而不是標準明列的單一概念，因此把它當成橫向貫穿的關注帶來看。對應 ISMS 的條款 8 運作管制與附錄 A.8 技術控制（變更管理、安全開發、日誌監控），也呼應 PDCA 的執行（Do）與查核（Check）。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "持續監控", "note": "上線後追蹤模型效能與資料／概念漂移。" },
+      { "label": "再訓練與版本控制", "note": "資料或環境改變時更新模型並管理版本。" }
+    ]
+  },
+  {
+    "id": "band-transparency",
+    "type": "cross-cutting-band",
+    "ref": "ISO/IEC 22989",
+    "title": "透明性與可解釋性",
+    "title_en": "Transparency and explainability",
+    "summary": "資訊可取得、決策可被人理解與追溯",
+    "explanation": "指 AI 的資訊要可取得、決策機制能用人話解釋。從設計階段就得決定揭露什麼、留下什麼紀錄、模型能不能被追溯與理解，這要求貫穿資料、訓練、部署到運維全程，讓使用者與稽核者看得懂、追得到。對應 ISMS 的文件化資訊（7.5）與日誌記錄（A.8.15），也是對利害關係人要求（4.2）的回應。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "透明性 Transparency", "note": "讓相關人能拿到系統開發、部署與運作的相關資訊，不被黑箱擋住。" },
+      { "label": "可解釋性 Explainability", "note": "把模型怎麼得出結果，用人聽得懂的方式講清楚。" }
+    ]
+  },
+  {
+    "id": "band-security-privacy",
+    "type": "cross-cutting-band",
+    "ref": "ISO/IEC 22989",
+    "title": "安全與隱私保護",
+    "title_en": "Security and privacy",
+    "summary": "全程保護資料、模型與輸出的機密與隱私",
+    "explanation": "AI 全程都有資安與個資風險：訓練資料、模型權重、推論 API 與輸出都要保護，還得防資料中毒、對抗式攻擊、模型竊取與隱私外洩。這正是 ISMS 的本業——以機密性、完整性、可用性三性搭配附錄 A 全套控制來守護，並可延伸到個資保護（ISO 27701），是資安與 AI 治理最直接的交集。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "資料中毒／對抗式攻擊", "note": "惡意輸入污染訓練資料或誤導推論結果。" },
+      { "label": "模型與隱私保護", "note": "防模型權重遭竊、防訓練資料洩漏個資。" }
+    ]
+  },
+  {
+    "id": "band-risk",
+    "type": "cross-cutting-band",
+    "ref": "ISO/IEC 22989",
+    "title": "風險管理",
+    "title_en": "Risk management",
+    "summary": "全程識別與處理 AI 特有風險的循環",
+    "explanation": "每個生命週期階段都要識別、分析、處理並持續監控 AI 特有風險（偏誤、不可靠、安全與倫理衝擊），不是做一次評估，而是貫穿全程的循環。對應 ISMS 條款 6.1 的風險評鑑與處理，方法上採 ISO 31000；AI 專屬風險還可參考 ISO/IEC 23894（AI 風險管理）與 AI 管理系統標準 ISO/IEC 42001。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "AI 特有風險", "note": "偏誤、不可靠、自動化決策帶來的安全與倫理衝擊。" },
+      { "label": "持續再評估", "note": "模型或環境變化時重新評鑑風險。" }
+    ]
+  },
+  {
+    "id": "band-governance",
+    "type": "cross-cutting-band",
+    "ref": "ISO/IEC 22989",
+    "title": "組織治理",
+    "title_en": "Governance",
+    "summary": "最上層的政策、問責與監督，統籌全局",
+    "explanation": "最上層的問責與監督：訂政策、分派角色職責、建立審查與監督機制，確保 AI 全程符合組織目標、倫理與法規，並統籌底下其他關注帶。對應 ISMS 的條款 5 領導與承諾、條款 4 組織背景與附錄 A.5 組織控制；在 AI 領域則對應專門的 AI 管理系統標準 ISO/IEC 42001（AIMS）。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "角色與問責", "note": "界定 AI 提供者、開發者、使用者等角色的職責。" },
+      { "label": "政策與監督", "note": "訂定 AI 政策並建立審查與監督機制。" }
+    ]
+  }
+]

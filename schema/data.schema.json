@@ -45,7 +45,7 @@
           "id": { "type": "string", "pattern": "^[a-z0-9.\\-]+$" },
           "type": {
             "type": "string",
-            "enum": ["clause", "control", "risk-step", "risk-technique", "bridge", "architecture", "lifecycle-stage", "cross-cutting-band"]
+            "enum": ["clause", "control", "risk-step", "risk-technique", "bridge", "lifecycle-stage", "cross-cutting-band"]
           },
           "ref": { "type": "string" },
           "title": { "type": "string", "minLength": 1 },
@@ -66,7 +66,6 @@
                 "type": "array",
                 "items": { "type": "string", "enum": ["機密性", "完整性", "可用性"] }
               },
-              "cyberConcept": { "type": "array", "items": { "type": "string" } },
               "operationalCapability": { "type": "array", "items": { "type": "string" } },
               "securityDomain": { "type": "array", "items": { "type": "string" } }
             }

@@ -1,0 +1,208 @@
+[
+  {
+    "id": "scope-context-criteria",
+    "type": "risk-step",
+    "ref": "31000 §6.3",
+    "title": "範圍、全景及準則",
+    "title_en": "Scope, context and criteria",
+    "summary": "先定清楚：風險管理管到哪、處在什麼環境、用什麼尺規衡量風險。",
+    "explanation": "風險流程的第一步，把「遊戲規則」先講好：界定範圍（管哪些業務、資產與邊界）、盤點內外部全景（法規、利害關係人、目標與既有控制），並訂出風險準則——也就是衡量風險大小、判斷可不可接受的尺規。準則沒先定好，後面的分析與評估都會各說各話。",
+    "layers": ["risk"],
+    "subconcepts": [
+      { "label": "範圍 Scope", "note": "這次風險評鑑涵蓋的業務、系統與邊界。" },
+      { "label": "全景 Context", "note": "內外部環境，含法規、目標、利害關係人與既有控制。" },
+      { "label": "風險準則 Risk criteria", "note": "衡量風險高低與可接受度的尺規（可能性×後果）。" }
+    ]
+  },
+  {
+    "id": "risk-identification",
+    "type": "risk-step",
+    "ref": "31000 §6.4.2",
+    "title": "風險識別",
+    "title_en": "Risk identification",
+    "summary": "找出有哪些風險：可能發生什麼、為什麼、會影響什麼。",
+    "explanation": "風險評鑑的第一個動作，把可能威脅到目標的風險「找出來、列成清單」。要問：會發生什麼事件、原因與來源是什麼、可能造成哪些後果。找得越完整越好，漏掉的風險之後不會被分析、也不會被處理。資安情境常用資產／威脅／弱點，或事件導向兩種角度切入。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "risk-analysis",
+    "type": "risk-step",
+    "ref": "31000 §6.4.3",
+    "title": "風險分析",
+    "title_en": "Risk analysis",
+    "summary": "搞懂每個風險的後果有多大、發生機率多高。",
+    "explanation": "把識別出來的每個風險「拆開來理解」：評估它一旦發生的後果嚴重度，以及實際發生的可能性，常合成為一個風險等級。可用定性（高中低）、定量（數字機率／金額）或半定量方法。分析時要把現有控制的效果與不確定性一起考慮，輸出供下一步評估與排序使用。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "risk-evaluation",
+    "type": "risk-step",
+    "ref": "31000 §6.4.4",
+    "title": "風險評估",
+    "title_en": "Risk evaluation",
+    "summary": "把分析結果對照準則，決定哪些風險要先處理。",
+    "explanation": "拿風險分析的結果去比對第一步訂的風險準則，判斷每個風險是否在可接受範圍內、要不要處理、以及處理的優先順序。輸出是一張排好序的待辦清單：哪些必須立刻治理、哪些可以接受、哪些再觀察。這一步把「技術分析」轉成「管理決策」。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "risk-assessment",
+    "type": "risk-step",
+    "ref": "31000 §6.4",
+    "title": "風險評鑑",
+    "title_en": "Risk assessment",
+    "summary": "識別＋分析＋評估三步合稱，是風險流程的核心。",
+    "explanation": "風險評鑑是「識別→分析→評估」三個子步驟的總稱，是整個風險流程的核心引擎。ISO/IEC 27001 條款 6.1.2 的資安風險評鑑即對應此處，做法與 ISO 31000、ISO/IEC 27005 對齊。完整跑完一輪，組織才知道自己面對哪些風險、各有多嚴重、哪些得優先處理。",
+    "layers": ["risk"],
+    "subconcepts": [
+      { "label": "風險識別", "note": "找出有哪些風險（6.4.2）。" },
+      { "label": "風險分析", "note": "理解後果與可能性（6.4.3）。" },
+      { "label": "風險評估", "note": "對照準則排序、決定處理與否（6.4.4）。" }
+    ]
+  },
+  {
+    "id": "risk-treatment-options",
+    "type": "risk-step",
+    "ref": "31000 §6.5.2",
+    "title": "風險處理選項",
+    "title_en": "Selection of risk treatment options",
+    "summary": "對每個要處理的風險，挑一種或多種應對方式。",
+    "explanation": "評鑑後，針對需要處理的風險選擇應對策略。常見選項：降低（加控制把風險壓低）、規避（乾脆不做這件事）、移轉／分擔（保險、外包、合約）、保留／接受（在準則內就知情接受）。各選項可組合使用，並要權衡成本與效益。對應 ISO/IEC 27001 條款 6.1.3(a)。",
+    "layers": ["risk"],
+    "subconcepts": [
+      { "label": "降低 Modify", "note": "導入控制措施，降低可能性或後果。" },
+      { "label": "規避 Avoid", "note": "不從事或停止會造成風險的活動。" },
+      { "label": "移轉／分擔 Share", "note": "透過保險、外包或合約把風險分出去。" },
+      { "label": "保留／接受 Retain", "note": "風險在可接受準則內，知情後接受。" }
+    ]
+  },
+  {
+    "id": "select-implement-controls",
+    "type": "risk-step",
+    "ref": "27001 6.1.3 b/c",
+    "title": "選擇與實施風險控制措施",
+    "title_en": "Determining and implementing controls",
+    "summary": "決定要用哪些控制、並比對附錄 A 確認沒漏掉。",
+    "explanation": "把「降低風險」的決定落地成具體控制。先依需要決定所有必要的控制措施，再比對 ISO/IEC 27001 附錄 A（93 項）逐一確認有沒有遺漏該有的控制。控制可來自附錄 A、其他框架或自訂。決定好之後就規劃導入並實際運行，對應條款 6.1.3(b)(c)。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "soa",
+    "type": "bridge",
+    "ref": "SoA",
+    "title": "適用性聲明書 (SoA)",
+    "title_en": "Statement of Applicability",
+    "summary": "風險處理決定與附錄 A 控制之間的橋樑文件。",
+    "explanation": "ISMS 的命脈文件，也是稽核必看的一頁。它逐條列出附錄 A 每項控制是否適用、為何適用或排除、以及目前實施狀態。SoA 把「風險處理選了哪些控制、為什麼」白紙黑字綁起來，是連接風險流程與控制清單的橋樑，對應 ISO/IEC 27001 條款 6.1.3(d)。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "risk-treatment-plan",
+    "type": "risk-step",
+    "ref": "31000 §6.5.3",
+    "title": "風險處理計畫",
+    "title_en": "Risk treatment plan",
+    "summary": "把控制落地的行動藍圖：做什麼、誰做、何時做。",
+    "explanation": "把選定的控制變成可執行的計畫：要做哪些事、由誰負責、需要哪些資源、時程多久、預期成效怎麼衡量。它是風險處理從「決定」走到「執行」的橋接，並需取得風險擁有者核准。對應 ISO/IEC 27001 條款 6.1.3(e)，並在條款 8.3 資訊安全風險處理（實施風險處理計畫）落地執行。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "residual-risks",
+    "type": "risk-step",
+    "ref": "27001 6.1.3 f",
+    "title": "剩餘風險",
+    "title_en": "Residual risks",
+    "summary": "控制做完後還剩下、需要被接受的風險。",
+    "explanation": "即使導入控制，風險也很少歸零；處理後仍殘留的部分就是剩餘風險。組織要重新評估它的等級，確認是否落在可接受準則內，並由風險擁有者「知情後正式接受」。沒被接受的剩餘風險，得回到流程再加碼處理。對應 ISO/IEC 27001 條款 6.1.3(f)。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "communication-consultation",
+    "type": "risk-step",
+    "ref": "31000 §6.2",
+    "title": "溝通及諮詢",
+    "title_en": "Communication and consultation",
+    "summary": "全程和利害關係人雙向交流，不是做完才講。",
+    "explanation": "貫穿整個風險流程的橫向活動，不是單一階段。目的是讓內外部利害關係人理解風險、提供不同觀點、並對決策建立共識。溝通是把資訊傳出去，諮詢是把意見收進來。做得好，風險判斷才不會閉門造車，處理決定也更容易被支持與落實。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "monitoring-review",
+    "type": "risk-step",
+    "ref": "31000 §6.6",
+    "title": "監督及審查",
+    "title_en": "Monitoring and review",
+    "summary": "持續盯著風險與控制是否仍有效、環境有沒有變。",
+    "explanation": "同樣貫穿全程的活動。持續監督風險、控制與環境的變化，並定期審查整個流程是否還適用、有沒有達到預期效果。環境會變、新風險會冒出來、控制也可能失效，所以要不斷回看與調整。對應 PDCA 的 Check，連結 ISO/IEC 27001 條款 9（監督、量測、稽核、管理階層審查）。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "documented-information",
+    "type": "risk-step",
+    "ref": "31000 §6.7",
+    "title": "文件化資訊（記錄與報告）",
+    "title_en": "Recording and reporting",
+    "summary": "把風險流程的過程與結果留下記錄、對外報告。",
+    "explanation": "風險流程的每個決定與結果都要被記錄並適當報告，才能追溯、稽核與持續改善。記錄提供決策的依據，報告把風險資訊傳達給管理階層與利害關係人以支持決策。對應 ISO 31000 §6.7，並與 ISO/IEC 27001 條款 7.5 文件化資訊的要求相呼應。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "technique-fmea",
+    "type": "risk-technique",
+    "ref": "IEC 31010",
+    "title": "失效模式與影響分析 (FMEA)",
+    "title_en": "Failure Mode and Effects Analysis",
+    "summary": "系統化盤點每個元件可能怎麼壞、影響多大。",
+    "explanation": "ISO/IEC 31010 列舉的風險評估技術之一。逐一檢視系統或流程的每個元件／步驟，問「它會以什麼方式失效、造成什麼後果、多容易發生、多容易被偵測」，再排出優先處理順序（FMECA 會再加上嚴重度評分）。常用於風險識別與分析階段，特別適合工程與製程場景。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "technique-bow-tie",
+    "type": "risk-technique",
+    "ref": "IEC 31010",
+    "title": "領結分析 (Bow-tie)",
+    "title_en": "Bow-tie analysis",
+    "summary": "一張圖看清風險的成因、後果與兩側防線。",
+    "explanation": "ISO/IEC 31010 的技術之一。以中間的「危害事件」為結，左邊畫出各種原因與用來預防的控制，右邊畫出可能後果與用來減緩的控制，整體形狀像個領結。它把預防與緩解的防線一次視覺化，溝通直觀，常用來分析重大風險的因果路徑與控制是否足夠。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "technique-hazop",
+    "type": "risk-technique",
+    "ref": "IEC 31010",
+    "title": "危害與可操作性分析 (HAZOP)",
+    "title_en": "Hazard and Operability study (HAZOP)",
+    "summary": "用引導詞逐點檢查流程哪裡會偏離設計。",
+    "explanation": "ISO/IEC 31010 的結構化技術。由團隊針對流程或系統的每個節點，套用引導詞（如「沒有」「過多」「過少」「相反」），系統性地問「若偏離正常設計會怎樣」，找出潛在危害與可操作性問題。源自化工製程，重視團隊紀律與集思廣益，適合複雜系統的風險識別。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "technique-brainstorming",
+    "type": "risk-technique",
+    "ref": "IEC 31010",
+    "title": "腦力激盪",
+    "title_en": "Brainstorming",
+    "summary": "團隊自由發想，盡量列出可能的風險。",
+    "explanation": "ISO/IEC 31010 收錄最基本的風險識別技術。集合相關人員，在鼓勵自由發言、先不急著批評的氛圍下，盡量發想可能的風險、原因與情境，再彙整篩選。優點是快速、能激發創意、納入多元觀點；缺點是品質依賴參與者經驗與引導，常作為其他技術的起點。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "technique-scenario-analysis",
+    "type": "risk-technique",
+    "ref": "IEC 31010",
+    "title": "情境分析",
+    "title_en": "Scenario analysis",
+    "summary": "設想幾種未來劇本，推演各自的風險與後果。",
+    "explanation": "ISO/IEC 31010 的技術之一。針對未來的不確定性，建構數個可能發生的情境（如最佳／最壞／最可能），推演每種情境下會發生什麼、帶來哪些風險與後果。它幫助組織為不同未來預作準備，特別適合長期、高度不確定、或難以用機率精確量化的策略性風險。",
+    "layers": ["risk"]
+  },
+  {
+    "id": "technique-checklists",
+    "type": "risk-technique",
+    "ref": "IEC 31010",
+    "title": "檢核表法",
+    "title_en": "Checklists",
+    "summary": "用既有清單逐項核對，避免漏看常見風險。",
+    "explanation": "ISO/IEC 31010 的技術之一。把過往經驗、法規或標準整理成檢核清單，使用時逐項核對，確認常見風險或控制有沒有被遺漏。優點是簡單、快速、可重複、不需太多專業；缺點是只能查到清單上列的項目，對全新或未知風險容易視而不見，宜搭配發想型技術一起用。",
+    "layers": ["risk"]
+  }
+]

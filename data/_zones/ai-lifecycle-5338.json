@@ -1,0 +1,118 @@
+[
+  {
+    "id": "ai-inception",
+    "type": "lifecycle-stage",
+    "ref": "ISO 5338 §6.4.1–6.4.3",
+    "title": "起始（概念形成）",
+    "title_en": "Inception",
+    "summary": "把想法變成明確的問題、需求與系統要求。",
+    "explanation": "AI 系統的最前段。先釐清這個 AI 要解決什麼業務或任務問題（6.4.1），再問清楚利害關係人真正需要與在意什麼（6.4.2），最後轉成可驗收的系統需求（6.4.3）。AI 的特別之處在於需求常和資料、效能與可接受錯誤率綁在一起，這裡沒想清楚，後面模型就會走偏。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "6.4.1 業務或任務分析（Business or mission analysis）", "note": "釐清這個 AI 要解決的業務／任務問題與機會，界定問題範圍。" },
+      { "label": "6.4.2 利害關係人需要與需求定義（Stakeholder needs & requirements definition）", "note": "問清楚使用者與關係人真正需要什麼、在意什麼，並轉成需求。" },
+      { "label": "6.4.3 系統需求定義（System requirements definition）", "note": "把利害關係人需求轉成可驗收的系統技術需求。" }
+    ]
+  },
+  {
+    "id": "ai-design-dev",
+    "type": "lifecycle-stage",
+    "ref": "ISO 5338 §6.4.4–6.4.10",
+    "title": "設計與開發",
+    "title_en": "Design & development",
+    "summary": "定架構、做設計、取得知識與資料、實作並整合。",
+    "explanation": "系統真正被打造的階段。先定整體架構（6.4.4）與細部設計（6.4.5），用系統分析（6.4.6）權衡效能、成本與風險；AI 專屬的是取得領域知識（6.4.7）與 AI 資料工程（6.4.8，蒐集、清理、標註、防偏誤）。接著實作模型與程式（6.4.9），再整合成完整系統（6.4.10）。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "6.4.4 系統架構定義（System architecture definition）", "note": "決定系統整體結構與主要元件如何組合。" },
+      { "label": "6.4.5 設計定義（Design definition）", "note": "把架構細化成可實作的詳細設計。" },
+      { "label": "6.4.6 系統分析（System analysis）", "note": "用分析與權衡支援設計決策（效能、成本、風險）。" },
+      { "label": "6.4.10 整合（Integration）", "note": "把各元件組合成完整系統並確認介面正確。" },
+      { "label": "6.4.7 知識獲取（Knowledge acquisition）", "note": "AI 專屬：取得並表述領域知識，供系統學習或推理。" },
+      { "label": "6.4.8 AI 資料工程（AI data engineering）", "note": "AI 專屬：蒐集、清理、標註資料並降低偏誤與被攻擊風險。" },
+      { "label": "6.4.9 實施（Implementation）", "note": "實際建出元件——含訓練模型與撰寫程式。" }
+    ]
+  },
+  {
+    "id": "ai-vnv",
+    "type": "lifecycle-stage",
+    "ref": "ISO 5338 §6.4.11 / §6.4.13",
+    "title": "查證與確證",
+    "title_en": "Verification & validation",
+    "summary": "確認「做對了」，也確認「做了對的東西」。",
+    "explanation": "兩個容易混淆但不同的把關。查證（6.4.11）問「有沒有照規格正確做出來」，例如模型指標是否達標、程式是否符合設計；確證（6.4.13）問「放進真實情境是不是真的解決使用者的問題」。AI 行為從資料學來、不易預測，這兩關都要用測試資料與真實場景反覆驗。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "6.4.11 查證（Verification）", "note": "確認系統是否照規格正確建造（做對了）。" },
+      { "label": "6.4.13 確證（Validation）", "note": "確認系統在真實情境是否滿足使用者需要（做了對的東西）。" }
+    ]
+  },
+  {
+    "id": "ai-deployment",
+    "type": "lifecycle-stage",
+    "ref": "ISO 5338 §6.4.12",
+    "title": "部署",
+    "title_en": "Deployment",
+    "summary": "把通過驗證的系統搬進正式營運環境。",
+    "explanation": "轉移（6.4.12）指把開發完成的 AI 系統交付、安裝、上線到實際運作環境，包含訓練使用者、移交維運責任、確認能與既有系統銜接。對 AI 還要特別注意：上線環境的資料分布若和訓練時不同，效果可能掉，所以部署不是「丟上去就好」，要先準備好監控與可回復的機制。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "6.4.12 轉移（Transition）", "note": "把系統交付、安裝、上線到正式營運環境並移交維運。" }
+    ]
+  },
+  {
+    "id": "ai-operation-monitoring",
+    "type": "lifecycle-stage",
+    "ref": "ISO 5338 §6.4.15–6.4.16",
+    "title": "營運與監督",
+    "title_en": "Operation & monitoring",
+    "summary": "日常運行、監看表現並做維護修補。",
+    "explanation": "上線後的長期照顧。營運（6.4.15）是讓系統穩定提供服務、監看使用與表現；維護（6.4.16）是修錯、更新、因應環境變化做調整。AI 的關鍵差異是模型會「變舊」——資料漂移或概念漂移會讓準確度悄悄下滑，所以監督不只看系統有沒有當機，更要盯模型表現有沒有退化。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "6.4.15 營運（Operation）", "note": "讓系統穩定提供服務並監看使用與表現。" },
+      { "label": "6.4.16 維護（Maintenance）", "note": "修錯、更新、因應環境變化做調整。" }
+    ]
+  },
+  {
+    "id": "ai-continuous-validation",
+    "type": "lifecycle-stage",
+    "ref": "ISO 5338 §6.4.14",
+    "title": "持續確證",
+    "title_en": "Continuous validation",
+    "summary": "上線後仍持續重驗模型是否還可信。",
+    "explanation": "這是 5338 為 AI 新增、傳統軟體沒有的流程（6.4.14）。模型不像一般程式裝好就固定，它的表現會隨真實資料改變而退化或產生新風險。持續確證就是定期拿新資料重新測試、比對效能與安全性，及早抓出資料漂移、概念漂移或新出現的偏誤，必要時觸發重新訓練或重新評估。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "6.4.14 持續確證（Continuous validation）", "note": "AI 專屬：上線後定期重測，抓資料／概念漂移與新風險。" }
+    ]
+  },
+  {
+    "id": "ai-reevaluation",
+    "type": "lifecycle-stage",
+    "ref": "ISO 5338 §6.3.8 / §6.4.2 / §6.4.13",
+    "title": "重新評估",
+    "title_en": "Re-evaluation",
+    "summary": "定期回頭檢視系統是否仍該存在、仍合格。",
+    "explanation": "它不是單一固定流程，而是借助品質保證（6.3.8）、回頭重看利害關係人需求（6.4.2）與重做確證（6.4.13）的綜合動作。目的是定期自問：這個 AI 還符合當初目標嗎？需求變了嗎？品質與合規還守得住嗎？評估結果可能導向繼續維運、重大改版，或進入汰除。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "6.3.8 品質保證（Quality assurance）", "note": "確保流程與產出持續達到品質要求。" },
+      { "label": "6.4.2 利害關係人需要與需求定義（Stakeholder needs & requirements definition）", "note": "回頭重看需求是否已經改變。" },
+      { "label": "6.4.13 確證（Validation）", "note": "重做確證，確認系統仍滿足當初目標。" }
+    ]
+  },
+  {
+    "id": "ai-retirement",
+    "type": "lifecycle-stage",
+    "ref": "ISO 5338 §6.4.17",
+    "title": "汰除",
+    "title_en": "Retirement",
+    "summary": "讓系統有計畫地除役並善後。",
+    "explanation": "汰除（6.4.17）是生命週期的終點：有計畫地停用、移除 AI 系統，並處理善後——資料如何刪除或保存、模型與文件如何封存、使用者如何轉到替代方案、法規與合約上的留存義務怎麼滿足。對 AI 特別重要的是訓練資料與模型本身要安全銷毀，避免敏感資料外流。",
+    "layers": ["lifecycle"],
+    "subconcepts": [
+      { "label": "6.4.17 汰除（Disposal）", "note": "有計畫地除役並處理資料、模型與文件的善後。" }
+    ]
+  }
+]
