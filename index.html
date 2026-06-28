@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ISMS 主導稽核員 · 互動課程筆記（ISO/CNS 27001）</title>
 <meta name="description" content="ISMS 主導稽核員(ISMS LA) 互動課程筆記：PDCA 運轉 + 風險管理 (ISO 31000/27005) + AI 系統生命週期 (ISO 5338/22989) + 附錄 A 控制；能學、能查、能稽核。" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#08080a" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="ISMS 主導稽核員 · 互動課程筆記" />
+<meta property="og:description" content="能學、能查、能拿去稽核的 ISMS LA 互動筆記：PDCA · 風險流程 · AI 生命週期 · 附錄A 控制 · ISO 27000 家族。" />
+<meta property="og:url" content="https://madangel1215.github.io/ismsla-notes/" />
+<meta property="og:image" content="https://madangel1215.github.io/ismsla-notes/og-image.png" />
+<meta name="twitter:card" content="summary_large_image" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -319,6 +329,25 @@ details.acc:not([open])>summary{margin-bottom:6px}
 .term-pop{position:fixed;max-width:290px;background:var(--glass);backdrop-filter:blur(20px) saturate(1.4);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.5);padding:10px 12px;font-size:12.5px;line-height:1.55;color:var(--text-2);z-index:60;display:none;pointer-events:none}
 .term-pop.show{display:block}
 .term-pop b{color:var(--text);display:block;margin-bottom:3px;font-size:13px}
+/* ---------- 列印稽核清單 ---------- */
+#print-area{display:none}
+@media print{
+  html,body{overflow:visible!important;height:auto!important;background:#fff;color:#000}
+  #app,.term-pop,.cmdk,.modal{display:none!important}
+  #print-area{display:block;padding:0 2mm;font-family:"Noto Sans TC",sans-serif}
+  .pr-h1{font-size:17pt;font-weight:700;margin:0 0 1mm}
+  .pr-meta{font-size:8.5pt;color:#555;margin-bottom:4mm}
+  .pr-sec{font-size:12pt;font-weight:700;border-bottom:1.5pt solid #000;margin:6mm 0 2mm;page-break-after:avoid}
+  .pr-node{margin:0 0 3.5mm;page-break-inside:avoid}
+  .pr-node h3{font-size:10.5pt;margin:0 0 1mm}
+  .pr-node .pr-ref{font-family:monospace;color:#555;font-weight:400;margin-right:4px}
+  .pr-block{margin:1mm 0 0}
+  .pr-block b{font-size:8.5pt;color:#234}
+  .pr-q{font-size:9.5pt;margin:.7mm 0 .7mm 5mm;text-indent:-5mm}
+  .pr-q::before{content:"\2610  "}
+  .pr-e{font-size:9pt;color:#333;margin:.4mm 0 .4mm 5mm}
+  .pr-nc{font-size:9pt;color:#900;margin:.4mm 0 .4mm 5mm}
+}
 </style>
   <script src="https://unpkg.com/cytoscape@3.34.0/dist/cytoscape.min.js" integrity="sha384-K+k+ywfDuvV9dwg+bwsVE0WGkrTnqFamaER+ydBgMFQTtlI0jdI9no9AjkQHwh/T" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/layout-base@2.0.1/layout-base.js" integrity="sha384-5E2lB9AIGE6LRCnOOSTnZRlYZFZ01iMeN2fw97Z1r4Z/kXALxKw2AC+ZzQqoeDsG" crossorigin="anonymous"></script>
@@ -346,6 +375,7 @@ details.acc:not([open])>summary{margin-bottom:6px}
         <button class="mrow" id="overlay-btn" role="menuitem"><span class="dot"></span><span>疊控制措施</span></button>
         <div class="menu-sep"></div>
         <button class="mrow" id="tour-btn2" role="menuitem"><span class="dot" style="background:var(--accent)"></span><span>▶ 稽核三問導覽</span></button>
+        <button class="mrow" id="print-btn" role="menuitem"><span class="dot"></span><span>⎙ 列印稽核清單 (PDF)</span></button>
       </div>
     </div>
   </header>
@@ -409,6 +439,7 @@ details.acc:not([open])>summary{margin-bottom:6px}
   </div>
   <div class="term-pop" id="term-pop" aria-hidden="true"></div>
 </div>
+<div id="print-area"></div>
 
 <script type="module">
 const SVGNS="http://www.w3.org/2000/svg";
@@ -927,6 +958,7 @@ function buildCmdk(){cmdkItems=[
   {kind:"動作",label:"疊控制措施 開／關",run:()=>document.getElementById("overlay-btn").click()},
   {kind:"動作",label:"開始 稽核三問導覽",run:()=>startTour()},
   {kind:"動作",label:"匯出 OSCAL（93 控制）",run:()=>downloadOscal()},
+  {kind:"動作",label:"列印 稽核清單（PDF）",run:()=>printChecklist()},
   {kind:"動作",label:"鍵盤快捷鍵說明",run:()=>openHelp()},
   ...DATA.nodes.map(n=>({kind:n.type==="control"?"控制":n.type==="clause"?"條款":"節點",label:(n.ref?n.ref+" ":"")+(n.title||n.id),hint:"前往",run:()=>select(n.id)})),
   ...STDS.map(s=>({kind:"標準",label:s.number+" "+s.title,hint:"開標準",run:()=>openStdPanel(s)})),
@@ -962,6 +994,25 @@ document.addEventListener("keydown",e=>{
   else if(e.key==="t")setTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light");
   else if(e.key==="\\")document.getElementById("rail-toggle").click();
   else if(e.key==="?")openHelp();});
+
+// ---------- 列印稽核清單 (PDF) ----------
+function buildPrintChecklist(){
+  const pa=document.getElementById("print-area");
+  const theme=document.documentElement.getAttribute("data-theme")||"dark";
+  const prNode=(n)=>{let s=`<div class="pr-node"><h3><span class="pr-ref">${n.ref||""}</span>${n.title||""}</h3>`;
+    if(n.audit?.questions?.length)s+=`<div class="pr-block"><b>稽核問句</b>`+n.audit.questions.map(q=>`<div class="pr-q">${q}</div>`).join("")+`</div>`;
+    if(n.audit?.evidence?.length)s+=`<div class="pr-block"><b>應備證據</b>`+n.audit.evidence.map(x=>`<div class="pr-e">· ${x}</div>`).join("")+`</div>`;
+    if(n.audit?.nonconformities?.length)s+=`<div class="pr-block"><b>常見不符合</b>`+n.audit.nonconformities.map(x=>`<div class="pr-nc">! ${x}</div>`).join("")+`</div>`;
+    const docs=docsByNode.get(n.id);if(docs?.length)s+=`<div class="pr-block"><b>必備/相關文件</b>`+docs.map(d=>`<div class="pr-e">· ${d.name}（${d.kind}${d.mandatory?"·必備":""}）</div>`).join("")+`</div>`;
+    return s+`</div>`;};
+  const clauses=DATA.nodes.filter(n=>n.type==="clause"),controls=DATA.nodes.filter(n=>n.type==="control");
+  pa.innerHTML=`<div class="pr-h1">ISMS 稽核清單 · ISO/IEC 27001:2022</div>`+
+    `<div class="pr-meta">ISMS·LA 互動課程筆記 — 稽核三件組（問句／證據／常見不符合）＋必備文件。☐ 供現場勾稽。© 內容 CC BY-NC 4.0。</div>`+
+    `<div class="pr-sec">條款 4–10（${clauses.length}）</div>`+clauses.map(prNode).join("")+
+    `<div class="pr-sec">附錄 A 控制（${controls.length}）</div>`+controls.map(prNode).join("");
+}
+function printChecklist(){buildPrintChecklist();setTimeout(()=>window.print(),60);}
+document.getElementById("print-btn").addEventListener("click",()=>{closeSettings();printChecklist();});
 
 // deep-link
 function updateHash(){const p=new URLSearchParams();p.set("view",curView);if(overlay)p.set("ov","1");if(mode==="audit")p.set("mode","audit");if(document.documentElement.getAttribute("data-theme")==="light")p.set("theme","light");if(selected)p.set("sel",selected);
@@ -1024,6 +1075,8 @@ document.getElementById("ob-tour").addEventListener("click",startTour);
   if(location.hash.length>1)applyHash();else switchView("pdca");
   try{ if(firstVisit && !localStorage.getItem("iso_seen")) document.getElementById("onboard").classList.add("show"); }catch(e){}
 })();
+// PWA：註冊 service worker（離線可用；需 https 或 localhost）
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script>
 </body>
 </html>
