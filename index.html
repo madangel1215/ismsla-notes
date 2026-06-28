@@ -300,6 +300,25 @@ details.acc:not([open])>summary{margin-bottom:6px}
   .rail.collapsed .ri-label,.rail.collapsed .rail-group-h{display:revert}
   .rail.collapsed .rail-item{justify-content:flex-start;padding:9px 10px}
 }
+/* ---------- command palette (⌘K) + help + glossary ---------- */
+.cmdk{position:fixed;inset:0;background:rgba(4,4,6,.6);backdrop-filter:blur(6px);display:none;justify-content:center;align-items:flex-start;padding-top:13vh;z-index:50}
+.cmdk.open{display:flex}
+.cmdk-card{width:min(620px,92vw);background:var(--glass);backdrop-filter:blur(30px) saturate(1.4);border:1px solid var(--line-2);border-radius:16px;box-shadow:0 40px 100px rgba(0,0,0,.6);overflow:hidden}
+.cmdk-input{width:100%;border:0;background:transparent;color:var(--text);font-size:16px;padding:17px 20px;outline:none;border-bottom:1px solid var(--line)}
+.cmdk-list{max-height:52vh;overflow-y:auto;padding:6px}
+.cmdk-item{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:9px;cursor:pointer}
+.cmdk-item.on,.cmdk-item:hover{background:var(--surface-2)}
+.cmdk-kind{font-family:var(--mono);font-size:9px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:5px;padding:2px 6px;min-width:40px;text-align:center;flex-shrink:0}
+.cmdk-label{font-size:13.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmdk-hint{font-size:11px;color:var(--text-3);margin-left:auto;white-space:nowrap;flex-shrink:0}
+.cmdk-foot{padding:9px 16px;border-top:1px solid var(--line);font-size:11px;color:var(--text-3);font-family:var(--mono)}
+.help-grid{display:grid;grid-template-columns:auto 1fr;gap:9px 14px;margin:16px 0 22px;font-size:13px;align-items:center}
+.help-grid kbd{font-family:var(--mono);font-size:11px;background:var(--surface-2);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:6px;padding:2px 8px;color:var(--text);justify-self:start;white-space:nowrap}
+.help-grid span{color:var(--text-2)}
+.term{border-bottom:1px dashed color-mix(in srgb,var(--accent) 60%,transparent);cursor:help}
+.term-pop{position:fixed;max-width:290px;background:var(--glass);backdrop-filter:blur(20px) saturate(1.4);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.5);padding:10px 12px;font-size:12.5px;line-height:1.55;color:var(--text-2);z-index:60;display:none;pointer-events:none}
+.term-pop.show{display:block}
+.term-pop b{color:var(--text);display:block;margin-bottom:3px;font-size:13px}
 </style>
   <script src="https://unpkg.com/cytoscape@3.34.0/dist/cytoscape.min.js" integrity="sha384-K+k+ywfDuvV9dwg+bwsVE0WGkrTnqFamaER+ydBgMFQTtlI0jdI9no9AjkQHwh/T" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/layout-base@2.0.1/layout-base.js" integrity="sha384-5E2lB9AIGE6LRCnOOSTnZRlYZFZ01iMeN2fw97Z1r4Z/kXALxKw2AC+ZzQqoeDsG" crossorigin="anonymous"></script>
@@ -373,6 +392,22 @@ details.acc:not([open])>summary{margin-bottom:6px}
     </div>
   </div>
   </div>
+  <div class="cmdk" id="cmdk" aria-hidden="true">
+    <div class="cmdk-card" role="dialog" aria-label="命令面板">
+      <input id="cmdk-input" class="cmdk-input" placeholder="跳到 條款 / 控制 / 標準 / 視圖，或輸入動作…" autocomplete="off" />
+      <div class="cmdk-list" id="cmdk-list"></div>
+      <div class="cmdk-foot">↑↓ 選擇 · ↵ 前往 · Esc 關閉</div>
+    </div>
+  </div>
+  <div class="modal" id="help">
+    <div class="modal-card" style="max-width:440px">
+      <div class="ob-eyebrow">鍵盤快捷鍵 · Keyboard</div>
+      <h1 style="font-size:22px">快捷鍵</h1>
+      <div class="help-grid" id="help-grid"></div>
+      <div class="ob-actions"><button class="ob-skip" id="help-close">關閉 (Esc)</button></div>
+    </div>
+  </div>
+  <div class="term-pop" id="term-pop" aria-hidden="true"></div>
 </div>
 
 <script type="module">
@@ -755,7 +790,7 @@ function openPanel(n){
   if(rels.length){h+=`<div class="sech">關聯 · Relations</div>`+rels.map(r=>{const o=byId.get(r.other);if(!o)return"";const cross=homeView(r.other)!==homeView(n.id);
     return `<div class="rel" data-go="${r.other}"><span class="rel-chip">${(r.rel||"").toUpperCase()}</span><span class="rel-arr">${r.dir==="out"?"→":"←"}</span><span class="rel-t">${o.ref?o.ref+" ":""}${o.title||o.id}</span>${cross?`<span class="rel-jump">跳 ${VIEWS[homeView(r.other)].n}</span>`:""}</div>`;}).join("");}
   pbody.innerHTML=h;
-  accordionize(pbody);
+  accordionize(pbody);tagGlossary(pbody);
   pbody.querySelectorAll("[data-go]").forEach(r=>r.addEventListener("click",()=>select(r.dataset.go)));
   pbody.querySelectorAll("[data-std]").forEach(r=>r.addEventListener("click",()=>openStdPanel(stdById.get(r.dataset.std))));
   panel.classList.add("open");panel.setAttribute("aria-hidden","false");
@@ -777,7 +812,7 @@ function openStdPanel(s){if(!s)return;
   if(ns.length)h+=`<div class="sech ax">量尺於 · Applies to</div>`+ns.map(n=>`<div class="rel" data-go="${n.id}"><span class="rel-chip">${n.ref||typeName(n.type).split(" ")[0]}</span><span class="rel-t">${n.title||n.id}</span><span class="rel-jump">跳 ${VIEWS[homeView(n.id)].n}</span></div>`).join("");
   if(s.view&&VIEWS[s.view])h+=`<div class="sech">對應圖</div><div class="rel" data-view="${s.view}"><span class="rel-chip">圖</span><span class="rel-t">看 ${VIEWS[s.view].n} ${VIEWS[s.view].t}</span></div>`;
   pbody.innerHTML=h;
-  accordionize(pbody);
+  accordionize(pbody);tagGlossary(pbody);
   pbody.querySelectorAll("[data-std]").forEach(r=>r.addEventListener("click",()=>openStdPanel(stdById.get(r.dataset.std))));
   pbody.querySelectorAll("[data-go]").forEach(r=>r.addEventListener("click",()=>select(r.dataset.go)));
   pbody.querySelectorAll("[data-view]").forEach(r=>r.addEventListener("click",()=>switchView(r.dataset.view)));
@@ -841,6 +876,92 @@ q.addEventListener("input",()=>{const s=q.value.trim().toLowerCase();if(!s){resu
 q.addEventListener("keydown",e=>{if(e.key==="ArrowDown"&&results.classList.contains("open")){e.preventDefault();results.querySelector("[data-id]")?.focus();}
   else if(e.key==="Escape"){results.classList.remove("open");}});
 document.addEventListener("click",e=>{if(!e.target.closest(".search"))results.classList.remove("open");});
+
+// ---------- glossary 名詞 hover 詞彙卡 ----------
+const GLOSSARY={
+  "風險擁有者":"對某『風險』當責(accountable)、有權核准其處理並接受剩餘風險的人(ISO 31000)；＝風險當責者，職位需夠高、能調資源。",
+  "風險當責者":"同『風險擁有者』——對風險當責、有權核准處理的人。",
+  "資產擁有者":"對某『資產』日常管理與保護負責的人或單位(A.5.9)，常為較基層角色；與風險擁有者不同、常為不同人。",
+  "適用性聲明":"SoA：列出附錄A每條控制是否適用、理由與實施狀態，是風險決定與控制之間的橋樑(6.1.3 d)。",
+  "SoA":"適用性聲明 Statement of Applicability：列出每條控制適用與否、理由、實施狀態(6.1.3 d)。",
+  "剩餘風險":"風險處理後仍殘留的風險，須由風險擁有者知情後正式接受並簽核(6.1.3 f)。",
+  "風險評鑑":"識別→分析→評估三步合稱(27001 6.1.2)：判斷有哪些風險、多嚴重、優先序。",
+  "風險處理":"對評鑑出的風險選對策(降低/接受/移轉/避免)並落實控制(6.1.3)。",
+  "風險準則":"判斷風險可不可接受的標準：可能性×衝擊評級，加上風險胃納/容忍度。",
+  "當責":"Accountable：對結果負最終責任、有權核准；與『負責(Responsible，實際執行)』不同。",
+  "關注方":"CNS 27001:2023 對 interested parties 的官方譯詞，即利害關係人(客戶/主管機關/供應商/員工等)。",
+  "文件化資訊":"documented information：須維持(文件)或保留(紀錄)的資訊；27001 多處明確要求。",
+  "Annex SL":"ISO 管理系統標準的共用高階結構(條款4–10)，27001/9001/14001/42001/27701 同殼，可整合稽核。",
+  "風險胃納":"Risk appetite：組織願意承擔的風險總量與種類。",
+};
+const GTERMS=Object.keys(GLOSSARY).sort((a,b)=>b.length-a.length);
+function tagGlossary(root){
+  const seen=new Set();
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:nd=>{
+    const p=nd.parentElement;if(!p)return NodeFilter.FILTER_REJECT;
+    if(p.closest(".term,summary,.sech,.ref,.rel-chip,.kbadge,.cmdk,h2,.ovl,.iso-line"))return NodeFilter.FILTER_REJECT;
+    return NodeFilter.FILTER_ACCEPT;}});
+  const targets=[];let n;while(n=walker.nextNode())targets.push(n);
+  for(const node of targets){for(const term of GTERMS){if(seen.has(term))continue;
+    const idx=node.nodeValue.indexOf(term);if(idx<0)continue;
+    const mid=node.splitText(idx);mid.splitText(term.length);
+    const span=document.createElement("span");span.className="term";span.dataset.term=term;span.textContent=term;
+    mid.parentNode.replaceChild(span,mid);seen.add(term);break;}}
+}
+const termPop=document.getElementById("term-pop");
+function showTerm(el){const def=GLOSSARY[el.dataset.term];if(!def)return;
+  termPop.innerHTML=`<b>${el.dataset.term}</b>${def}`;termPop.classList.add("show");
+  const r=el.getBoundingClientRect();const pw=termPop.offsetWidth,ph=termPop.offsetHeight;
+  let x=r.left,y=r.bottom+6;if(x+pw>innerWidth-10)x=innerWidth-10-pw;if(y+ph>innerHeight-10)y=r.top-6-ph;
+  termPop.style.left=Math.max(8,x)+"px";termPop.style.top=Math.max(8,y)+"px";}
+pbody.addEventListener("mouseover",e=>{const t=e.target.closest(".term");if(t)showTerm(t);});
+pbody.addEventListener("mouseout",e=>{if(e.target.closest(".term"))termPop.classList.remove("show");});
+
+// ---------- ⌘K 命令面板 ----------
+let cmdkItems=[],cmdkShown=[],cmdkSel=0;
+const cmdkEl=document.getElementById("cmdk"),cmdkInput=document.getElementById("cmdk-input"),cmdkList=document.getElementById("cmdk-list");
+function buildCmdk(){cmdkItems=[
+  ...Object.keys(VIEWS).map(k=>({kind:"視圖",label:VIEWS[k].n+" "+VIEWS[k].t,hint:"切視圖",run:()=>switchView(k)})),
+  {kind:"動作",label:"切換 深／淺色",run:()=>setTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light")},
+  {kind:"動作",label:"切換 學習／稽核者視角",run:()=>{setMode(mode==="learn"?"audit":"learn");if(selected)openPanel(byId.get(selected));updateHash();}},
+  {kind:"動作",label:"疊控制措施 開／關",run:()=>document.getElementById("overlay-btn").click()},
+  {kind:"動作",label:"開始 稽核三問導覽",run:()=>startTour()},
+  {kind:"動作",label:"匯出 OSCAL（93 控制）",run:()=>downloadOscal()},
+  {kind:"動作",label:"鍵盤快捷鍵說明",run:()=>openHelp()},
+  ...DATA.nodes.map(n=>({kind:n.type==="control"?"控制":n.type==="clause"?"條款":"節點",label:(n.ref?n.ref+" ":"")+(n.title||n.id),hint:"前往",run:()=>select(n.id)})),
+  ...STDS.map(s=>({kind:"標準",label:s.number+" "+s.title,hint:"開標準",run:()=>openStdPanel(s)})),
+];}
+function openCmdk(){if(!cmdkItems.length)buildCmdk();cmdkEl.classList.add("open");cmdkInput.value="";filterCmdk("");cmdkInput.focus();}
+function closeCmdk(){cmdkEl.classList.remove("open");}
+function filterCmdk(q){q=q.trim().toLowerCase();
+  cmdkShown=(q?cmdkItems.filter(it=>it.label.toLowerCase().includes(q)||it.kind.includes(q)):cmdkItems).slice(0,50);
+  cmdkSel=0;renderCmdk();}
+function renderCmdk(){cmdkList.innerHTML=cmdkShown.map((it,i)=>`<div class="cmdk-item${i===cmdkSel?" on":""}" data-i="${i}"><span class="cmdk-kind">${it.kind}</span><span class="cmdk-label">${it.label}</span>${it.hint?`<span class="cmdk-hint">${it.hint}</span>`:""}</div>`).join("")||`<div class="cmdk-item"><span class="cmdk-label" style="color:var(--text-3)">無結果</span></div>`;
+  cmdkList.querySelectorAll("[data-i]").forEach(el=>el.addEventListener("click",()=>runCmdk(+el.dataset.i)));}
+function runCmdk(i){const it=cmdkShown[i];if(!it)return;closeCmdk();it.run();}
+cmdkInput.addEventListener("input",e=>filterCmdk(e.target.value));
+cmdkInput.addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){e.preventDefault();cmdkSel=Math.min(cmdkSel+1,cmdkShown.length-1);renderCmdk();document.querySelector(".cmdk-item.on")?.scrollIntoView({block:"nearest"});}
+  else if(e.key==="ArrowUp"){e.preventDefault();cmdkSel=Math.max(cmdkSel-1,0);renderCmdk();document.querySelector(".cmdk-item.on")?.scrollIntoView({block:"nearest"});}
+  else if(e.key==="Enter"){e.preventDefault();runCmdk(cmdkSel);}
+  else if(e.key==="Escape"){closeCmdk();}});
+cmdkEl.addEventListener("click",e=>{if(e.target===cmdkEl)closeCmdk();});
+
+// ---------- 鍵盤快捷鍵 + 說明 ----------
+const SHORTCUTS=[["⌘K / Ctrl K","命令面板（跳任何東西）"],["1 – 6","切換六個視圖"],["g","切 學習／稽核者視角"],["t","切 深／淺色"],["\\","收合／展開左側選單"],["/","聚焦搜尋"],["?","顯示此快捷鍵表"],["Esc","關閉面板／選單"]];
+function openHelp(){document.getElementById("help-grid").innerHTML=SHORTCUTS.map(([k,d])=>`<kbd>${k}</kbd><span>${d}</span>`).join("");document.getElementById("help").classList.add("show");}
+function closeHelp(){document.getElementById("help").classList.remove("show");}
+document.getElementById("help-close").addEventListener("click",closeHelp);
+document.addEventListener("keydown",e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();openCmdk();return;}
+  if(e.key==="Escape"){if(document.getElementById("help").classList.contains("show")){closeHelp();return;}if(cmdkEl.classList.contains("open")){closeCmdk();return;}}
+  const tag=(e.target.tagName||"").toLowerCase();if(tag==="input"||tag==="textarea"||e.target.isContentEditable||e.metaKey||e.ctrlKey||e.altKey)return;
+  const vk={"1":"pdca","2":"risk","3":"ai","4":"controls","5":"docs","6":"explorer"};
+  if(vk[e.key])switchView(vk[e.key]);
+  else if(e.key==="g"){setMode(mode==="learn"?"audit":"learn");if(selected)openPanel(byId.get(selected));updateHash();}
+  else if(e.key==="t")setTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light");
+  else if(e.key==="\\")document.getElementById("rail-toggle").click();
+  else if(e.key==="?")openHelp();});
 
 // deep-link
 function updateHash(){const p=new URLSearchParams();p.set("view",curView);if(overlay)p.set("ov","1");if(mode==="audit")p.set("mode","audit");if(document.documentElement.getAttribute("data-theme")==="light")p.set("theme","light");if(selected)p.set("sel",selected);
