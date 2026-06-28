@@ -249,3 +249,35 @@ describe("文件化資訊 + ISO 27000 家族 (參考資料)", () => {
     expect(standards.items.find((s) => s.id === "iso-5338").parent.sort()).toEqual(["iso-12207", "iso-15288"]);
   });
 });
+
+const exam = JSON.parse(readFileSync(join(here, "../data/exam.json"), "utf8"));
+const examSchema = JSON.parse(readFileSync(join(here, "../schema/exam.schema.json"), "utf8"));
+
+describe("考題 (exam — 練習題庫)", () => {
+  it("exam.json 通過 JSON Schema 驗證", () => {
+    const ajv = new Ajv({ allErrors: true });
+    addFormats(ajv);
+    const v = ajv.compile(examSchema);
+    const ok = v(exam);
+    if (!ok) console.error(v.errors);
+    expect(ok, JSON.stringify(v.errors, null, 2)).toBe(true);
+  });
+  it("題目 id 不重複", () => {
+    const ids = exam.items.map((q) => q.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+  it("正解都落在選項鍵內，且單選恰一個答案", () => {
+    const bad = [];
+    for (const q of exam.items) {
+      const keys = new Set(q.options.map((o) => o.k));
+      for (const a of q.answer) if (!keys.has(a)) bad.push(`${q.id}:正解${a}不在選項`);
+      if ((q.type === "single" || q.type === "tf") && q.answer.length !== 1) bad.push(`${q.id}:${q.type}卻有${q.answer.length}個答案`);
+    }
+    expect(bad, bad.join(", ")).toEqual([]);
+  });
+  it("refs 都指向存在的節點 (能跳回框架)", () => {
+    const bad = [];
+    for (const q of exam.items) for (const r of q.refs || []) if (!nodeIds.has(r)) bad.push(`${q.id}→${r}`);
+    expect(bad, bad.join(", ")).toEqual([]);
+  });
+});

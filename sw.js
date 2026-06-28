@@ -1,8 +1,8 @@
 // ISMS·LA service worker — 離線可用 app shell（cache-first）
-const CACHE = "ismsla-v0.7.0";
+const CACHE = "ismsla-v0.8.0";
 const CORE = [
   "./", "index.html", "favicon.svg", "manifest.webmanifest", "icon-192.png", "icon-512.png", "og-image.png",
-  "data/data.json", "data/supplements.json", "data/documents.json", "data/standards.json",
+  "data/data.json", "data/supplements.json", "data/documents.json", "data/standards.json", "data/exam.json",
   "https://unpkg.com/cytoscape@3.34.0/dist/cytoscape.min.js",
   "https://unpkg.com/layout-base@2.0.1/layout-base.js",
   "https://unpkg.com/cose-base@2.2.0/cose-base.js",

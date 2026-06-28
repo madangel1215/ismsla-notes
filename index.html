@@ -220,6 +220,69 @@ svg#canvas{width:100%;height:100%;display:block}
 .pyr-band .pyr-c{font-family:var(--mono);font-size:11px;color:var(--text-3)}
 .pyr-clear{font-family:var(--mono);font-size:11px;color:var(--accent);cursor:pointer;text-transform:none;letter-spacing:0}
 .kbadge.tier{color:var(--text-3);border:1px solid var(--line-2)}
+/* 考題練習 (exam) */
+#exam{position:absolute;inset:0;overflow-y:auto;padding:26px 32px 64px;display:none}
+#exam.show{display:block}
+.ex-wrap{max-width:860px;margin:0 auto}
+.ex-modes{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.ex-stat{font-size:12.5px;color:var(--text-3);margin-bottom:16px;display:flex;gap:14px;flex-wrap:wrap}
+.ex-stat b{color:var(--text);font-family:var(--mono)}
+.ex-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.exq{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:18px 20px;margin-bottom:14px}
+.exq-top{display:flex;align-items:center;gap:8px;margin-bottom:11px;flex-wrap:wrap}
+.exq-no{font-family:var(--mono);font-size:11px;color:var(--text-3)}
+.exq-topic{font-size:11px;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));border-radius:99px;padding:2px 9px}
+.exq-type{font-family:var(--mono);font-size:10px;color:var(--text-3);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.exq-badge{margin-left:auto;font-family:var(--mono);font-size:11.5px}
+.exq-badge.ok{color:var(--cat-control)}
+.exq-badge.no{color:var(--warn-strong)}
+.exq-stem{font-size:15px;line-height:1.7;color:var(--text);margin-bottom:14px;white-space:pre-wrap}
+.exo{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:10px;padding:11px 13px;margin-bottom:7px;cursor:pointer;font-size:14px;line-height:1.55;transition:border-color .12s var(--ease),background .12s var(--ease)}
+.exo:hover:not(:disabled){border-color:var(--line-2)}
+.exo:focus-visible{outline:none;border-color:var(--accent)}
+.exo .exo-k{font-family:var(--mono);font-size:12px;color:var(--text-3);flex:0 0 auto;width:16px;padding-top:1px}
+.exo .exo-t{flex:1 1 auto}
+.exo.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.exo.sel .exo-k{color:var(--accent)}
+.exo.correct{border-color:var(--cat-control);background:color-mix(in srgb,var(--cat-control) 14%,var(--surface))}
+.exo.correct .exo-k{color:var(--cat-control)}
+.exo.wrong{border-color:var(--warn-strong);background:color-mix(in srgb,var(--warn-strong) 13%,var(--surface))}
+.exo.wrong .exo-k{color:var(--warn-strong)}
+.exo:disabled{cursor:default}
+.exo-mark{margin-left:auto;font-family:var(--mono);font-size:13px;flex:0 0 auto}
+.ex-submit{font-size:13px;padding:8px 16px;border-radius:9px;border:1px solid var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface));color:var(--text);cursor:pointer;margin-top:4px}
+.ex-submit:hover{background:color-mix(in srgb,var(--accent) 24%,var(--surface))}
+.exfb{margin-top:13px;border-top:1px solid var(--line);padding-top:12px}
+.exfb-h{font-size:13.5px;font-weight:600;margin-bottom:7px}
+.exfb-h.ok{color:var(--cat-control)}
+.exfb-h.no{color:var(--warn-strong)}
+.exfb-x{font-size:13.5px;line-height:1.75;color:var(--text-2);white-space:pre-wrap}
+.exfb-refs{margin-top:11px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.exfb-refs .rl{font-size:11px;color:var(--text-3)}
+.ex-ref{font-size:12px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 10%,var(--surface));border-radius:7px;padding:3px 9px;cursor:pointer}
+.ex-ref:hover{background:color-mix(in srgb,var(--accent) 20%,var(--surface))}
+.ex-redo{font-size:11.5px;color:var(--text-3);background:none;border:0;cursor:pointer;margin-top:10px;text-decoration:underline}
+.ex-redo:hover{color:var(--text)}
+.ex-empty{color:var(--text-3);font-size:14px;padding:46px 0;text-align:center;line-height:1.7}
+.ex-setup{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:28px 24px;text-align:center}
+.ex-setup h3{font-size:17px;margin-bottom:8px}
+.ex-setup p{font-size:13px;color:var(--text-3);margin:0 auto 18px;line-height:1.7;max-width:520px}
+.ex-nsel{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.ex-note{font-size:12px;color:var(--text-3)}
+.ex-mocktop{display:flex;align-items:center;gap:14px;margin-bottom:14px;font-family:var(--mono);font-size:13px;color:var(--text-2);position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:2}
+.ex-mocktop .mt-timer{margin-left:auto;color:var(--accent)}
+.ex-prog{height:5px;background:var(--surface-3);border-radius:99px;overflow:hidden;flex:0 0 120px}
+.ex-prog i{display:block;height:100%;background:var(--accent);transition:width .2s var(--ease)}
+.ex-nav{display:flex;gap:8px;margin-top:14px;align-items:center}
+.ex-nav button{font-size:13px;padding:8px 14px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);cursor:pointer}
+.ex-nav button:hover:not(:disabled){border-color:var(--line-2)}
+.ex-nav button:disabled{opacity:.4;cursor:default}
+.ex-nav .nav-submit{margin-left:auto;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,var(--surface))}
+.ex-result{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:30px 24px;text-align:center;margin-bottom:18px}
+.ex-score{font-family:var(--mono);font-size:46px;font-weight:700;margin:8px 0;line-height:1}
+.ex-score.pass{color:var(--cat-control)}
+.ex-score.fail{color:var(--warn-strong)}
+.ex-result .rmeta{font-size:13px;color:var(--text-3);line-height:1.7}
 /* 可收合區塊 + 右側頁內目錄(TOC) */
 .dsec{margin-bottom:24px}
 .dsec-h{cursor:pointer;user-select:none}
@@ -469,6 +532,7 @@ details.acc:not([open])>summary{margin-bottom:6px}
     </svg>
     <div id="grid"></div>
     <div id="docs"></div>
+    <div id="exam"></div>
     <div id="cy"></div>
     <div class="view-cap" id="cap"></div>
     <div class="vhint" id="vhint"><span class="vhint-ico">ⓘ</span><span class="vhint-t" id="vhint-t"></span><button class="vhint-x" id="vhint-x" aria-label="關閉提示">✕</button></div>
@@ -487,7 +551,7 @@ details.acc:not([open])>summary{margin-bottom:6px}
       <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="ob-title">
         <div class="ob-eyebrow">ISMS 主導稽核員 · 互動課程筆記</div>
         <h1 id="ob-title">30 秒上手</h1>
-        <p>左側選單七個視圖：<b>① PDCA ② 風險流程 ③ AI 生命週期 ④ AI 管理系統(42001) ⑤ 附錄A 控制 ⑥ 文件·標準 ⑦ 關係總覽</b>（☰ 可收合，⌘K 快速跳）。點任一節點看白話說明；右上 <b>⚙</b> 可切「學習者 / 稽核者(LA)視角」、深淺色、疊控制；點節點會把<b>相關的跨圖高亮</b>、其餘變暗。</p>
+        <p>左側九個視圖：<b>① PDCA ② 風險流程 ③ AI 生命週期 ④ AIMS(42001) ⑤ 稽核流程 ⑥ 附錄A 控制 ⑦ 文件·標準 ⑧ 關係總覽 ⑨ 考題練習</b>（☰ 可收合，⌘K 快速跳，數字鍵 1–9 直達）。點任一節點看白話說明；右上 <b>⚙</b> 可切「學習者 / 稽核者(LA)視角」、深淺色、疊控制；點節點會把<b>相關的跨圖高亮</b>、其餘變暗。</p>
         <div class="ob-q">稽核三問當主線：<b>這是什麼架構？ · 有什麼風險？ · 產品/服務週期是什麼？</b></div>
         <div class="ob-actions">
           <button class="ob-go" id="ob-tour">▶ 帶我走一遍（稽核三問）</button>
@@ -576,6 +640,7 @@ const ICONS={
   wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
   user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  exam:'<path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.83l8.57 3.91a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
 };
 const TIER_IC={政策:"flag",程序:"clipboard",作業:"wrench",紀錄:"check2",外部:"link"};
 const FAM_IC={"核心 ISMS":"shield","整合管理系統":"layers","工程生命週期":"settings","風險":"alert","控制與實作":"controls","稽核與驗證":"audit","隱私":"lock","雲端":"cloud","事故":"zap","AI":"ai"};
@@ -1039,6 +1104,137 @@ function renderExplorer(){
   cyEl.appendChild(legendEl());
   if(selected)setTimeout(()=>cyHighlight(selected),60);}
 
+// ---------- 考題練習 (exam：練習 / 模擬考 / 錯題本) ----------
+const examEl=document.getElementById("exam");
+let EXAM=[], EX={}, exMode="practice", exTopic=null, mockState=null, mockTimer=null;
+try{EX=JSON.parse(localStorage.getItem("ismsla_exam")||"{}");}catch(e){EX={};}
+function exSave(){try{localStorage.setItem("ismsla_exam",JSON.stringify(EX));}catch(e){}}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+const EX_TYPE={single:"單選",multi:"複選",tf:"是非"};
+function arrEq(a,b){a=[...a].sort();b=[...b].sort();return a.length===b.length&&a.every((x,i)=>x===b[i]);}
+function exGrade(q,picked){return arrEq(picked||[],q.answer);}
+function examStats(){const done=EXAM.filter(q=>EX[q.id]&&EX[q.id].picked);const ok=done.filter(q=>EX[q.id].correct);return{total:EXAM.length,done:done.length,ok:ok.length,wrong:done.length-ok.length};}
+function examTopics(){return[...new Set(EXAM.map(q=>q.topic))];}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function statHTML(){const s=examStats();return `<span>題庫 <b>${s.total}</b></span><span>已練 <b>${s.done}</b></span><span>答對 <b>${s.ok}</b></span><span>正確率 <b>${s.done?Math.round(s.ok/s.done*100):0}%</b></span>`;}
+function updateExStat(){const e=examEl.querySelector(".ex-stat");if(e)e.innerHTML=statHTML();const wb=examEl.querySelector('[data-exmode="wrong"]');if(wb){const w=examStats().wrong;wb.textContent="錯題本"+(w?` (${w})`:"");}}
+
+function exFeedbackHTML(q,picked,review){
+  const ok=exGrade(q,picked);
+  let s=`<div class="exfb"><div class="exfb-h ${ok?"ok":"no"}">${ok?"✓ 正確":"✗ "+((picked||[]).length?"答錯":"未作答")} — 正解 ${q.answer.join("、")}</div>`;
+  s+=`<div class="exfb-x">${esc(q.explain)}</div>`;
+  const refs=(q.refs||[]).map(r=>{const n=byId.get(r);return n?`<button class="ex-ref" data-ref="${r}">${esc((n.ref?n.ref+" ":"")+(n.title||r))}</button>`:"";}).filter(Boolean);
+  if(refs.length)s+=`<div class="exfb-refs"><span class="rl">相關（點可跳回框架）：</span>${refs.join("")}</div>`;
+  if(!review)s+=`<button class="ex-redo" data-redo="${q.id}">↺ 重做這題</button>`;
+  return s+`</div>`;
+}
+function exCardHTML(q,opts){
+  opts=opts||{};const rec=EX[q.id];const mock=!!opts.mock;
+  const graded=!mock&&(opts.review||(!opts.fresh&&rec&&rec.picked));
+  const picked=opts.picked||(graded&&rec?rec.picked:[]);
+  let badge="";
+  if(graded)badge=exGrade(q,picked)?'<span class="exq-badge ok">✓ 答對</span>':'<span class="exq-badge no">✗ 答錯</span>';
+  let s=`<div class="exq" data-qid="${q.id}"><div class="exq-top"><span class="exq-no">${q.id.toUpperCase()}</span><span class="exq-topic">${esc(q.topic)}</span><span class="exq-type">${EX_TYPE[q.type]||""}</span>${badge}</div>`;
+  s+=`<div class="exq-stem">${esc(q.stem)}</div>`;
+  for(const o of q.options){
+    let cls="exo",mark="";
+    if(graded){const isAns=q.answer.includes(o.k),isPick=(picked||[]).includes(o.k);
+      if(isAns){cls+=" correct";mark='<span class="exo-mark" style="color:var(--cat-control)">✓</span>';}
+      else if(isPick){cls+=" wrong";mark='<span class="exo-mark" style="color:var(--warn-strong)">✗</span>';}}
+    else if((picked||[]).includes(o.k))cls+=" sel";
+    s+=`<button class="${cls}" data-k="${o.k}"${graded?" disabled":""}><span class="exo-k">${o.k}</span><span class="exo-t">${esc(o.t)}</span>${mark}</button>`;
+  }
+  if(!graded&&!mock&&q.type==="multi")s+='<button class="ex-submit" data-submit="1">對答案</button>';
+  if(graded)s+=exFeedbackHTML(q,picked,opts.review);
+  return s+`</div>`;
+}
+function renderPractice(){
+  let h=`<div class="ex-filter"><button class="lb-btn${!exTopic?" on":""}" data-extopic="">全部</button>`+examTopics().map(t=>`<button class="lb-btn${exTopic===t?" on":""}" data-extopic="${esc(t)}">${esc(t)}</button>`).join("")+`</div>`;
+  return h+EXAM.filter(q=>!exTopic||q.topic===exTopic).map(q=>exCardHTML(q)).join("");
+}
+function renderWrong(){
+  const list=EXAM.filter(q=>EX[q.id]&&EX[q.id].picked&&!EX[q.id].correct);
+  if(!list.length)return `<div class="ex-empty">${examStats().done?"目前沒有錯題 👍 全部答對！":"還沒作答——先去『練習』或『模擬考』，答錯的題會自動收進這裡。"}</div>`;
+  return `<div class="ex-note" style="margin-bottom:14px">錯題 ${list.length} 題（重練答對後，重新整理本頁即移除）：</div>`+list.map(q=>exCardHTML(q,{fresh:true})).join("");
+}
+function mockSetupHTML(){
+  const n=EXAM.length;const choices=[...[10,20,30].filter(x=>x<n),n];
+  return `<div class="ex-setup"><h3>模擬考</h3><p>從題庫隨機抽題、計時作答；交卷後看分數與逐題檢討。作答期間不顯示對錯（與真考一致）。</p>
+   <div class="ex-nsel">`+choices.map(c=>`<button class="lb-btn" data-startn="${c}">${c===n?`全部 ${n} 題`:c+" 題"}</button>`).join("")+`</div>
+   <div class="ex-note">通過參考線：70%（依實際驗證/考試標準調整）</div></div>`;
+}
+function mockQuestionHTML(){
+  const i=mockState.idx,id=mockState.order[i],q=EXAM.find(x=>x.id===id);
+  const answered=mockState.order.filter(x=>(mockState.answers[x]||[]).length).length;
+  let h=`<div class="ex-mocktop"><span>第 ${i+1} / ${mockState.order.length} 題</span><span class="ex-prog"><i style="width:${Math.round((i+1)/mockState.order.length*100)}%"></i></span><span class="mt-ans">已答 ${answered}</span><span class="mt-timer" id="mt-timer">00:00</span></div>`;
+  h+=exCardHTML(q,{mock:true,picked:mockState.answers[id]||[]});
+  h+=`<div class="ex-nav"><button data-mnav="prev"${i===0?" disabled":""}>‹ 上一題</button><button data-mnav="next"${i===mockState.order.length-1?" disabled":""}>下一題 ›</button><button class="nav-submit" data-mnav="submit">交卷</button></div>`;
+  return h;
+}
+function mockResultHTML(){
+  const n=mockState.order.length,ok=mockState.ok,pct=Math.round(ok/n*100),pass=pct>=70;
+  const mm=String(Math.floor(mockState.elapsed/60)).padStart(2,"0"),ss=String(mockState.elapsed%60).padStart(2,"0");
+  let h=`<div class="ex-result"><div class="ob-eyebrow">模擬考結果</div><div class="ex-score ${pass?"pass":"fail"}">${pct}%</div><div class="rmeta">答對 ${ok} / ${n}　·　用時 ${mm}:${ss}　·　通過參考線 70%（${pass?"達標 ✓":"未達 ✗"}）</div><button class="ex-submit" data-again="1" style="margin-top:16px">再考一次</button></div>`;
+  h+=`<div class="ex-note" style="margin-bottom:14px">逐題檢討（綠＝正解、紅＝你選錯）：</div>`;
+  return h+mockState.order.map(id=>{const q=EXAM.find(x=>x.id===id);return exCardHTML(q,{review:true,picked:mockState.answers[id]||[]});}).join("");
+}
+function renderMock(){if(!mockState)return mockSetupHTML();return mockState.submitted?mockResultHTML():mockQuestionHTML();}
+function startMock(n){mockState={order:shuffle(EXAM.map(q=>q.id)).slice(0,n),idx:0,answers:{},started:Date.now(),submitted:false};renderExam();}
+function submitMock(){
+  if(mockTimer){clearInterval(mockTimer);mockTimer=null;}
+  mockState.submitted=true;mockState.elapsed=Math.floor((Date.now()-mockState.started)/1000);
+  let ok=0;for(const id of mockState.order){const q=EXAM.find(x=>x.id===id);const picked=mockState.answers[id]||[];const correct=exGrade(q,picked);if(correct)ok++;EX[id]={picked,correct,ts:Date.now()};}
+  mockState.ok=ok;exSave();renderExam();
+}
+function startMockTimer(){
+  if(mockTimer)clearInterval(mockTimer);
+  if(!mockState||mockState.submitted||!examEl.querySelector("#mt-timer"))return;
+  const upd=()=>{const t=examEl.querySelector("#mt-timer");if(!t){clearInterval(mockTimer);mockTimer=null;return;}const s=Math.floor((Date.now()-mockState.started)/1000);t.textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");};
+  upd();mockTimer=setInterval(upd,1000);
+}
+function rebuildCard(card,q,opts){const tmp=document.createElement("div");tmp.innerHTML=exCardHTML(q,opts);const nw=tmp.firstElementChild;card.replaceWith(nw);wireCard(nw);}
+function wireCard(card){
+  const qid=card.dataset.qid,q=EXAM.find(x=>x.id===qid);if(!q)return;
+  card.querySelectorAll("[data-ref]").forEach(b=>b.onclick=()=>select(b.dataset.ref));
+  const redo=card.querySelector("[data-redo]");if(redo)redo.onclick=()=>{delete EX[qid];exSave();rebuildCard(card,q,{fresh:true});updateExStat();};
+  const live=[...card.querySelectorAll(".exo:not(:disabled)")];if(!live.length)return;
+  if(q.type==="multi"){
+    live.forEach(o=>o.onclick=()=>o.classList.toggle("sel"));
+    const sub=card.querySelector("[data-submit]");if(sub)sub.onclick=()=>commitAnswer(card,q,live.filter(o=>o.classList.contains("sel")).map(o=>o.dataset.k));
+  }else live.forEach(o=>o.onclick=()=>commitAnswer(card,q,[o.dataset.k]));
+}
+function commitAnswer(card,q,picked){EX[q.id]={picked,correct:exGrade(q,picked),ts:Date.now()};exSave();rebuildCard(card,q,{});updateExStat();}
+function wireMock(){
+  examEl.querySelectorAll("[data-startn]").forEach(b=>b.onclick=()=>startMock(+b.dataset.startn));
+  examEl.querySelectorAll("[data-ref]").forEach(b=>b.onclick=()=>select(b.dataset.ref));
+  const again=examEl.querySelector("[data-again]");if(again)again.onclick=()=>{mockState=null;renderExam();};
+  if(!mockState||mockState.submitted)return;
+  const card=examEl.querySelector(".exq");
+  if(card){const id=card.dataset.qid,q=EXAM.find(x=>x.id===id),opts=[...card.querySelectorAll(".exo")];
+    opts.forEach(o=>o.onclick=()=>{const k=o.dataset.k;let cur=mockState.answers[id]||[];
+      cur=q.type==="multi"?(cur.includes(k)?cur.filter(x=>x!==k):[...cur,k]):[k];
+      mockState.answers[id]=cur;opts.forEach(x=>x.classList.toggle("sel",cur.includes(x.dataset.k)));
+      const a=examEl.querySelector(".mt-ans");if(a)a.textContent="已答 "+mockState.order.filter(x=>(mockState.answers[x]||[]).length).length;});}
+  examEl.querySelectorAll("[data-mnav]").forEach(b=>b.onclick=()=>{const a=b.dataset.mnav;
+    if(a==="submit"){submitMock();return;}
+    if(a==="prev"&&mockState.idx>0)mockState.idx--;else if(a==="next"&&mockState.idx<mockState.order.length-1)mockState.idx++;
+    renderExam();});
+  startMockTimer();
+}
+function renderExam(){
+  if(mockTimer){clearInterval(mockTimer);mockTimer=null;}
+  if(!EXAM.length){examEl.innerHTML=`<div class="ex-wrap"><div class="ex-empty">題庫尚未載入（data/exam.json 為空或需以 http 開啟）。</div></div>`;return;}
+  const st=examStats(),modes=[["practice","練習"],["mock","模擬考"],["wrong","錯題本"]];
+  let h=`<div class="ex-wrap"><div class="ex-modes">`+modes.map(([k,n])=>`<button class="lb-btn${exMode===k?" on":""}" data-exmode="${k}">${n}${k==="wrong"&&st.wrong?` (${st.wrong})`:""}</button>`).join("")+`</div>`;
+  h+=`<div class="ex-stat">${statHTML()}</div>`;
+  h+=exMode==="mock"?renderMock():exMode==="wrong"?renderWrong():renderPractice();
+  examEl.innerHTML=h+`</div>`;
+  examEl.querySelectorAll("[data-exmode]").forEach(b=>b.onclick=()=>{exMode=b.dataset.exmode;renderExam();});
+  if(exMode==="mock"){wireMock();return;}
+  examEl.querySelectorAll("[data-extopic]").forEach(b=>b.onclick=()=>{exTopic=b.dataset.extopic||null;renderExam();});
+  examEl.querySelectorAll(".exq").forEach(card=>wireCard(card));
+}
+
 // ---------- view switching ----------
 const VIEWS={pdca:{n:"圖一",t:"PDCA 運轉",r:renderPDCA,cap:"圖一 · ISMS PDCA 運轉（條款 4–10）"},
   risk:{n:"圖二",t:"風險流程",r:renderRisk,cap:"圖二 · 風險管理流程（ISO 31000 / 27005）"},
@@ -1047,7 +1243,8 @@ const VIEWS={pdca:{n:"圖一",t:"PDCA 運轉",r:renderPDCA,cap:"圖一 · ISMS P
   audit:{n:"稽核",t:"稽核流程",r:renderAuditFlow,cap:"ISO 19011 · 管理系統稽核流程（如何稽核：啟動→文審→現場→報告→跟催）"},
   controls:{n:"附錄A",t:"控制措施",r:renderControls,cap:"附錄 A · 93 控制措施（4 主題）"},
   docs:{n:"文件",t:"文件·標準",r:renderDocs,cap:"ISMS 文件化資訊清單（7.5）+ ISO 27000 標準家族"},
-  explorer:{n:"總覽",t:"關係總覽",r:renderExplorer,cap:"關係總覽 · 只顯示有關係的節點（節點大小＝連線數；孤立控制見附錄A）"}};
+  explorer:{n:"總覽",t:"關係總覽",r:renderExplorer,cap:"關係總覽 · 只顯示有關係的節點（節點大小＝連線數；孤立控制見附錄A）"},
+  exam:{n:"測驗",t:"考題練習",r:renderExam,cap:"考題練習 · 純練習題（練習 / 模擬考 / 錯題本，作答存本機）"}};
 // ---------- 每視圖「怎麼看」引導提示條 ----------
 let hintDismissed=new Set();try{hintDismissed=new Set(JSON.parse(localStorage.getItem("iso_hints")||"[]"));}catch(e){}
 const HINTS={
@@ -1059,6 +1256,7 @@ const HINTS={
   controls:"附錄A＝93 控制(4 主題，標題可收合)。切『稽核者視角』每條看稽核三件組；面板可標稽核底稿狀態，這裡看進度。右側目錄可跳主題。",
   docs:"文件·標準＝上方文件金字塔(點層篩選)＋下方標準家族(可收合，點卡看血緣)；右側目錄可跳段。",
   explorer:"關係總覽＝知識圖，只顯示有關係的節點(大小＝連線數)。點節點看它連到誰；點圖例可篩選類別。",
+  exam:"考題練習＝三模式：『練習』作答即時對答＋解析；『模擬考』抽題計時、交卷出分＋逐題檢討；『錯題本』收答錯的題重練。每題解析下方『相關』可跳回對應條款。",
 };
 // 頁內目錄 overlay（☰ → 置中彈出）
 let tocSections=[];
@@ -1075,7 +1273,7 @@ const vhint=document.getElementById("vhint"),vhintT=document.getElementById("vhi
 function showHint(k){if(!HINTS[k]||hintDismissed.has(k)){vhint.classList.remove("show");return;}vhintT.textContent=HINTS[k];vhint.classList.add("show");}
 document.getElementById("vhint-x").addEventListener("click",()=>{hintDismissed.add(curView);try{localStorage.setItem("iso_hints",JSON.stringify([...hintDismissed]));}catch(e){}vhint.classList.remove("show");});
 function resetHints(){hintDismissed.clear();try{localStorage.removeItem("iso_hints");}catch(e){}showHint(curView);toast("已重新開啟所有視圖提示");}
-const RAIL_GROUPS=[["圖解 Diagrams",["pdca","risk","ai","aims"]],["稽核 Audit",["audit"]],["清單 Lists",["controls","docs"]],["探索 Explore",["explorer"]]];
+const RAIL_GROUPS=[["圖解 Diagrams",["pdca","risk","ai","aims"]],["稽核 Audit",["audit"]],["清單 Lists",["controls","docs"]],["探索 Explore",["explorer"]],["測驗 Practice",["exam"]]];
 function buildRail(){const r=document.getElementById("rail");r.innerHTML="";
   for(const[gname,keys]of RAIL_GROUPS){const g=document.createElement("div");g.className="rail-group";
     g.innerHTML=`<div class="rail-group-h">${gname}</div>`;
@@ -1087,11 +1285,12 @@ function switchView(k){
   const changed=k!==curView;
   const run=()=>{curView=k;buildRail();document.getElementById("cap").textContent=VIEWS[k].cap;
     document.getElementById("view-title").textContent=VIEWS[k].n+" · "+VIEWS[k].t;
-    const isGrid=k==="controls",isExp=k==="explorer",isDocs=k==="docs",htmlView=isGrid||isExp||isDocs;
-    svg.style.display=htmlView?"none":"block";grid.classList.toggle("show",isGrid);docsEl.classList.toggle("show",isDocs);cyEl.classList.toggle("show",isExp);
-    document.getElementById("cap").style.display=(isGrid||isDocs)?"none":"block";  // 滾動型 HTML 視圖不浮 caption
-    if(isGrid)renderControls();else if(isExp)renderExplorer();else if(isDocs)renderDocs();else{scene.replaceChildren();VIEWS[k].r();}
-    if(selected){if(isExp)cyHighlight(selected);else if(isGrid)highlight(selected);else if(!isDocs&&scene.querySelector('.node[data-id="'+CSS.escape(selected)+'"]'))highlight(selected);}
+    const isGrid=k==="controls",isExp=k==="explorer",isDocs=k==="docs",isExam=k==="exam",htmlView=isGrid||isExp||isDocs||isExam;
+    if(mockTimer&&!isExam){clearInterval(mockTimer);mockTimer=null;}
+    svg.style.display=htmlView?"none":"block";grid.classList.toggle("show",isGrid);docsEl.classList.toggle("show",isDocs);examEl.classList.toggle("show",isExam);cyEl.classList.toggle("show",isExp);
+    document.getElementById("cap").style.display=(isGrid||isDocs||isExam)?"none":"block";  // 滾動型 HTML 視圖不浮 caption
+    if(isGrid)renderControls();else if(isExp)renderExplorer();else if(isDocs)renderDocs();else if(isExam)renderExam();else{scene.replaceChildren();VIEWS[k].r();}
+    if(selected){if(isExp)cyHighlight(selected);else if(isGrid)highlight(selected);else if(!isDocs&&!isExam&&scene.querySelector('.node[data-id="'+CSS.escape(selected)+'"]'))highlight(selected);}
     updateHash();showHint(k);};
   // View Transitions API：切視圖平滑過場（尊重 reduced-motion；同視圖不過場）
   if(changed&&document.startViewTransition&&!REDUCE_MOTION)document.startViewTransition(run);else run();}
@@ -1335,14 +1534,14 @@ cmdkInput.addEventListener("keydown",e=>{
 cmdkEl.addEventListener("click",e=>{if(e.target===cmdkEl)closeCmdk();});
 
 // ---------- 鍵盤快捷鍵 + 說明 ----------
-const SHORTCUTS=[["⌘K / Ctrl K","命令面板（跳任何東西）"],["1 – 8","切換八個視圖"],["g","切 學習／稽核者視角"],["t","切 深／淺色"],["\\","收合／展開左側選單"],["/","聚焦搜尋"],["?","顯示此快捷鍵表"],["Esc","關閉面板／選單"]];
+const SHORTCUTS=[["⌘K / Ctrl K","命令面板（跳任何東西）"],["1 – 9","切換九個視圖（9＝考題）"],["g","切 學習／稽核者視角"],["t","切 深／淺色"],["\\","收合／展開左側選單"],["/","聚焦搜尋"],["?","顯示此快捷鍵表"],["Esc","關閉面板／選單"]];
 function openHelp(){document.getElementById("help-grid").innerHTML=SHORTCUTS.map(([k,d])=>`<kbd>${k}</kbd><span>${d}</span>`).join("");document.getElementById("help").classList.add("show");document.getElementById("help-close").focus();}
 function closeHelp(){document.getElementById("help").classList.remove("show");}
 document.getElementById("help-close").addEventListener("click",closeHelp);
 document.addEventListener("keydown",e=>{
   if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();openCmdk();return;}
   const tag=(e.target.tagName||"").toLowerCase();if(tag==="input"||tag==="textarea"||e.target.isContentEditable||e.metaKey||e.ctrlKey||e.altKey)return;
-  const vk={"1":"pdca","2":"risk","3":"ai","4":"aims","5":"audit","6":"controls","7":"docs","8":"explorer"};
+  const vk={"1":"pdca","2":"risk","3":"ai","4":"aims","5":"audit","6":"controls","7":"docs","8":"explorer","9":"exam"};
   if(vk[e.key])switchView(vk[e.key]);
   else if(e.key==="g"){setMode(mode==="learn"?"audit":"learn");if(selected)openPanel(byId.get(selected));updateHash();}
   else if(e.key==="t")setTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light");
@@ -1429,6 +1628,7 @@ document.getElementById("ob-tour").addEventListener("click",startTour);
   try{const sr=await fetch("./data/supplements.json");if(sr.ok){const sup=await sr.json();for(const it of (sup.items||[])){const n=byId.get(it.nodeId);if(n)(n.supplements=n.supplements||[]).push(it);}}}catch(e){}
   try{const dr=await fetch("./data/documents.json");if(dr.ok)DOCS=(await dr.json()).items||[];}catch(e){}
   try{const tr=await fetch("./data/standards.json");if(tr.ok)STDS=(await tr.json()).items||[];}catch(e){}
+  try{const er=await fetch("./data/exam.json");if(er.ok)EXAM=(await er.json()).items||[];}catch(e){}
   for(const d of DOCS)if(d.nodeId&&byId.has(d.nodeId))(docsByNode.get(d.nodeId)||docsByNode.set(d.nodeId,[]).get(d.nodeId)).push(d);
   stdById=new Map(STDS.map(s=>[s.id,s]));
   for(const s of STDS)for(const nid of (s.nodes||[]))if(byId.has(nid))(stdsByNode.get(nid)||stdsByNode.set(nid,[]).get(nid)).push(s);
