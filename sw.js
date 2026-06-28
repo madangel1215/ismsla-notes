@@ -28,18 +28,30 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  const isHTML = req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html");
+  const isData = url.origin === location.origin && url.pathname.endsWith(".json");
+  // HTML 與同源 JSON 內容 → network-first：線上拿最新(部署/CMS 編輯立即生效)，離線退快取
+  if (isHTML || isData) {
+    e.respondWith((async () => {
+      try {
+        const res = await fetch(req);
+        if (res && res.ok) { const c = await caches.open(CACHE); c.put(req, res.clone()); }
+        return res;
+      } catch (err) {
+        return (await caches.match(req)) || (isHTML && await caches.match("index.html")) || Response.error();
+      }
+    })());
+    return;
+  }
+  // 其餘(釘版 CDN、圖示、og-image) → cache-first
   e.respondWith((async () => {
     const cached = await caches.match(req);
     if (cached) return cached;
     try {
       const res = await fetch(req);
-      if (res && res.ok && new URL(req.url).origin === location.origin) {
-        const c = await caches.open(CACHE);
-        c.put(req, res.clone());
-      }
+      if (res && res.ok && url.origin === location.origin) { const c = await caches.open(CACHE); c.put(req, res.clone()); }
       return res;
-    } catch (err) {
-      return cached || Response.error();
-    }
+    } catch (err) { return cached || Response.error(); }
   })());
 });
