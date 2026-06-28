@@ -339,10 +339,12 @@ details.acc:not([open])>summary{margin-bottom:6px}
 .tc-nav button:hover{color:var(--text);border-color:var(--line-2)}
 .tc-nav button:disabled{opacity:.4;cursor:default}
 @media (max-width:880px){.search{width:150px}.panel{width:auto;left:14px}}
+.rail-scrim{display:none}
 @media (max-width:760px){
   .view-title{display:none}
   .rail{position:fixed;top:52px;bottom:0;left:0;width:206px!important;transform:translateX(-100%);box-shadow:0 20px 60px rgba(0,0,0,.55)}
   .rail.open{transform:none}
+  .rail.open ~ .rail-scrim{display:block;position:fixed;inset:52px 0 0 0;background:rgba(0,0,0,.45);z-index:13}
   .rail.collapsed .ri-label,.rail.collapsed .rail-group-h{display:revert}
   .rail.collapsed .rail-item{justify-content:flex-start;padding:9px 10px}
 }
@@ -432,6 +434,7 @@ details.acc:not([open])>summary{margin-bottom:6px}
   </header>
   <div class="body">
     <nav class="rail" id="rail" aria-label="主導覽"></nav>
+    <div class="rail-scrim" id="rail-scrim"></div>
     <div class="stage">
     <svg id="canvas" preserveAspectRatio="xMidYMid meet">
       <defs>
@@ -461,9 +464,9 @@ details.acc:not([open])>summary{margin-bottom:6px}
       <div class="tc-nav"><button id="tc-prev">‹</button><button id="tc-next">下一步 ›</button><button id="tc-exit">結束</button></div>
     </div>
     <div class="modal" id="onboard">
-      <div class="modal-card">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="ob-title">
         <div class="ob-eyebrow">ISMS 主導稽核員 · 互動課程筆記</div>
-        <h1>30 秒上手</h1>
+        <h1 id="ob-title">30 秒上手</h1>
         <p>左側選單七個視圖：<b>① PDCA ② 風險流程 ③ AI 生命週期 ④ AI 管理系統(42001) ⑤ 附錄A 控制 ⑥ 文件·標準 ⑦ 關係總覽</b>（☰ 可收合，⌘K 快速跳）。點任一節點看白話說明；右上 <b>⚙</b> 可切「學習者 / 稽核者(LA)視角」、深淺色、疊控制；點節點會把<b>相關的跨圖高亮</b>、其餘變暗。</p>
         <div class="ob-q">稽核三問當主線：<b>這是什麼架構？ · 有什麼風險？ · 產品/服務週期是什麼？</b></div>
         <div class="ob-actions">
@@ -482,9 +485,9 @@ details.acc:not([open])>summary{margin-bottom:6px}
     </div>
   </div>
   <div class="modal" id="help">
-    <div class="modal-card" style="max-width:440px">
+    <div class="modal-card" style="max-width:440px" role="dialog" aria-modal="true" aria-labelledby="help-title">
       <div class="ob-eyebrow">鍵盤快捷鍵 · Keyboard</div>
-      <h1 style="font-size:22px">快捷鍵</h1>
+      <h1 id="help-title" style="font-size:22px">快捷鍵</h1>
       <div class="help-grid" id="help-grid"></div>
       <div class="ob-actions"><button class="ob-skip" id="help-close">關閉 (Esc)</button></div>
     </div>
@@ -717,7 +720,7 @@ function renderAIMS(){
     scene.append(el("path",{class:"ring",d:`M${p1.x},${p1.y} Q${cpx},${cpy} ${p2.x},${p2.y}`,"marker-end":"url(#ah)"}));
     scene.append(tx(mx+ox/od*66,my+oy/od*66+4,"ring-label",lab));}
   for(const n of [N.n6,N.n78,N.n9,N.n10]){const p1=edgePt(C,n,2),p2=edgePt(n,C,2);scene.append(el("line",{class:"spoke",x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y}));}
-  const ringDisc=(cid,name,num,n,center)=>{const g=el("g",{class:"node","data-id":cid});
+  const ringDisc=(cid,name,num,n,center)=>{const g=el("g",{class:"node","data-id":cid,"aria-label":name+" "+num});
     g.append(el("circle",{class:"disc"+(center?" center":""),cx:n.x,cy:n.y,r:n.r}));
     g.append(tx(n.x,n.y+2,"nm",name));g.append(tx(n.x,n.y+22,"num","["+num+"]"));
     click(g,()=>{selected=cid;scene.querySelectorAll(".node").forEach(x=>x.classList.toggle("sel",x===g));openPanel(byId.get(cid));updateHash();});scene.append(g);};
@@ -727,7 +730,7 @@ function renderAIMS(){
   ringDisc("clause-10.1","改善","10",N.n10);
   ringDisc("clause-5.1","領導作為","5",C,true);
   // AI 專屬側欄（自訂導向：標準面板 / 圖三）
-  const aiSat=(label,sub,x,y,w,h,fn)=>{const g=el("g",{class:"node"});
+  const aiSat=(label,sub,x,y,w,h,fn)=>{const g=el("g",{class:"node","aria-label":sub?label+"，"+sub:label});
     g.append(el("rect",{class:"box dash",x,y,width:w,height:h,rx:10}));
     g.append(tx(x+w/2,y+(sub?h/2-6:h/2+5),"nm sm",label,{"text-anchor":"middle"}));
     if(sub)g.append(tx(x+w/2,y+h/2+13,"sub",sub,{"text-anchor":"middle"}));
@@ -1061,14 +1064,15 @@ document.addEventListener("click",e=>{if(!e.target.closest(".menu-wrap"))closeSe
 document.getElementById("rail-toggle").addEventListener("click",()=>{
   if(window.innerWidth<=760)railEl.classList.toggle("open");
   else{const c=railEl.classList.toggle("collapsed");try{localStorage.setItem("iso_rail",c?"1":"0");}catch(e){}}});
+document.getElementById("rail-scrim").addEventListener("click",()=>railEl.classList.remove("open"));
 (function(){try{if(localStorage.getItem("iso_rail")==="1"&&window.innerWidth>760)railEl.classList.add("collapsed");}catch(e){}})();
 
 // overlay toggle
-document.getElementById("overlay-btn").addEventListener("click",function(){overlay=!overlay;this.classList.toggle("on",overlay);
+document.getElementById("overlay-btn").addEventListener("click",function(){overlay=!overlay;this.classList.toggle("on",overlay);this.setAttribute("aria-pressed",overlay);
   if(curView==="pdca"){scene.replaceChildren();renderPDCA();if(selected)highlight(selected);}updateHash();});
 // learner <-> auditor(LA) view mode
 const modeBtn=document.getElementById("mode-btn");
-function setMode(m){mode=m;modeBtn.classList.toggle("on",m==="audit");document.getElementById("mode-label").textContent=m==="audit"?"稽核者視角":"學習者視角";}
+function setMode(m){mode=m;modeBtn.classList.toggle("on",m==="audit");modeBtn.setAttribute("aria-pressed",m==="audit");document.getElementById("mode-label").textContent=m==="audit"?"稽核者視角":"學習者視角";}
 modeBtn.addEventListener("click",()=>{setMode(mode==="learn"?"audit":"learn");if(selected)openPanel(byId.get(selected));updateHash();});
 // theme (dark / light)
 const themeBtn=document.getElementById("theme-btn");
@@ -1188,7 +1192,7 @@ cmdkEl.addEventListener("click",e=>{if(e.target===cmdkEl)closeCmdk();});
 
 // ---------- 鍵盤快捷鍵 + 說明 ----------
 const SHORTCUTS=[["⌘K / Ctrl K","命令面板（跳任何東西）"],["1 – 8","切換八個視圖"],["g","切 學習／稽核者視角"],["t","切 深／淺色"],["\\","收合／展開左側選單"],["/","聚焦搜尋"],["?","顯示此快捷鍵表"],["Esc","關閉面板／選單"]];
-function openHelp(){document.getElementById("help-grid").innerHTML=SHORTCUTS.map(([k,d])=>`<kbd>${k}</kbd><span>${d}</span>`).join("");document.getElementById("help").classList.add("show");}
+function openHelp(){document.getElementById("help-grid").innerHTML=SHORTCUTS.map(([k,d])=>`<kbd>${k}</kbd><span>${d}</span>`).join("");document.getElementById("help").classList.add("show");document.getElementById("help-close").focus();}
 function closeHelp(){document.getElementById("help").classList.remove("show");}
 document.getElementById("help-close").addEventListener("click",closeHelp);
 document.addEventListener("keydown",e=>{
@@ -1204,7 +1208,6 @@ document.addEventListener("keydown",e=>{
 // ---------- 列印稽核清單 (PDF) ----------
 function buildPrintChecklist(){
   const pa=document.getElementById("print-area");
-  const theme=document.documentElement.getAttribute("data-theme")||"dark";
   const stName={conform:"✔ 符合",observe:"△ 觀察",nc:"✘ 不符合"};
   const prNode=(n)=>{const w=WS[n.id]||{};let s=`<div class="pr-node"><h3><span class="pr-ref">${n.ref||""}</span>${n.title||""}${w.status?` — ${stName[w.status]||""}`:""}</h3>`;
     if(n.audit?.questions?.length)s+=`<div class="pr-block"><b>稽核問句</b>`+n.audit.questions.map(q=>`<div class="pr-q">${q}</div>`).join("")+`</div>`;
@@ -1291,7 +1294,7 @@ document.getElementById("ob-tour").addEventListener("click",startTour);
   buildRail();
   const firstVisit = location.hash.length<=1;   // capture before switchView rewrites the hash
   if(location.hash.length>1)applyHash();else switchView("pdca");
-  try{ if(firstVisit && !localStorage.getItem("iso_seen")) document.getElementById("onboard").classList.add("show"); }catch(e){}
+  try{ if(firstVisit && !localStorage.getItem("iso_seen")){ document.getElementById("onboard").classList.add("show"); document.getElementById("ob-tour").focus(); } }catch(e){}
 })();
 // ---------- 統一 Esc（單一優先序，只關最上層；不會誤關詳情面板） ----------
 document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;

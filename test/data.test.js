@@ -179,6 +179,19 @@ describe("建置可重現性 (zones → data.json，防手改衍生檔漂移)", 
   });
 });
 
+describe("版本一致性 (防 sw 快取不失效 / 部署漏更新)", () => {
+  const v = data.meta.version;
+  it("package.json version === data.meta.version", () => {
+    const pkg = JSON.parse(readFileSync(join(here, "../package.json"), "utf8"));
+    expect(pkg.version).toBe(v);
+  });
+  it("sw.js CACHE 版本 === data.meta.version", () => {
+    const sw = readFileSync(join(here, "../sw.js"), "utf8");
+    const swV = (sw.match(/ismsla-v([\d.]+)/) || [])[1];
+    expect(swV).toBe(v);
+  });
+});
+
 describe("文件化資訊 + ISO 27000 家族 (參考資料)", () => {
   const ajvV = (sch, doc) => {
     const ajv = new Ajv({ allErrors: true });
