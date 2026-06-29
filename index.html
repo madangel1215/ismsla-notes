@@ -264,6 +264,8 @@ details.exfb:not([open])>summary::after{transform:rotate(-90deg)}
 .exfb-toggle{font-size:11px;font-weight:400;color:var(--text-3);margin-left:8px}
 .exfb-body{margin-top:9px}
 .exfb-x{font-size:13.5px;line-height:1.75;color:var(--text-2);white-space:pre-wrap}
+.exfb-verify{margin-top:11px;padding:9px 12px;font-size:12.5px;line-height:1.7;color:var(--text-2);white-space:pre-wrap;border:1px solid var(--warn-strong);border-left-width:3px;border-radius:8px;background:color-mix(in srgb,var(--warn-strong) 9%,var(--surface))}
+.exfb-verify-h{display:inline-block;margin-right:7px;font-weight:600;font-size:11.5px;color:var(--warn-strong);letter-spacing:.02em}
 .exfb-refs{margin-top:11px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .exfb-refs .rl{font-size:11px;color:var(--text-3)}
 .ex-ref{font-size:12px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 10%,var(--surface));border-radius:7px;padding:3px 9px;cursor:pointer}
@@ -1306,6 +1308,7 @@ function exFeedbackHTML(q,picked,review){
   let s=`<details class="exfb" open><summary class="exfb-h ${ok?"ok":"no"}">${head}<span class="exfb-toggle">解析</span></summary><div class="exfb-body">`;
   if(q.type==="order")s+=`<div class="ord-ans"><span class="rl">正解順序：</span>`+q.answer.map((k,i)=>`<span class="ord-ans-i">${i+1}. ${esc((q.options.find(o=>o.k===k)||{}).t||k)}</span>`).join("")+`</div>`;
   s+=`<div class="exfb-x">${esc(q.explain)}</div>`;
+  if(q.verify)s+=`<div class="exfb-verify"><span class="exfb-verify-h">⚠ 待理清</span>${esc(q.verify)}</div>`;
   const refs=(q.refs||[]).map(r=>{const n=byId.get(r);return n?`<button class="ex-ref" data-ref="${r}">${esc((n.ref?n.ref+" ":"")+(n.title||r))}</button>`:"";}).filter(Boolean);
   if(refs.length)s+=`<div class="exfb-refs"><span class="rl">相關（點可跳回框架）：</span>${refs.join("")}</div>`;
   if(!review)s+=`<button class="ex-redo" data-redo="${q.id}">↺ 重做這題</button>`;
